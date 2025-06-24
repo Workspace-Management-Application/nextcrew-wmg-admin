@@ -10,8 +10,10 @@ Rails.application.routes.draw do
     resources :workspaces, only: [:show, :create, :update, :destroy] do
       member do
         get 'search_by_phone_number'
+        get 'get_data_for_room'
       end
     end
+    resources :bookings
   end
 
   # Web routes (optional - for admin interface)

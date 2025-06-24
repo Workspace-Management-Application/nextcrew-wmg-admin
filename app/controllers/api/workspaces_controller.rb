@@ -1,9 +1,16 @@
 class Api::WorkspacesController < Api::BaseController
-  # skip_before_action :authenticate_user!, only: [:search_by_phone_number]
   before_action :authenticate_user!
   before_action :set_workspace
 
-  # GET /api/workspaces/search_by_phone_number?phone_number=...
+  def get_data_for_room
+    room = @workspace.rooms
+    if room
+      render_success(room)
+    else
+      render_error("Room not found", :not_found)
+    end
+  end
+
   def search_by_phone_number
     company = @workspace.companies.find_by(phone_number: params[:phone_number])
     if company
