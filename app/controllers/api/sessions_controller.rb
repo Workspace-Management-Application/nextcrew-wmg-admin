@@ -4,16 +4,32 @@ class Api::SessionsController < Devise::SessionsController
 
   # POST /api/login
   def create
-    self.resource = warden.authenticate!(scope: :user)
-    sign_in(resource_name, resource)
-    data = {}
-    data = {
-      token: request.env['warden-jwt_auth.token'],
-      user: resource.as_json(only: [:id, :email, :name]),
-      workspace_id: resource.workspace&.id
-    }
+    # Find user by email, if not found return 404
+    user = User.find_by_email(params[:user][:email])
 
-    render json:{ message: 'Logged in successfully', data: data }, status: :ok
+    # Handle case where user doesn't exist
+    if user.nil?
+      return render json: { error: 'User not found' }, status: :not_found
+    end
+
+    # Validate user password
+    if user.valid_password?(params[:user][:password])
+      # Skip the warden.authenticate! since we already validated the password
+      sign_in(resource_name, user)
+
+      # Prepare data to send back in the response
+      data = {
+        token: request.env['warden-jwt_auth.token'],  # Get JWT token
+        user: user.as_json(only: [:id, :email, :name]),  # Only expose essential fields
+        workspace_id: user.workspace&.id  # Get associated workspace if exists
+      }
+
+      # Send success response
+      render json: { message: 'Logged in successfully', data: data }, status: :ok
+    else
+      # Invalid password error response
+      render json: { error: 'Invalid credentials' }, status: :unauthorized
+    end
   end
 
   # DELETE /api/logout
