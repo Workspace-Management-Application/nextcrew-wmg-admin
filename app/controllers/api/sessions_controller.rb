@@ -10,7 +10,7 @@ class Api::SessionsController < Devise::SessionsController
     data = {
       token: request.env['warden-jwt_auth.token'],
       user: resource.as_json(only: [:id, :email, :name]),
-      # workspace_id: resource.workspace&.id
+      workspace_id: resource.workspace&.id
     }
 
     render json:{ message: 'Logged in successfully', data: data }, status: :ok

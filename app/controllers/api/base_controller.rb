@@ -65,7 +65,7 @@ class Api::BaseController < ApplicationController
   end
 
   # Method to render a successful response
-  def render_success(data, status = :ok)
-    render json: data, status: status
+  def render_success(data, message = "success" , status = :ok)
+    render json: { message: message, data: data }, status: status
   end
 end

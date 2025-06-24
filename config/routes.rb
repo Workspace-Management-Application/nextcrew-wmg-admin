@@ -7,9 +7,11 @@ Rails.application.routes.draw do
     }, skip: [:registrations]  # Skip registrations if you're handling them separately for the API
     
     resources :users, only: [:create, :show, :update]  # Add necessary user actions for API
-    
-    get 'workspaces/search_by_phone_number', to: 'workspaces#search_by_phone_number'
-    resources :workspaces, only: []
+    resources :workspaces, only: [:show, :create, :update, :destroy] do
+      member do
+        get 'search_by_phone_number'
+      end
+    end
   end
 
   # Web routes (optional - for admin interface)
