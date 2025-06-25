@@ -1,10 +1,11 @@
 class Api::BookingsController < Api::BaseController
   before_action :authenticate_user!
+  before_action :set_workspace
   before_action :set_booking, only: [:show, :update, :destroy]
 
   # GET /api/bookings
   def index
-    bookings = Booking.all
+    bookings = Booking.where(room_id: @workspace.rooms.select(:id))
     render_success(bookings)
   end
 
@@ -20,6 +21,9 @@ class Api::BookingsController < Api::BaseController
   # POST /api/bookings
   def create
     booking = current_user.bookings.new(booking_params)
+    unless @workspace.rooms.exists?(id: booking.room_id)
+      return render_error('Room does not belong to this workspace', :unprocessable_entity)
+    end
     if booking.save
       render_success(booking, 'Booking created successfully', :created)
     else
@@ -30,6 +34,9 @@ class Api::BookingsController < Api::BaseController
   # PATCH/PUT /api/bookings/:id
   def update
     if @booking
+      if booking_params[:room_id] && !@workspace.rooms.exists?(id: booking_params[:room_id])
+        return render_error('Room does not belong to this workspace', :unprocessable_entity)
+      end
       if @booking.update(booking_params)
         render_success(@booking, 'Booking updated successfully')
       else
@@ -52,8 +59,13 @@ class Api::BookingsController < Api::BaseController
 
   private
 
+  def set_workspace
+    @workspace = Workspace.find_by(id: params[:workspace_id])
+    render_error('Workspace not found', :not_found) unless @workspace
+  end
+
   def set_booking
-    @booking = Booking.find_by(id: params[:id])
+    @booking = Booking.where(room_id: @workspace.rooms.select(:id)).find_by(id: params[:id])
   end
 
   def booking_params
