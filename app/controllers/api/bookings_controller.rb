@@ -57,6 +57,6 @@ class Api::BookingsController < Api::BaseController
   end
 
   def booking_params
-    params.require(:booking).permit(:booker_name, :phone_number, :room_id, :start_time, :end_time, :purpose, :status)
+    params.require(:booking).permit(:booker_name, :phone_number, :room_id, :start_time, :end_time, :status)
   end
 end

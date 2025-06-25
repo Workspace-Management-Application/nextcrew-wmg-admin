@@ -4,7 +4,7 @@ class Booking < ApplicationRecord
 
   enum :status, { confirmed: 'confirmed', cancelled: 'cancelled' }, default: :confirmed
 
-  validates :booker_name, :phone_number, :user_id, :room_id, :start_time, :end_time, :purpose, :status, presence: true
+  validates :booker_name, :phone_number, :user_id, :room_id, :start_time, :end_time, :status, presence: true
   validate :no_time_overlap_for_room
 
   private
