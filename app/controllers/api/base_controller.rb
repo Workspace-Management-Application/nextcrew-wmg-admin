@@ -66,6 +66,6 @@ class Api::BaseController < ApplicationController
 
   # Method to render a successful response
   def render_success(data, message = "success" , status = :ok)
-    render json: { message: message, data: data.as_json(except: [:created_at, :updated_at]) }, status: status
+    render json: { data: data.as_json(except: [:created_at, :updated_at]), message: message }, status: status
   end
 end

@@ -10,6 +10,8 @@ Rails.application.routes.draw do
       post 'refresh_token', to: 'sessions#refresh_token'
     end
     
+    get 'get_profile', to: 'user#get_profile'
+    
     resources :users, only: [:create, :show, :update]  # Add necessary user actions for API
     resources :workspaces, only: [:show, :create, :update, :destroy] do
       member do
