@@ -20,11 +20,7 @@ class Api::OfficeEnquiriesController < Api::BaseController
 
   # POST /api/workspaces/:workspace_id/office_enquiries
   def create
-    office_enquiry = @workspace.office_enquiries.new(office_enquiry_params.except(:photo))
-    if params[:photo].present?
-      photo_url = S3Uploader.upload(params[:photo], folder: 'office_enquiry_photos')
-      office_enquiry.photo = photo_url
-    end
+    office_enquiry = @workspace.office_enquiries.new(office_enquiry_params)
     if office_enquiry.save
       render_success(office_enquiry, 'Office enquiry created successfully', :created)
     else
@@ -35,11 +31,7 @@ class Api::OfficeEnquiriesController < Api::BaseController
   # PATCH/PUT /api/workspaces/:workspace_id/office_enquiries/:id
   def update
     if @office_enquiry
-      if params[:photo].present?
-        photo_url = S3Uploader.upload(params[:photo], folder: 'office_enquiry_photos')
-        @office_enquiry.photo = photo_url
-      end
-      if @office_enquiry.update(office_enquiry_params.except(:photo))
+      if @office_enquiry.update(office_enquiry_params)
         render_success(@office_enquiry, 'Office enquiry updated successfully')
       else
         render_error(@office_enquiry.errors.full_messages.join(', '))
@@ -71,7 +63,7 @@ class Api::OfficeEnquiriesController < Api::BaseController
   end
 
   def office_enquiry_params
-    params.require(:office_enquiry).permit(:enquirer_name, :visitor_name, :phone_number, :email, :requirement, :company_name, :photo)
+    params.require(:office_enquiry).permit(:enquirer_name, :phone_number, :email, :requirement, :company_name)
   end
 
   def authorize_floor_user!

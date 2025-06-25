@@ -7,5 +7,8 @@ class Company < ApplicationRecord
 
   enum :status, { active: 'active', inactive: 'inactive', pending: 'pending', approved: 'approved' }, default: :pending
 
+  validates :name, :email, :phone_number, :address, presence: true
   validates :phone_number, uniqueness: true
+  validates :email, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP, message: "invalid email format" }
+  validates :phone_number, format: { with: /\A(\+?\d{1,3}[- ]?)?\(?\d{1,4}?\)?[- ]?\d{1,4}[- ]?\d{1,4}\z/, message: "invalid phone number format" }
 end
