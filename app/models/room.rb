@@ -1,7 +1,8 @@
 class Room < ApplicationRecord
   belongs_to :workspace
 
-  validates :name, :category, :capacity, :whiteboard, :projector, :is_available, presence: true
+  validates :name, :category, :capacity, presence: true
+  validates :whiteboard, :projector, :is_available, inclusion: { in: [true, false] }
 
   def is_occupied?
     Booking.where(room_id: id, status: 'confirmed')
