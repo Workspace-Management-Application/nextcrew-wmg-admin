@@ -35,4 +35,4 @@ UserWorkspace.find_or_create_by!(user: user, workspace: workspace)
 room = Room.find_or_create_by!(name: 'Conference Room A', category: 'Conference', workspace_id: workspace.id, capacity: 10, whiteboard: true, projector: true, is_available: true)
 
 # Optionally, seed a booking
-Booking.find_or_create_by!(booker_name: user.name, phone_number: '1234567890', user: user, room: room, start_time: Time.now + 1.day, end_time: Time.now + 1.day + 2.hours, purpose: 'Team Meeting', status: 'confirmed')
+Booking.find_or_create_by!(booker_name: user.name, phone_number: '1234567890', user: user, room: room, start_time: Time.now + 1.day, end_time: Time.now + 1.day + 2.hours, status: 'confirmed')
