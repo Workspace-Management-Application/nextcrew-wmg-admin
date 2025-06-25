@@ -6,7 +6,9 @@ Rails.application.routes.draw do
       registrations: 'api/users'
     }, skip: [:registrations]  # Skip registrations if you're handling them separately for the API
     
-    post 'refresh_token', to: 'sessions#refresh_token'
+    devise_scope :user do
+      post 'refresh_token', to: 'sessions#refresh_token'
+    end
     
     resources :users, only: [:create, :show, :update]  # Add necessary user actions for API
     resources :workspaces, only: [:show, :create, :update, :destroy] do
