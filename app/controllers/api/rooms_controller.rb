@@ -4,7 +4,7 @@ class Api::RoomsController < Api::BaseController
 
   # GET /api/workspaces/:workspace_id/rooms
   def index
-    rooms = @workspace.rooms.includes(:bookings)
+    rooms = @workspace.rooms
     rooms_with_occupancy = rooms.map do |room|
       room.as_json(except: [:created_at, :updated_at]).merge(is_occupied: room.is_occupied?)
     end
@@ -72,7 +72,7 @@ class Api::RoomsController < Api::BaseController
   end
 
   def set_room
-    @room = @workspace.rooms.find_by(id: params[:id]).includes(:bookings)
+    @room = @workspace.rooms.find_by(id: params[:id])
   end
 
   def room_params
