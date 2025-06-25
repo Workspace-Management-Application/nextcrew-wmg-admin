@@ -18,8 +18,11 @@ Rails.application.routes.draw do
         get 'search_by_phone_number'
         get 'get_data_for_room'
       end
+      resources :visitor_entries
+      resources :bookings
+      resources :office_enquiries
+      resources :day_passes
     end
-    resources :bookings
   end
 
   # Web routes (optional - for admin interface)

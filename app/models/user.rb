@@ -13,7 +13,7 @@ class User < ApplicationRecord
   has_many :bookings
 
   # Enum declaration with a default value
-  enum :role, { super_admin: 'super_admin', admin: 'admin', user: 'user' }, default: :user
+  enum :role, { super_admin: 'super_admin', admin: 'admin', floor_user: 'floor_user', user: 'user' }, default: :user
   before_create :generate_token
 
   private
