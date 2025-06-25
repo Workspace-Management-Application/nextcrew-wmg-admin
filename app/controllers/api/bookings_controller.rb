@@ -5,7 +5,7 @@ class Api::BookingsController < Api::BaseController
 
   # GET /api/bookings
   def index
-    bookings = current_user.bookings.where(room_id: @workspace.rooms.select(:id))
+    bookings = Booking.where(room_id: @workspace.rooms.select(:id))
     render_success(bookings)
   end
 
