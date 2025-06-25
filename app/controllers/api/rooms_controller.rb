@@ -19,7 +19,7 @@ class Api::RoomsController < Api::BaseController
         date = Date.parse(params[:date]) rescue nil
         if date
           bookings = Booking.where(room_id: @room.id)
-                            .where('DATE(start_time) = ?', date)
+                            .where('start_time >= ? AND start_time < ?', date.beginning_of_day, date.next_day.beginning_of_day)
           room_data[:bookings] = bookings.as_json(except: [:created_at, :updated_at])
         else
           room_data[:bookings] = []
