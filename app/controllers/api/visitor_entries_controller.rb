@@ -1,6 +1,7 @@
 class Api::VisitorEntriesController < Api::BaseController
   before_action :set_workspace
   before_action :set_visitor_entry, only: [:show, :update, :destroy]
+  before_action :authorize_floor_user!
 
   # GET /api/workspaces/:workspace_id/visitor_entries
   def index
@@ -71,5 +72,11 @@ class Api::VisitorEntriesController < Api::BaseController
 
   def visitor_entry_params
     params.require(:visitor_entry).permit(:name, :workspace_id, :person_to_visit_name, :phone_number, :email, :purpose, :photo)
+  end
+
+  def authorize_floor_user!
+    unless current_user&.role == 'floor_user'
+      render_error('Forbidden: Only floor users allowed', :forbidden)
+    end
   end
 end 

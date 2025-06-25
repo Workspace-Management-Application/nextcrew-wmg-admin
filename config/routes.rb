@@ -20,6 +20,8 @@ Rails.application.routes.draw do
       end
       resources :visitor_entries
       resources :bookings
+      resources :office_enquiries
+      resources :day_passes
     end
   end
 
