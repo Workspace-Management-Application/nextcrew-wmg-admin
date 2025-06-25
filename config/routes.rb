@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       resources :bookings
       resources :office_enquiries
       resources :day_passes
+      resources :rooms
     end
   end
 
