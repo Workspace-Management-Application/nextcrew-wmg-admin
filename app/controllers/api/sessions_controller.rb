@@ -16,11 +16,14 @@ class Api::SessionsController < Devise::SessionsController
     if user.valid_password?(params[:user][:password])
       # Skip the warden.authenticate! since we already validated the password
       sign_in(resource_name, user)
-
+      refresh_token = SecureRandom.hex(32)
+      resource.update(refresh_token: refresh_token)
+ 
       # Prepare data to send back in the response
       data = {
         token: request.env['warden-jwt_auth.token'],  # Get JWT token
         user: user.as_json(only: [:id, :email, :name]),  # Only expose essential fields
+        refresh_token: refresh_token,
         workspace_id: user.workspace&.id  # Get associated workspace if exists
       }
 
@@ -53,5 +56,28 @@ class Api::SessionsController < Devise::SessionsController
 
   def respond_to_on_destroy
     head :no_content
+  end
+
+  # POST /api/refresh_token
+  def refresh_token
+    provided_refresh_token = params[:refresh_token]
+    user = User.find_by(refresh_token: provided_refresh_token)
+
+    if user.nil?
+      return render json: { error: 'Invalid refresh token' }, status: :unauthorized
+    end
+
+    # Generate a new JWT token for the user
+    sign_in(:user, user)
+    new_access_token = request.env['warden-jwt_auth.token']
+    new_refresh_token = SecureRandom.hex(32)
+    user.update(refresh_token: new_refresh_token)
+
+    data = {
+      token: new_access_token,
+      refresh_token: new_refresh_token
+    }
+
+    render json: { message: 'Token refreshed successfully', data: data }, status: :ok
   end
 end
