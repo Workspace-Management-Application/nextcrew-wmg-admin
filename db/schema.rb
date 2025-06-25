@@ -74,7 +74,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
   create_table "office_enquiries", force: :cascade do |t|
     t.integer "workspace_id"
     t.string "enquirer_name"
-    t.string "visitor_name"
     t.string "phone_number"
     t.string "email"
     t.string "requirement"
@@ -134,7 +133,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
     t.string "phone_number"
     t.string "email"
     t.string "purpose"
-    t.string "image"
+    t.string "photo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
