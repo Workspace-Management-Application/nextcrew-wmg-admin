@@ -124,6 +124,170 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
+## Day Passes API
+
+### Authentication
+All day passes endpoints require:
+- JWT token in `Authorization: Bearer <token>` header
+- User must have `floor_user` role
+
+### 1. List Day Passes
+**GET** `/api/workspaces/:workspace_id/day_passes`
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "phone_number": "1234567890",
+      "email": "john@example.com",
+      "company_name": "Acme Corporation",
+      "pass_date": "2024-07-01",
+      "purpose": "Business Meeting",
+      "photo": "https://s3-url/photo.jpg"
+    }
+  ],
+  "message": "success"
+}
+```
+
+### 2. Create Day Pass
+**POST** `/api/workspaces/:workspace_id/day_passes`
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "day_pass": {
+    "name": "John Doe",
+    "phone_number": "1234567890",
+    "email": "john@example.com",
+    "company_name": "Acme Corporation",
+    "pass_date": "2024-07-01",
+    "purpose": "Business Meeting"
+  }
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "phone_number": "1234567890",
+    "email": "john@example.com",
+    "company_name": "Acme Corporation",
+    "pass_date": "2024-07-01",
+    "purpose": "Business Meeting",
+    "photo": null
+  },
+  "message": "Day pass created successfully"
+}
+```
+
+### 3. Get Single Day Pass
+**GET** `/api/workspaces/:workspace_id/day_passes/:id`
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "id": 1,
+    "name": "John Doe",
+    "phone_number": "1234567890",
+    "email": "john@example.com",
+    "company_name": "Acme Corporation",
+    "pass_date": "2024-07-01",
+    "purpose": "Business Meeting",
+    "photo": "https://s3-url/photo.jpg"
+  },
+  "message": "success"
+}
+```
+
+### 4. Update Day Pass
+**PUT/PATCH** `/api/workspaces/:workspace_id/day_passes/:id`
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "day_pass": {
+    "name": "John Doe Updated",
+    "phone_number": "1234567890",
+    "email": "john.updated@example.com",
+    "company_name": "Acme Corporation Ltd",
+    "pass_date": "2024-07-02",
+    "purpose": "Follow-up Meeting"
+  }
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "id": 1,
+    "name": "John Doe Updated",
+    "phone_number": "1234567890",
+    "email": "john.updated@example.com",
+    "company_name": "Acme Corporation Ltd",
+    "pass_date": "2024-07-02",
+    "purpose": "Follow-up Meeting",
+    "photo": "https://s3-url/photo.jpg"
+  },
+  "message": "Day pass updated successfully"
+}
+```
+
+### 5. Delete Day Pass
+**DELETE** `/api/workspaces/:workspace_id/day_passes/:id`
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {},
+  "message": "Day pass deleted successfully"
+}
+```
+
+### Day Pass Validation Rules
+- `name`: Required, string
+- `phone_number`: Required, string
+- `email`: Required, string, email format
+- `company_name`: Optional, string
+- `pass_date`: Required, date format (YYYY-MM-DD)
+- `purpose`: Required, text
+- `photo`: Optional, file upload (stored in S3)
+
 ## JWT Token Usage
 
 ### Token Format
@@ -147,17 +311,24 @@ Tokens expire after 30 minutes. When a token expires, the user must log in again
 }
 ```
 
+### Authorization Errors (403 Forbidden)
+```json
+{
+  "message": "Forbidden: Only floor users allowed"
+}
+```
+
 ### Validation Errors (422 Unprocessable Entity)
 ```json
 {
-  "error": "Email has already been taken"
+  "message": "Name can't be blank, Email can't be blank"
 }
 ```
 
 ### Not Found Errors (404 Not Found)
 ```json
 {
-  "error": "User not found"
+  "message": "Day pass not found"
 }
 ```
 
@@ -179,9 +350,26 @@ curl -X POST http://localhost:3000/api/login \
   -d '{"user": {"email": "test@example.com", "password": "password123"}}'
 ```
 
-3. **Get user profile (replace TOKEN with the actual token):**
+3. **Create a day pass (replace TOKEN with the actual token):**
 ```bash
-curl -X GET http://localhost:3000/api/users/1 \
+curl -X POST http://localhost:3000/api/workspaces/1/day_passes \
+  -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "day_pass": {
+      "name": "John Doe",
+      "phone_number": "1234567890",
+      "email": "john@example.com",
+      "company_name": "Acme Corporation",
+      "pass_date": "2024-07-01",
+      "purpose": "Business Meeting"
+    }
+  }'
+```
+
+4. **Get all day passes:**
+```bash
+curl -X GET http://localhost:3000/api/workspaces/1/day_passes \
   -H "Authorization: Bearer TOKEN"
 ```
 
@@ -196,4 +384,7 @@ curl -X GET http://localhost:3000/api/users/1 \
 - User confirmation is enabled but can be configured
 - Account locking is enabled after failed login attempts
 - Password recovery is available through Devise
-- All responses are in JSON format 
+- All responses are in JSON format
+- Day passes are scoped to specific workspaces
+- Only users with `floor_user` role can manage day passes
+- Photos are uploaded to S3 and URLs are stored in the database 

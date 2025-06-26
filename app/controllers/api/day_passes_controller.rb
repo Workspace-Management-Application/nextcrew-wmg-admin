@@ -71,7 +71,7 @@ class Api::DayPassesController < Api::BaseController
   end
 
   def day_pass_params
-    params.require(:day_pass).permit(:name, :phone_number, :email, :company_id, :pass_date, :purpose, :photo)
+    params.require(:day_pass).permit(:name, :phone_number, :email, :company_name, :pass_date, :purpose, :photo)
   end
 
   def authorize_floor_user!

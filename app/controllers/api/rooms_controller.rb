@@ -6,7 +6,10 @@ class Api::RoomsController < Api::BaseController
   def index
     rooms = @workspace.rooms
     rooms_with_occupancy = rooms.map do |room|
-      room.as_json(except: [:created_at, :updated_at]).merge(is_occupied: room.is_occupied?)
+      room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
+        is_occupied: room.is_occupied?,
+        workspace_name: @workspace.name
+      )
     end
     render_success(rooms_with_occupancy)
   end
@@ -14,7 +17,9 @@ class Api::RoomsController < Api::BaseController
   # GET /api/workspaces/:workspace_id/rooms/:id
   def show
     if @room
-      room_data = @room.as_json(except: [:created_at, :updated_at])
+      room_data = @room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
+        workspace_name: @workspace.name
+      )
       if params[:date].present?
         date = Date.parse(params[:date]) rescue nil
         if date
@@ -46,7 +51,10 @@ class Api::RoomsController < Api::BaseController
   def update
     if @room
       if @room.update(room_params)
-        render_success(@room, 'Room updated successfully')
+        data = @room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
+          workspace_name: @workspace.name
+        )
+        render_success(data, 'Room updated successfully')
       else
         render_error(@room.errors.full_messages.join(', '))
       end

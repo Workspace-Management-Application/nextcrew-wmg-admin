@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_26_120101) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "bookings", force: :cascade do |t|
+    t.string "booker_name"
     t.string "phone_number"
     t.integer "user_id"
     t.integer "room_id"
@@ -54,12 +55,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
     t.string "name"
     t.string "phone_number"
     t.string "email"
-    t.integer "company_id"
     t.date "pass_date"
     t.text "purpose"
     t.string "photo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "company_name"
   end
 
   create_table "jwt_denylists", force: :cascade do |t|
@@ -73,6 +74,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
   create_table "office_enquiries", force: :cascade do |t|
     t.integer "workspace_id"
     t.string "enquirer_name"
+    t.string "visitor_name"
     t.string "phone_number"
     t.string "email"
     t.string "requirement"
@@ -119,7 +121,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
     t.string "role"
     t.string "refresh_token"
     t.string "name"
-    t.string "phone_number"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -129,10 +130,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
   create_table "visitor_entries", force: :cascade do |t|
     t.string "name"
     t.integer "workspace_id"
+    t.string "person_to_visit_name"
     t.string "phone_number"
     t.string "email"
     t.string "purpose"
-    t.string "photo"
+    t.string "image"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
