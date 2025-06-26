@@ -1,0 +1,77 @@
+<% content_for :page_title, "Bookings" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Bookings</h2>
+  <%= link_to "Create Booking", new_admin_booking_path, class: "btn btn-primary" %>
+</div>
+
+<!-- Filters -->
+<div class="bg-dark p-3 rounded mb-4">
+  <%= form_with url: admin_bookings_path, method: :get, local: true, class: "row g-3" do |form| %>
+    <div class="col-md-3">
+      <%= form.label :date, "Filter by Date", class: "form-label" %>
+      <%= form.date_field :date, value: params[:date], class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= form.label :workspace_id, "Filter by Workspace", class: "form-label" %>
+      <%= form.select :workspace_id, 
+                      options_from_collection_for_select(Workspace.all, :id, :name, params[:workspace_id]), 
+                      { prompt: 'All Workspaces' }, 
+                      { class: "form-select" } %>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+      <%= form.submit "Filter", class: "btn btn-outline-primary me-2" %>
+      <%= link_to "Clear", admin_bookings_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Room</th>
+        <th>Workspace</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @bookings.each do |booking| %>
+        <tr>
+          <td><%= booking.user.name %> </td>
+          <td><%= booking.room.name %></td>
+          <td><%= booking.room.workspace.name %></td>
+          <td><%= booking.start_time.strftime("%b %d, %Y %I:%M %p") if booking.start_time %></td>
+          <td><%= booking.end_time.strftime("%b %d, %Y %I:%M %p") if booking.end_time %></td>
+          <td>
+            <% if booking.start_time && booking.start_time > Time.current %>
+              <span class="badge bg-secondary">Upcoming</span>
+            <% elsif booking.end_time && booking.end_time < Time.current %>
+              <span class="badge bg-dark">Completed</span>
+            <% else %>
+              <span class="badge bg-light text-dark">Active</span>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to "View", admin_booking_path(booking), class: "btn btn-outline-primary btn-sm me-2" %>
+            <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-secondary btn-sm me-2" %>
+            <%= link_to "Cancel", admin_booking_path(booking), method: :delete, 
+                        class: "btn btn-danger btn-sm",
+                        confirm: "Are you sure you want to cancel this booking?" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @bookings.empty? %>
+  <div class="text-center mt-5">
+    <p class="text-muted">No bookings found.</p>
+    <%= link_to "Create the first booking", new_admin_booking_path, class: "btn btn-primary" %>
+  </div>
+<% end %>

@@ -1,0 +1,57 @@
+<% content_for :page_title, "Add Company" %>
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Add New Company</h2>
+      <%= link_to "← Back to Companies", admin_companies_path, class: "btn btn-outline-primary" %>
+    </div>
+
+    <%= form_with model: [:admin, @company], local: true, class: "needs-validation", novalidate: true do |form| %>
+      <% if @company.errors.any? %>
+        <div class="alert alert-danger">
+          <h6><%= pluralize(@company.errors.count, "error") %> prohibited this company from being saved:</h6>
+          <ul class="mb-0">
+            <% @company.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :name, "Company Name", class: "form-label" %>
+          <%= form.text_field :name, class: "form-control", required: true %>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <%= form.label :contact_person, class: "form-label" %>
+          <%= form.text_field :contact_person, class: "form-control", required: true %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :email, class: "form-label" %>
+          <%= form.email_field :email, class: "form-control", required: true %>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <%= form.label :phone, class: "form-label" %>
+          <%= form.telephone_field :phone, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :address, class: "form-label" %>
+        <%= form.text_area :address, class: "form-control", rows: 3 %>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= form.submit "Create Company", class: "btn btn-primary" %>
+        <%= link_to "Cancel", admin_companies_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+<% content_for :page_title, @user.name %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><%= @user.name %></h2>
+  <div>
+    <%= link_to "Edit", edit_admin_user_path(@user), class: "btn btn-primary me-2" %>
+    <% if current_user.super_admin? && @user.admin? %>
+      <%= link_to "Assign Workspace", assign_workspace_admin_user_path(@user), class: "btn btn-outline-primary me-2" %>
+    <% end %>
+    <%= link_to "← Back to Users", admin_users_path, class: "btn btn-outline-primary" %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="bg-dark p-4 rounded mb-4">
+      <h4 class="mb-3">User Information</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Name:</strong> <%= @user.name %></p>
+          <p><strong>Email:</strong> <%= @user.email %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Phone:</strong> <%= @user.phone || 'Not provided' %></p>
+          <p><strong>Role:</strong> 
+            <span class="badge <%= @user.role == 'super_admin' ? 'bg-light text-dark' : @user.role == 'admin' ? 'bg-secondary' : 'bg-dark' %>">
+              <%= @user.role.humanize %>
+            </span>
+          </p>
+          <% if @user.workspace %>
+            <p><strong>Assigned Workspace:</strong> <%= @user.workspace.name %></p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- User's Bookings -->
+    <h4 class="mb-3">Recent Bookings</h4>
+    <% recent_bookings = @user.bookings.includes(:room).order(created_at: :desc).limit(5) %>
+    <% if recent_bookings.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recent_bookings.each do |booking| %>
+              <tr>
+                <td><%= booking.room.name %></td>
+                <td><%= booking.start_time.strftime("%b %d, %Y %I:%M %p") if booking.start_time %></td>
+                <td><%= booking.end_time.strftime("%b %d, %Y %I:%M %p") if booking.end_time %></td>
+                <td>
+                  <% if booking.start_time && booking.start_time > Time.current %>
+                    <span class="badge bg-secondary">Upcoming</span>
+                  <% elsif booking.end_time && booking.end_time < Time.current %>
+                    <span class="badge bg-dark">Completed</span>
+                  <% else %>
+                    <span class="badge bg-light text-dark">Active</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-muted">No bookings found for this user.</p>
+    <% end %>
+  </div>
+
+  <div class="col-md-4">
+    <div class="text-center mb-4">
+      <div class="profile-avatar mx-auto" style="width: 80px; height: 80px; font-size: 2rem;">
+        <%= @user.name&.first&.upcase || "U" %>
+      </div>
+    </div>
+
+    <!-- User Stats -->
+    <div class="bg-dark p-4 rounded">
+      <h5 class="mb-3">User Statistics</h5>
+      
+      <div class="metric-card mb-3">
+        <div class="metric-value"><%= @user.bookings.count %></div>
+        <div class="metric-label">Total Bookings</div>
+      </div>
+      
+      <div class="metric-card mb-3">
+        <div class="metric-value"><%= @user.bookings.where(created_at: Date.current.beginning_of_month..Date.current.end_of_month).count %></div>
+        <div class="metric-label">This Month Bookings</div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-value"><%= @user.bookings.where(created_at: 30.days.ago..Date.current).count %></div>
+        <div class="metric-label">Last 30 Days</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -29,6 +29,32 @@ Rails.application.routes.draw do
   # Web routes (optional - for admin interface)
   devise_for :users
 
+  # Admin routes
+  namespace :admin do
+    root 'dashboard#index'
+    get 'dashboard', to: 'dashboard#index'
+    
+    resources :workspaces do
+      resources :rooms
+    end
+    
+    resources :bookings
+    resources :companies do
+      member do
+        get :export_data
+      end
+    end
+    
+    resources :users do
+      member do
+        get :assign_workspace
+        patch :assign_workspace
+      end
+    end
+    
+    resource :profile, only: [:show, :edit, :update]
+  end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -40,5 +66,5 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "admin/dashboard#index"
 end

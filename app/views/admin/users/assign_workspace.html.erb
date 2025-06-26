@@ -1,0 +1,46 @@
+<% content_for :page_title, "Assign Workspace to #{@user.first_name} #{@user.last_name}" %>
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Assign Workspace</h2>
+      <%= link_to "← Back to User", admin_user_path(@user), class: "btn btn-outline-primary" %>
+    </div>
+
+    <div class="bg-dark p-4 rounded mb-4">
+      <h4>User Information</h4>
+      <p><strong>Name:</strong> <%= @user.first_name %> <%= @user.last_name %></p>
+      <p><strong>Email:</strong> <%= @user.email %></p>
+      <p><strong>Role:</strong> <%= @user.role.humanize %></p>
+      <p><strong>Current Workspace:</strong> <%= @user.workspace&.name || 'Not assigned' %></p>
+    </div>
+
+    <%= form_with url: assign_workspace_admin_user_path(@user), method: :patch, local: true do |form| %>
+      <div class="mb-4">
+        <%= form.label :workspace_id, "Select Workspace", class: "form-label" %>
+        <%= form.select :workspace_id, 
+                        options_from_collection_for_select(@workspaces, :id, :name, @user.workspace&.id), 
+                        { prompt: 'Select a workspace to assign' }, 
+                        { class: "form-select", required: true } %>
+        <small class="form-text text-muted">This user will be assigned to manage the selected workspace</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= form.submit "Assign Workspace", class: "btn btn-primary" %>
+        <%= link_to "Cancel", admin_user_path(@user), class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+
+    <% if @user.workspace %>
+      <hr class="my-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Remove Current Assignment</h5>
+        <%= link_to "Remove Workspace Assignment", 
+                    assign_workspace_admin_user_path(@user, workspace_id: ''), 
+                    method: :patch,
+                    class: "btn btn-danger",
+                    confirm: "Are you sure you want to remove the workspace assignment for this user?" %>
+      </div>
+    <% end %>
+  </div>
+</div>

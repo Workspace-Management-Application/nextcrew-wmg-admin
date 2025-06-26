@@ -1,0 +1,63 @@
+<% content_for :page_title, "Edit Workspace" %>
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Edit Workspace</h2>
+      <%= link_to "← Back to Workspaces", admin_workspaces_path, class: "btn btn-outline-primary" %>
+    </div>
+
+    <%= form_with model: [:admin, @workspace], local: true, class: "needs-validation", novalidate: true do |form| %>
+      <% if @workspace.errors.any? %>
+        <div class="alert alert-danger">
+          <h6><%= pluralize(@workspace.errors.count, "error") %> prohibited this workspace from being saved:</h6>
+          <ul class="mb-0">
+            <% @workspace.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :name, class: "form-label" %>
+          <%= form.text_field :name, class: "form-control", required: true %>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <%= form.label :building, class: "form-label" %>
+          <%= form.text_field :building, class: "form-control", required: true %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :city, class: "form-label" %>
+          <%= form.text_field :city, class: "form-control", required: true %>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <%= form.label :pincode, class: "form-label" %>
+          <%= form.text_field :pincode, class: "form-control", required: true %>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :address, class: "form-label" %>
+        <%= form.text_area :address, class: "form-control", rows: 3, required: true %>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :picture, class: "form-label" %>
+        <%= form.file_field :picture, class: "form-control", accept: "image/*" %>
+        <small class="form-text text-muted">Upload a new picture to replace the current one (optional)</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= form.submit "Update Workspace", class: "btn btn-primary" %>
+        <%= link_to "Cancel", admin_workspaces_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

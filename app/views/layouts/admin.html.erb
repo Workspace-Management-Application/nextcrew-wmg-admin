@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Admin Dashboard - Workspace Management" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="admin-body">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h4 class="sidebar-title">Admin Panel</h4>
+        <button class="sidebar-toggle d-md-none" onclick="toggleSidebar()">×</button>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <%= link_to admin_dashboard_path, class: "nav-item #{'active' if current_page?(admin_dashboard_path)}" do %>
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        <% end %>
+        
+        <%= link_to admin_workspaces_path, class: "nav-item #{'active' if controller_name == 'workspaces'}" do %>
+          <span class="nav-icon">🏢</span>
+          <span class="nav-text">Workspace</span>
+        <% end %>
+        
+        <%= link_to admin_bookings_path, class: "nav-item #{'active' if controller_name == 'bookings'}" do %>
+          <span class="nav-icon">📅</span>
+          <span class="nav-text">Bookings</span>
+        <% end %>
+        
+        <%= link_to admin_users_path, class: "nav-item #{'active' if controller_name == 'users'}" do %>
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Users</span>
+        <% end %>
+        
+        <%= link_to admin_companies_path, class: "nav-item #{'active' if controller_name == 'companies'}" do %>
+          <span class="nav-icon">🏭</span>
+          <span class="nav-text">Companies</span>
+        <% end %>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <button class="sidebar-toggle d-md-none" onclick="toggleSidebar()">☰</button>
+        <h1 class="page-title"><%= yield(:page_title) || "Dashboard" %></h1>
+        
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown">
+          <button class="profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="profile-avatar">
+              <%= current_user.name&.first&.upcase || "A" %>
+            </div>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><%= link_to "Edit Profile", admin_profile_path, class: "dropdown-item" %></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><%= link_to "Logout", destroy_user_session_path, method: :delete, class: "dropdown-item" %></li>
+          </ul>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <main class="content-area">
+        <% if notice %>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= notice %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+
+        <% if alert %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= alert %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+      function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('show');
+      }
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.querySelector('.sidebar-toggle');
+        
+        if (window.innerWidth < 768 && 
+            !sidebar.contains(event.target) && 
+            !toggleBtn.contains(event.target)) {
+          sidebar.classList.remove('show');
+        }
+      });
+    </script>
+
+    <%= yield :scripts %>
+  </body>
+</html>

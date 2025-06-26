@@ -1,0 +1,134 @@
+<% content_for :page_title, "Dashboard" %>
+
+<div class="dashboard-container">
+  <!-- Metrics Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-3 col-md-6">
+      <div class="metric-card">
+        <div class="metric-label">Total Workspaces</div>
+        <div class="metric-value"><%= @total_workspaces %></div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="metric-card">
+        <div class="metric-label">Total Rooms</div>
+        <div class="metric-value"><%= @total_rooms %></div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="metric-card">
+        <div class="metric-label">Today's Bookings</div>
+        <div class="metric-value"><%= @todays_bookings %></div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <div class="metric-card">
+        <div class="metric-label">Day Passes Generated Today</div>
+        <div class="metric-value"><%= @day_passes_today %></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="chart-container">
+        <h4>7-Day Booking Trends</h4>
+        <div style="position: relative; height: 200px;">
+          <canvas id="bookingChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <%= link_to new_admin_workspace_path, class: "quick-action-btn" do %>
+      <div>+ Add Workspace</div>
+    <% end %>
+    
+    <%= link_to new_admin_booking_path, class: "quick-action-btn" do %>
+      <div>+ Add Booking</div>
+    <% end %>
+    
+    <%= link_to new_admin_company_path, class: "quick-action-btn" do %>
+      <div>+ Add Company</div>
+    <% end %>
+    
+    <%= link_to new_admin_user_path, class: "quick-action-btn" do %>
+      <div>+ Add User</div>
+    <% end %>
+  </div>
+</div>
+
+<% content_for :scripts do %>
+<script>
+  // Booking Chart
+  const ctx = document.getElementById('bookingChart').getContext('2d');
+  const chartData = <%= raw @booking_chart_data.to_json %>;
+  
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartData.map(item => item.date),
+      datasets: [{
+        label: 'Bookings',
+        data: chartData.map(item => item.bookings),
+        backgroundColor: '#ffffff',
+        borderColor: '#ffffff',
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      layout: {
+        padding: {
+          top: 10,
+          bottom: 10
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: Math.max(...chartData.map(item => item.bookings)) + 5, // Add some padding to max value
+          ticks: {
+            color: '#cccccc',
+            font: {
+              size: 11
+            },
+            stepSize: 2
+          },
+          grid: {
+            color: '#333333',
+            drawBorder: false
+          }
+        },
+        x: {
+          ticks: {
+            color: '#cccccc',
+            font: {
+              size: 11
+            }
+          },
+          grid: {
+            display: false
+          }
+        }
+      },
+      elements: {
+        bar: {
+          backgroundColor: '#ffffff'
+        }
+      }
+    }
+  });
+</script>
+<% end %>

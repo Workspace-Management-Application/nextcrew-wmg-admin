@@ -1,0 +1,51 @@
+<% content_for :page_title, "Booking Details" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Booking Details</h2>
+  <div>
+    <%= link_to "Edit", edit_admin_booking_path(@booking), class: "btn btn-primary me-2" %>
+    <%= link_to "← Back to Bookings", admin_bookings_path, class: "btn btn-outline-primary" %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="bg-dark p-4 rounded">
+      <h4 class="mb-3">Booking Information</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>User:</strong> <%= @booking.user.name %></p>
+          <p><strong>Email:</strong> <%= @booking.user.email %></p>
+          <p><strong>Room:</strong> <%= @booking.room.name %></p>
+          <p><strong>Workspace:</strong> <%= @booking.room.workspace.name %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Start Time:</strong> <%= @booking.start_time.strftime("%b %d, %Y %I:%M %p") if @booking.start_time %></p>
+          <p><strong>End Time:</strong> <%= @booking.end_time.strftime("%b %d, %Y %I:%M %p") if @booking.end_time %></p>
+          <p><strong>Duration:</strong> 
+            <% if @booking.start_time && @booking.end_time %>
+              <%= distance_of_time_in_words(@booking.start_time, @booking.end_time) %>
+            <% end %>
+          </p>
+          <p><strong>Status:</strong>
+            <% if @booking.start_time && @booking.start_time > Time.current %>
+              <span class="badge bg-secondary">Upcoming</span>
+            <% elsif @booking.end_time && @booking.end_time < Time.current %>
+              <span class="badge bg-dark">Completed</span>
+            <% else %>
+              <span class="badge bg-light text-dark">Active</span>
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="bg-dark p-4 rounded">
+      <h5 class="mb-3">Room Details</h5>
+      <p><strong>Category:</strong> <%= @booking.room.category %></p>
+      <p><strong>Capacity:</strong> <%= @booking.room.capacity %> people</p>
+    </div>
+  </div>
+</div>

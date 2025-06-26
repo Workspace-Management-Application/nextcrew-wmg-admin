@@ -1,0 +1,47 @@
+<% content_for :page_title, "Workspaces" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Workspaces</h2>
+  <%= link_to "Add Workspace", new_admin_workspace_path, class: "btn btn-primary" %>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Building</th>
+        <th>City</th>
+        <th>Address</th>
+        <th>Pincode</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @workspaces.each do |workspace| %>
+        <tr>
+          <td><%= workspace.name %></td>
+          <td><%= workspace.building_name %></td>
+          <td><%= workspace.city %></td>
+          <td><%= workspace.address %></td>
+          <td><%= workspace.pincode %></td>
+          <td>
+            <%= link_to "View", admin_workspace_path(workspace), class: "btn btn-outline-primary btn-sm me-2" %>
+            <%= link_to "Edit", edit_admin_workspace_path(workspace), class: "btn btn-secondary btn-sm me-2" %>
+            <%= link_to "Rooms", admin_workspace_rooms_path(workspace), class: "btn btn-outline-primary btn-sm me-2" %>
+            <%= link_to "Delete", admin_workspace_path(workspace), method: :delete, 
+                        class: "btn btn-danger btn-sm",
+                        confirm: "Are you sure you want to delete this workspace?" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @workspaces.empty? %>
+  <div class="text-center mt-5">
+    <p class="text-muted">No workspaces found.</p>
+    <%= link_to "Add your first workspace", new_admin_workspace_path, class: "btn btn-primary" %>
+  </div>
+<% end %>

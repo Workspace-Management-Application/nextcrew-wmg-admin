@@ -1,0 +1,61 @@
+<% content_for :page_title, "Add Room to #{@workspace.name}" %>
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Add New Room</h2>
+      <%= link_to "← Back to Rooms", admin_workspace_rooms_path(@workspace), class: "btn btn-outline-primary" %>
+    </div>
+
+    <%= form_with model: [:admin, @workspace, @room], local: true, class: "needs-validation", novalidate: true do |form| %>
+      <% if @room.errors.any? %>
+        <div class="alert alert-danger">
+          <h6><%= pluralize(@room.errors.count, "error") %> prohibited this room from being saved:</h6>
+          <ul class="mb-0">
+            <% @room.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :name, class: "form-label" %>
+          <%= form.text_field :name, class: "form-control", required: true, placeholder: "e.g., Conference Room A" %>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <%= form.label :category, class: "form-label" %>
+          <%= form.select :category, 
+                          options_for_select([
+                            ['Meeting Room', 'meeting_room'],
+                            ['Conference Room', 'conference_room'],
+                            ['Phone Booth', 'phone_booth'],
+                            ['Open Desk', 'open_desk'],
+                            ['Private Office', 'private_office'],
+                            ['Event Space', 'event_space']
+                          ]), 
+                          { prompt: 'Select Category' }, 
+                          { class: "form-select", required: true } %>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :capacity, class: "form-label" %>
+        <%= form.number_field :capacity, class: "form-control", required: true, min: 1, placeholder: "Maximum number of people" %>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :amenities, class: "form-label" %>
+        <%= form.text_area :amenities, class: "form-control", rows: 3, placeholder: "e.g., Projector, Whiteboard, Video Conferencing, WiFi" %>
+        <small class="form-text text-muted">List the amenities available in this room</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= form.submit "Create Room", class: "btn btn-primary" %>
+        <%= link_to "Cancel", admin_workspace_rooms_path(@workspace), class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

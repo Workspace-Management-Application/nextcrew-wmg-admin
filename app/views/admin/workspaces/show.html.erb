@@ -1,0 +1,77 @@
+<% content_for :page_title, @workspace.name %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><%= @workspace.name %></h2>
+  <div>
+    <%= link_to "Edit", edit_admin_workspace_path(@workspace), class: "btn btn-primary me-2" %>
+    <%= link_to "← Back to Workspaces", admin_workspaces_path, class: "btn btn-outline-primary" %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="bg-dark p-4 rounded mb-4">
+      <h4 class="mb-3">Workspace Details</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Building:</strong> <%= @workspace.building %></p>
+          <p><strong>City:</strong> <%= @workspace.city %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Pincode:</strong> <%= @workspace.pincode %></p>
+          <p><strong>Address:</strong> <%= @workspace.address %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>Rooms (<%= @rooms.count %>)</h4>
+      <%= link_to "Add Room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary" %>
+    </div>
+
+    <% if @rooms.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Capacity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @rooms.each do |room| %>
+              <tr>
+                <td><%= room.name %></td>
+                <td><%= room.category %></td>
+                <td><%= room.capacity %></td>
+                <td>
+                  <%= link_to "View", admin_workspace_room_path(@workspace, room), class: "btn btn-outline-primary btn-sm me-2" %>
+                  <%= link_to "Edit", edit_admin_workspace_room_path(@workspace, room), class: "btn btn-secondary btn-sm me-2" %>
+                  <%= link_to "Delete", admin_workspace_room_path(@workspace, room), method: :delete, 
+                              class: "btn btn-danger btn-sm",
+                              confirm: "Are you sure you want to delete this room?" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center mt-4">
+        <p class="text-muted">No rooms found in this workspace.</p>
+        <%= link_to "Add the first room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="col-md-4">
+    <% if @workspace.picture.present? %>
+      <div class="bg-dark p-3 rounded">
+        <h5>Workspace Picture</h5>
+        <%= image_tag @workspace.picture, class: "img-fluid rounded", alt: @workspace.name %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<% content_for :page_title, @company.name %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><%= @company.name %></h2>
+  <div>
+    <%= link_to "Edit", edit_admin_company_path(@company), class: "btn btn-primary me-2" %>
+    <%= link_to "Export Data", export_data_admin_company_path(@company, format: :xlsx), class: "btn btn-outline-primary me-2" %>
+    <%= link_to "← Back to Companies", admin_companies_path, class: "btn btn-outline-primary" %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <!-- Company Details -->
+    <div class="bg-dark p-4 rounded mb-4">
+      <h4 class="mb-3">Company Information</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Email:</strong> <%= @company.email %></p>
+          <p><strong>Phone:</strong> <%= @company.phone %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Contact Person:</strong> <%= @company.contact_person %></p>
+          <p><strong>Address:</strong> <%= @company.address %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Users -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>Company Users (<%= @company_users.count %>)</h4>
+    </div>
+
+    <% if @company_users.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @company_users.each do |user| %>
+              <tr>
+                <td><%= user.first_name %> <%= user.last_name %></td>
+                <td><%= user.email %></td>
+                <td>
+                  <span class="badge <%= user.role == 'super_admin' ? 'bg-light text-dark' : user.role == 'admin' ? 'bg-secondary' : 'bg-dark' %>">
+                    <%= user.role.humanize %>
+                  </span>
+                </td>
+                <td>
+                  <%= link_to "View", admin_user_path(user), class: "btn btn-outline-primary btn-sm" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center mt-4">
+        <p class="text-muted">No users assigned to this company.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="col-md-4">
+    <!-- Usage Analytics -->
+    <div class="bg-dark p-4 rounded">
+      <h5 class="mb-3">Usage Analytics</h5>
+      
+      <div class="metric-card mb-3">
+        <div class="metric-value"><%= @usage_analytics[:total_users] %></div>
+        <div class="metric-label">Total Users</div>
+      </div>
+      
+      <div class="metric-card mb-3">
+        <div class="metric-value"><%= @usage_analytics[:total_bookings] %></div>
+        <div class="metric-label">Total Bookings</div>
+      </div>
+      
+      <div class="metric-card mb-3">
+        <div class="metric-value"><%= @usage_analytics[:this_month_bookings] %></div>
+        <div class="metric-label">This Month Bookings</div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-value"><%= @usage_analytics[:active_users] %></div>
+        <div class="metric-label">Active Users (30 days)</div>
+      </div>
+    </div>
+  </div>
+</div>
