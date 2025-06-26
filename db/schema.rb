@@ -129,7 +129,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
   create_table "visitor_entries", force: :cascade do |t|
     t.string "name"
     t.integer "workspace_id"
-    t.string "person_to_visit_name"
     t.string "phone_number"
     t.string "email"
     t.string "purpose"
