@@ -1,4 +1,4 @@
-<% content_for :page_title, "Assign Workspace to #{@user.first_name} #{@user.last_name}" %>
+<% content_for :page_title, "Assign Workspace to #{@user.name}" %>
 
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
@@ -9,7 +9,7 @@
 
     <div class="bg-dark p-4 rounded mb-4">
       <h4>User Information</h4>
-      <p><strong>Name:</strong> <%= @user.first_name %> <%= @user.last_name %></p>
+      <p><strong>Name:</strong> <%= @user.name %></p>
       <p><strong>Email:</strong> <%= @user.email %></p>
       <p><strong>Role:</strong> <%= @user.role.humanize %></p>
       <p><strong>Current Workspace:</strong> <%= @user.workspace&.name || 'Not assigned' %></p>

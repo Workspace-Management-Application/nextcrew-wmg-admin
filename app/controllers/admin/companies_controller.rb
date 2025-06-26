@@ -1,5 +1,5 @@
 class Admin::CompaniesController < Admin::BaseController
-  before_action :set_company, only: [:show, :edit, :update, :destroy, :export_data]
+  before_action :set_company, only: [:show, :edit, :update, :destroy]
 
   def index
     @companies = Company.all
@@ -38,19 +38,6 @@ class Admin::CompaniesController < Admin::BaseController
   def destroy
     @company.destroy
     redirect_to admin_companies_path, notice: 'Company was successfully deleted.'
-  end
-
-  def export_data
-    respond_to do |format|
-      format.xlsx {
-        response.headers['Content-Disposition'] = "attachment; filename=\"#{@company.name}_data.xlsx\""
-      }
-      format.pdf {
-        render pdf: "#{@company.name}_report",
-               layout: 'pdf',
-               template: 'admin/companies/export_pdf'
-      }
-    end
   end
 
   private

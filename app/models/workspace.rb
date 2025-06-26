@@ -1,10 +1,10 @@
 class Workspace < ApplicationRecord
-  has_many :company_workspaces
-  has_many :companies, through: :company_workspaces
-  has_many :user_workspaces
-  has_many :users, through: :user_workspaces
-  has_many :rooms
-  has_many :day_passes
-  has_many :visitor_entries
-  has_many :office_enquiries
+  has_many :company_workspaces,  dependent: :destroy
+  has_many :companies, through: :company_workspaces,  dependent: :destroy
+  has_many :user_workspaces,  dependent: :destroy
+  has_many :users, through: :user_workspaces,  dependent: :destroy
+  has_many :rooms,  dependent: :destroy
+  has_many :day_passes,  dependent: :destroy
+  has_many :visitor_entries,  dependent: :destroy
+  has_many :office_enquiries, dependent: :destroy
 end

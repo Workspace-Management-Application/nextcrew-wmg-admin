@@ -1,4 +1,5 @@
 class Room < ApplicationRecord
+  has_many :bookings, dependent: :destroy
   belongs_to :workspace
 
   validates :name, :category, presence: true
