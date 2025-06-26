@@ -1,5 +1,4 @@
 class Api::BookingsController < Api::BaseController
-  before_action :authenticate_user!
   before_action :set_workspace
   before_action :set_booking, only: [:show, :update, :destroy]
 

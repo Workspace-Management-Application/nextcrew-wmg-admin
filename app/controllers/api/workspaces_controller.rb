@@ -1,5 +1,4 @@
 class Api::WorkspacesController < Api::BaseController
-  before_action :authenticate_user!
   before_action :set_workspace
 
   def get_data_for_room
