@@ -21,7 +21,7 @@
           <p><strong>Email:</strong> <%= @user.email %></p>
         </div>
         <div class="col-md-6">
-          <p><strong>Phone:</strong> <%= @user.phone || 'Not provided' %></p>
+          <p><strong>Phone:</strong> <%= @user.phone_number || 'Not provided' %></p>
           <p><strong>Role:</strong> 
             <span class="badge <%= @user.role == 'super_admin' ? 'bg-light text-dark' : @user.role == 'admin' ? 'bg-secondary' : 'bg-dark' %>">
               <%= @user.role.humanize %>

@@ -14,7 +14,7 @@
       <h4 class="mb-3">Workspace Details</h4>
       <div class="row">
         <div class="col-md-6">
-          <p><strong>Building:</strong> <%= @workspace.building %></p>
+          <p><strong>Building:</strong> <%= @workspace.building_name %></p>
           <p><strong>City:</strong> <%= @workspace.city %></p>
         </div>
         <div class="col-md-6">
@@ -49,9 +49,12 @@
                 <td>
                   <%= link_to "View", admin_workspace_room_path(@workspace, room), class: "btn btn-outline-primary btn-sm me-2" %>
                   <%= link_to "Edit", edit_admin_workspace_room_path(@workspace, room), class: "btn btn-secondary btn-sm me-2" %>
-                  <%= link_to "Delete", admin_workspace_room_path(@workspace, room), method: :delete, 
-                              class: "btn btn-danger btn-sm",
-                              confirm: "Are you sure you want to delete this room?" %>
+                  <%= link_to "Delete", admin_workspace_room_path(@workspace, room), 
+                              data: { 
+                                turbo_method: :delete, 
+                                turbo_confirm: "Are you sure you want to delete this room?" 
+                              },
+                              class: "btn btn-danger btn-sm" %>
                 </td>
               </tr>
             <% end %>
@@ -62,15 +65,6 @@
       <div class="text-center mt-4">
         <p class="text-muted">No rooms found in this workspace.</p>
         <%= link_to "Add the first room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary" %>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="col-md-4">
-    <% if @workspace.picture.present? %>
-      <div class="bg-dark p-3 rounded">
-        <h5>Workspace Picture</h5>
-        <%= image_tag @workspace.picture, class: "img-fluid rounded", alt: @workspace.name %>
       </div>
     <% end %>
   </div>

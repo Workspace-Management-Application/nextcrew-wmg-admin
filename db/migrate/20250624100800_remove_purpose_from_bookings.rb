@@ -4,5 +4,7 @@ class RemovePurposeFromBookings < ActiveRecord::Migration[8.0]
     remove_column :office_enquiries, :visitor_name, :string
     rename_column :visitor_entries, :image, :photo
     remove_column :visitor_entries, :person_to_visit_name, :string
+    remove_column :bookings, :booker_name, :string
+    add_column :users, :phone_number, :string
   end
 end 

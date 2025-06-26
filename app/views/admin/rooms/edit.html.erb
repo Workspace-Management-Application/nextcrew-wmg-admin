@@ -1,9 +1,9 @@
-<% content_for :page_title, "Add Room to #{@workspace.name}" %>
+<% content_for :page_title, "Edit Room - #{@room.name}" %>
 
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Add New Room</h2>
+      <h2>Edit Room</h2>
       <%= link_to "← Back to Rooms", admin_workspace_rooms_path(@workspace), class: "btn btn-outline-primary" %>
     </div>
 
@@ -35,7 +35,7 @@
                             ['Open Desk', 'open_desk'],
                             ['Private Office', 'private_office'],
                             ['Event Space', 'event_space']
-                          ]), 
+                          ], @room.category), 
                           { prompt: 'Select Category' }, 
                           { class: "form-select", required: true } %>
         </div>
@@ -55,7 +55,7 @@
               <%= form.label :whiteboard_yes, "Yes", class: "form-check-label" %>
             </div>
             <div class="form-check form-check-inline">
-              <%= form.radio_button :whiteboard, false, class: "form-check-input", id: "whiteboard_no", checked: true %>
+              <%= form.radio_button :whiteboard, false, class: "form-check-input", id: "whiteboard_no" %>
               <%= form.label :whiteboard_no, "No", class: "form-check-label" %>
             </div>
           </div>
@@ -69,7 +69,7 @@
               <%= form.label :projector_yes, "Yes", class: "form-check-label" %>
             </div>
             <div class="form-check form-check-inline">
-              <%= form.radio_button :projector, false, class: "form-check-input", id: "projector_no", checked: true %>
+              <%= form.radio_button :projector, false, class: "form-check-input", id: "projector_no" %>
               <%= form.label :projector_no, "No", class: "form-check-label" %>
             </div>
           </div>
@@ -79,7 +79,7 @@
           <%= form.label :is_available, "Active", class: "form-label" %>
           <div>
             <div class="form-check form-check-inline">
-              <%= form.radio_button :is_available, true, class: "form-check-input", id: "is_available_yes", checked: true %>
+              <%= form.radio_button :is_available, true, class: "form-check-input", id: "is_available_yes" %>
               <%= form.label :is_available_yes, "Yes", class: "form-check-label" %>
             </div>
             <div class="form-check form-check-inline">
@@ -91,7 +91,7 @@
       </div>
 
       <div class="d-flex gap-2">
-        <%= form.submit "Create Room", class: "btn btn-primary" %>
+        <%= form.submit "Update Room", class: "btn btn-primary" %>
         <%= link_to "Cancel", admin_workspace_rooms_path(@workspace), class: "btn btn-secondary" %>
       </div>
     <% end %>

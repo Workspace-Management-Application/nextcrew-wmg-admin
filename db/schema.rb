@@ -15,7 +15,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "bookings", force: :cascade do |t|
-    t.string "booker_name"
     t.string "phone_number"
     t.integer "user_id"
     t.integer "room_id"
@@ -120,6 +119,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_24_100800) do
     t.string "role"
     t.string "refresh_token"
     t.string "name"
+    t.string "phone_number"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

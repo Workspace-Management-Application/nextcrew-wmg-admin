@@ -19,7 +19,6 @@ class Admin::BookingsController < Admin::BaseController
 
   def create
     @booking = Booking.new(booking_params)
-    
     if @booking.save
       redirect_to admin_bookings_path, notice: 'Booking was successfully created.'
     else
@@ -59,6 +58,6 @@ class Admin::BookingsController < Admin::BaseController
   end
 
   def booking_params
-    params.require(:booking).permit(:user_id, :room_id, :start_time, :end_time, :purpose)
+    params.require(:booking).permit(:user_id, :room_id, :phone_number, :start_time, :end_time)
   end
 end

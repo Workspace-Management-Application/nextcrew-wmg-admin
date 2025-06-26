@@ -15,7 +15,6 @@ class Admin::WorkspacesController < Admin::BaseController
 
   def create
     @workspace = Workspace.new(workspace_params)
-    
     if @workspace.save
       redirect_to admin_workspaces_path, notice: 'Workspace was successfully created.'
     else
@@ -46,6 +45,6 @@ class Admin::WorkspacesController < Admin::BaseController
   end
 
   def workspace_params
-    params.require(:workspace).permit(:name, :building, :city, :address, :pincode, :picture)
+    params.require(:workspace).permit(:name, :building, :city, :address, :pincode)
   end
 end
