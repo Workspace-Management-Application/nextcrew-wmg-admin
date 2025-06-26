@@ -21,6 +21,8 @@ default: &default
   user: postgres
   password: postgres
   host: localhost
+  variables:
+    timezone: Asia/Kolkata
 
 
 development:
