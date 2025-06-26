@@ -31,10 +31,12 @@
 
   <body class="admin-body">
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <h4 class="sidebar-title">Admin Panel</h4>
-        <button class="sidebar-toggle d-md-none" onclick="toggleSidebar()">×</button>
+    <div class="sidebar show" id="sidebar">
+      <div class="sidebar-header d-flex align-items-center justify-content-between">
+        <h4 class="sidebar-title mb-0">Admin Panel</h4>
+        <button class="sidebar-toggle btn btn-outline-light ms-2" onclick="toggleSidebar()" style="font-size: 1.5rem;">
+          ☰
+        </button>
       </div>
       
       <nav class="sidebar-nav">
@@ -65,15 +67,23 @@
       </nav>
     </div>
 
+    <!-- Floating open sidebar button -->
+    <button id="openSidebarBtn" class="btn btn-outline-light position-fixed" style="top: 20px; left: 10px; z-index: 2000; display: none; font-size: 1.5rem;" onclick="toggleSidebar()">
+      ☰
+    </button>
+
     <!-- Main Content -->
     <div class="main-content">
       <!-- Top Header -->
-      <header class="top-header">
-        <button class="sidebar-toggle d-md-none" onclick="toggleSidebar()">☰</button>
-        <h1 class="page-title"><%= yield(:page_title) || "Dashboard" %></h1>
-        
+      <header class="top-header d-flex align-items-center" style="min-height: 120px; background: #000 !important; color: #fff !important; position: relative;">
+        <div class="flex-grow-1 text-center">
+          <h2 class="fw-bold mb-1" style="letter-spacing: 2px;">NEXTCOWORKS</h2>
+          <hr style="width: 60px; margin: 0.5rem auto; border-top: 2px solid #fff; opacity: 1;">
+          <div>Coworking Spaces</div>
+          <div>Private Cabin | Private Office | Private Desk | Shared Desk</div>
+        </div>
         <!-- Profile Dropdown -->
-        <div class="profile-dropdown">
+        <div class="profile-dropdown position-absolute end-0 me-4">
           <button class="profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
             <div class="profile-avatar">
               <%= current_user.name&.first&.upcase || "A" %>
@@ -115,18 +125,6 @@
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('show');
       }
-
-      // Close sidebar when clicking outside on mobile
-      document.addEventListener('click', function(event) {
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.querySelector('.sidebar-toggle');
-        
-        if (window.innerWidth < 768 && 
-            !sidebar.contains(event.target) && 
-            !toggleBtn.contains(event.target)) {
-          sidebar.classList.remove('show');
-        }
-      });
     </script>
 
     <%= yield :scripts %>
