@@ -34,15 +34,9 @@
 
         <div class="row">
           <div class="col-md-6 mb-3">
-            <%= form.label :phone, class: "form-label" %>
-            <%= form.telephone_field :phone, class: "form-control" %>
+            <%= form.label :phone_number, class: "form-label" %>
+            <%= form.telephone_field :phone_number, class: "form-control" %>
           </div>
-        </div>
-
-        <div class="mb-3">
-          <%= form.label :avatar, "Profile Picture", class: "form-label" %>
-          <%= form.file_field :avatar, class: "form-control", accept: "image/*" %>
-          <small class="form-text text-muted">Upload a new profile picture (optional)</small>
         </div>
 
         <hr class="my-4">

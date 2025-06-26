@@ -82,7 +82,7 @@
           <ul class="dropdown-menu dropdown-menu-end">
             <li><%= link_to "Edit Profile", admin_profile_path, class: "dropdown-item" %></li>
             <li><hr class="dropdown-divider"></li>
-            <li><%= link_to "Logout", destroy_user_session_path, method: :delete, class: "dropdown-item" %></li>
+            <li><%= button_to "Logout", destroy_user_session_path, method: :delete, class: "dropdown-item border-0 bg-transparent w-100 text-start", form: { style: "display: inline;" } %></li>
           </ul>
         </div>
       </header>

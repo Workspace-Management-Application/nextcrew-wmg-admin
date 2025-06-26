@@ -4,7 +4,6 @@
   <h2><%= @company.name %></h2>
   <div>
     <%= link_to "Edit", edit_admin_company_path(@company), class: "btn btn-primary me-2" %>
-    <%= link_to "Export Data", export_data_admin_company_path(@company, format: :xlsx), class: "btn btn-outline-primary me-2" %>
     <%= link_to "← Back to Companies", admin_companies_path, class: "btn btn-outline-primary" %>
   </div>
 </div>
@@ -44,7 +43,7 @@
           <tbody>
             <% @company_users.each do |user| %>
               <tr>
-                <td><%= user.first_name %> <%= user.last_name %></td>
+                <td><%= user.name %></td>
                 <td><%= user.email %></td>
                 <td>
                   <span class="badge <%= user.role == 'super_admin' ? 'bg-light text-dark' : user.role == 'admin' ? 'bg-secondary' : 'bg-dark' %>">

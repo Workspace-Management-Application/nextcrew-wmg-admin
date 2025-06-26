@@ -20,6 +20,6 @@ class Admin::ProfileController < Admin::BaseController
   private
 
   def profile_params
-    params.require(:user).permit(:name, :email, :phone, :avatar)
+    params.require(:user).permit(:name, :email, :phone_number)
   end
 end
