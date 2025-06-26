@@ -35,7 +35,8 @@ class Api::RoomsController < Api::BaseController
   def create
     room = @workspace.rooms.new(room_params)
     if room.save
-      render_success(room, 'Room created successfully', :created)
+      data = room.as_json(except: [:created_at, :updated_at]).merge(workspace_name: room.workspace.name)
+      render_success(data, 'Room created successfully', :created)
     else
       render_error(room.errors.full_messages.join(', '))
     end
