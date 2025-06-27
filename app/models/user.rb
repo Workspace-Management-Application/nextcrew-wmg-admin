@@ -16,6 +16,16 @@ class User < ApplicationRecord
   enum :role, { super_admin: 'super_admin', admin: 'admin', floor_user: 'floor_user', user: 'user' }, default: :user
   before_create :generate_token
 
+  # Check if user can access web interface
+  def can_access_web?
+    admin? || super_admin?
+  end
+
+  # Check if user should use mobile app only
+  def mobile_only?
+    user? || floor_user?
+  end
+
   private
 
   def generate_token

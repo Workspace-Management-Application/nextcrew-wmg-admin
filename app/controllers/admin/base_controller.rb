@@ -7,7 +7,7 @@ class Admin::BaseController < ApplicationController
   private
 
   def require_admin!
-    redirect_to root_path unless current_user.admin? || current_user.super_admin?
+    redirect_to root_path unless current_user&.can_access_web?
   end
   
 end

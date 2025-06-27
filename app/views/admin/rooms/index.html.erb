@@ -1,72 +1,74 @@
-<% content_for :page_title, "Rooms in #{@workspace.name}" %>
+<% content_for :page_title, "Rooms in \\#{@workspace.name}" %>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h2>Rooms in <%= @workspace.name %></h2>
-  <div>
-    <%= link_to "Add Room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary me-2" %>
-    <%= link_to "← Back to Workspace", admin_workspace_path(@workspace), class: "btn btn-outline-primary" %>
+<div class="content-area bg-dark text-white p-4 rounded">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Rooms in <%= @workspace.name %></h2>
+    <div>
+      <%= link_to "Add Room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary me-2" %>
+      <%= link_to "← Back to Workspace", admin_workspace_path(@workspace), class: "btn btn-outline-primary" %>
+    </div>
   </div>
-</div>
 
-<div class="table-responsive">
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Category</th>
-        <th>Capacity</th>
-        <th>Whiteboard</th>
-        <th>Projector</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @rooms.each do |room| %>
+  <div class="table-responsive">
+    <table class="table table-hover table-dark">
+      <thead>
         <tr>
-          <td><%= room.name %></td>
-          <td><%= room.category.humanize %></td>
-          <td><%= room.capacity %> people</td>
-          <td>
-            <% if room.whiteboard %>
-              <span class="badge bg-success">Yes</span>
-            <% else %>
-              <span class="badge bg-secondary">No</span>
-            <% end %>
-          </td>
-          <td>
-            <% if room.projector %>
-              <span class="badge bg-success">Yes</span>
-            <% else %>
-              <span class="badge bg-secondary">No</span>
-            <% end %>
-          </td>
-          <td>
-            <% if room.is_available %>
-              <span class="badge bg-success">Active</span>
-            <% else %>
-              <span class="badge bg-danger">Inactive</span>
-            <% end %>
-          </td>
-          <td>
-            <%= link_to "View", admin_workspace_room_path(@workspace, room), class: "btn btn-outline-primary btn-sm me-2" %>
-            <%= link_to "Edit", edit_admin_workspace_room_path(@workspace, room), class: "btn btn-secondary btn-sm me-2" %>
-            <%= link_to "Delete", admin_workspace_room_path(@workspace, room), 
-                        data: { 
-                          turbo_method: :delete, 
-                          turbo_confirm: "Are you sure you want to delete this room?" 
-                        },
-                        class: "btn btn-danger btn-sm" %>
-          </td>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Capacity</th>
+          <th>Whiteboard</th>
+          <th>Projector</th>
+          <th>Status</th>
+          <th>Actions</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
-
-<% if @rooms.empty? %>
-  <div class="text-center mt-5">
-    <p class="text-muted">No rooms found in this workspace.</p>
-    <%= link_to "Add the first room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary" %>
+      </thead>
+      <tbody>
+        <% @rooms.each do |room| %>
+          <tr>
+            <td><%= room.name %></td>
+            <td><%= room.category.humanize %></td>
+            <td><%= room.capacity %> people</td>
+            <td>
+              <% if room.whiteboard %>
+                <span class="badge bg-success">Yes</span>
+              <% else %>
+                <span class="badge bg-secondary">No</span>
+              <% end %>
+            </td>
+            <td>
+              <% if room.projector %>
+                <span class="badge bg-success">Yes</span>
+              <% else %>
+                <span class="badge bg-secondary">No</span>
+              <% end %>
+            </td>
+            <td>
+              <% if room.is_available %>
+                <span class="badge bg-success">Active</span>
+              <% else %>
+                <span class="badge bg-danger">Inactive</span>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to "View", admin_workspace_room_path(@workspace, room), class: "btn btn-outline-primary btn-sm me-2" %>
+              <%= link_to "Edit", edit_admin_workspace_room_path(@workspace, room), class: "btn btn-secondary btn-sm me-2" %>
+              <%= link_to "Delete", admin_workspace_room_path(@workspace, room), 
+                          data: { 
+                            turbo_method: :delete, 
+                            turbo_confirm: "Are you sure you want to delete this room?" 
+                          },
+                          class: "btn btn-danger btn-sm" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
-<% end %>
+
+  <% if @rooms.empty? %>
+    <div class="text-center mt-5">
+      <p class="text-muted">No rooms found in this workspace.</p>
+      <%= link_to "Add the first room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

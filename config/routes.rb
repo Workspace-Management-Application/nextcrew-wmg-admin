@@ -27,11 +27,13 @@ Rails.application.routes.draw do
   end
 
   # Web routes (optional - for admin interface)
-  devise_for :users
+  devise_for :users, controllers: {
+    sessions: 'custom_sessions'
+  }
 
   # Admin routes
   namespace :admin do
-    root 'dashboard#index'
+    get '/', to: 'dashboard#index', as: :root
     get 'dashboard', to: 'dashboard#index'
     
     resources :workspaces do
@@ -62,7 +64,6 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Bootstrap test route
-  get "bootstrap_test", to: "pages#bootstrap_test"
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
