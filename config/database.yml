@@ -87,8 +87,11 @@ production:
   primary: &primary_production
     <<: *default
     database: workspace_management_rails_production
-    username: workspace_management_rails
-    password: <%= ENV["WORKSPACE_MANAGEMENT_RAILS_DATABASE_PASSWORD"] %>
+    username: <%= ENV["DATABASE_USERNAME"] || "postgres" %>  # Use environment variable for username or fallback to default
+    password: <%= ENV["WORKSPACE_MANAGEMENT_RAILS_DATABASE_PASSWORD"] %>  # Secure password in env variable
+    host: <%= ENV["DATABASE_HOST"] %>  # Database host, set via env
+    port: <%= ENV["DATABASE_PORT"] %>  # Database port, set via env
+    timeout: 5000  # Connection timeout for database connections
   cache:
     <<: *primary_production
     database: workspace_management_rails_production_cache
