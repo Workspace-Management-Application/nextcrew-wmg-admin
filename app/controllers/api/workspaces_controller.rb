@@ -3,8 +3,8 @@ class Api::WorkspacesController < Api::BaseController
 
   def get_data_for_room
     company = @workspace.companies.find_by(id: params[:company_id])
-    room =  company.rooms
-    if room && company
+    rooms =  company.rooms
+    if rooms && company
       rooms_with_occupancy = rooms.map do |room|
         room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
           is_occupied: room.is_occupied?,

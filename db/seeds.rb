@@ -32,7 +32,11 @@ CompanyUser.find_or_create_by!(company: company, user: user)
 UserWorkspace.find_or_create_by!(user: user, workspace: workspace)
 
 # Seed Rooms
-Room.find_or_create_by!(name: 'Tesla', category: 'Conference', workspace_id: workspace.id, capacity: 20, whiteboard: true, projector: true, is_available: true)
-Room.find_or_create_by!(name: 'Mercedes', category: 'Conference', workspace_id: workspace.id, capacity: 20, whiteboard: true, projector: true, is_available: true)
-Room.find_or_create_by!(name: 'Alto', category: 'Meeting', workspace_id: workspace.id, capacity: 6, whiteboard: true, projector: true, is_available: true)
-Room.find_or_create_by!(name: 'Nano', category: 'Meeting', workspace_id: workspace.id, capacity: 6, whiteboard: true, projector: true, is_available: true)
+tesla_room = Room.find_or_create_by!(name: 'Tesla', category: 'Conference', workspace_id: workspace.id, capacity: 20, whiteboard: true, projector: true, is_available: true)
+mercedes_room = Room.find_or_create_by!(name: 'Mercedes', category: 'Conference', workspace_id: workspace.id, capacity: 20, whiteboard: true, projector: true, is_available: true)
+alto_room = Room.find_or_create_by!(name: 'Alto', category: 'Meeting', workspace_id: workspace.id, capacity: 6, whiteboard: true, projector: true, is_available: true)
+nano_room = Room.find_or_create_by!(name: 'Nano', category: 'Meeting', workspace_id: workspace.id, capacity: 6, whiteboard: true, projector: true, is_available: true)
+
+# Associate Company with all Rooms
+CompanyRoom.find_or_create_by!(company: company, room: tesla_room)
+CompanyRoom.find_or_create_by!(company: company, room: nano_room)
