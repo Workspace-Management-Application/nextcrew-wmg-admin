@@ -2,8 +2,9 @@ class Api::WorkspacesController < Api::BaseController
   before_action :set_workspace
 
   def get_data_for_room
-    room = @workspace.rooms
-    if room
+    company = @workspace.companies.find_by(id: params[:company_id])
+    room =  company.rooms
+    if room && company
       render_success(room)
     else
       render_error("Room not found", :not_found)

@@ -43,7 +43,8 @@ Rails.application.routes.draw do
     resources :bookings
     resources :companies do
       member do
-        get :export_data
+        post :add_room
+        delete :remove_room
       end
     end
     

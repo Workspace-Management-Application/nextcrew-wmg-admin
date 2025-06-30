@@ -7,6 +7,9 @@ class Admin::CompaniesController < Admin::BaseController
 
   def show
     @company_users = @company.users
+    @rooms = @company.rooms
+    @available_rooms = @company.workspaces.first.rooms.where.not(id: @rooms.pluck(:id))
+
     @usage_analytics = calculate_usage_analytics(@company)
   end
 
@@ -38,6 +41,20 @@ class Admin::CompaniesController < Admin::BaseController
   def destroy
     @company.destroy
     redirect_to admin_companies_path, notice: 'Company was successfully deleted.'
+  end
+
+  def add_room
+    @company = Company.find(params[:id])
+    @room = Room.find(params[:room_id])
+    @company.rooms << @room unless @company.rooms.include?(@room)
+    redirect_to admin_company_path(@company), notice: "Room added."
+  end
+
+  def remove_room
+    @company = Company.find(params[:id])
+    @room = Room.find(params[:room_id])
+    @company.rooms.delete(@room)
+    redirect_to admin_company_path(@company), notice: "Room removed."
   end
 
   private

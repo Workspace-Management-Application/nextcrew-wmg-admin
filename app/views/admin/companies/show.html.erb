@@ -1,3 +1,4 @@
+<!-- filepath: /home/dell/jj/workspace-management-rails/app/views/admin/companies/show.html.erb -->
 <% content_for :page_title, @company.name %>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -63,6 +64,50 @@
         <p class="text-muted">No users assigned to this company.</p>
       </div>
     <% end %>
+
+    <!-- Associated Rooms -->
+    <div class="mt-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Associated Rooms (<%= @company.rooms.count %>)</h4>
+      </div>
+      <% if @company.rooms.any? %>
+        <div class="table-responsive">
+          <table class="table table-hover table-dark">
+            <thead>
+              <tr>
+                <th>Room Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @company.rooms.each do |room| %>
+                <tr>
+                  <td><%= room.name %></td>
+                  <td>
+                    <%= button_to "Remove", remove_room_admin_company_path(@company, room_id: room.id), method: :delete, class: "btn btn-danger btn-sm", data: { confirm: "Are you sure you want to remove this room?" } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="text-center mt-4">
+          <p class="text-muted">No rooms associated with this company.</p>
+        </div>
+      <% end %>
+
+      <!-- Add Room Form -->
+      <div class="mt-4">
+        <h5>Add Room</h5>
+        <%= form_with url: add_room_admin_company_path(@company), method: :post, local: true do %>
+          <div class="input-group mb-3" style="max-width: 400px;">
+            <%= select_tag :room_id, options_from_collection_for_select(@available_rooms, :id, :name), prompt: "Select a room", class: "form-select" %>
+            <button class="btn btn-success" type="submit">Add Room</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <div class="col-md-4">
@@ -90,5 +135,3 @@
         <div class="metric-label">Active Users (30 days)</div>
       </div>
     </div>
-  </div>
-</div>

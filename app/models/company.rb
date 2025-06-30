@@ -4,6 +4,8 @@ class Company < ApplicationRecord
   has_many :company_workspaces
   has_many :workspaces, through: :company_workspaces
   has_many :day_passes
+  has_many :company_rooms, dependent: :destroy
+  has_many :rooms, through: :company_rooms
 
   enum :status, { active: 'active', inactive: 'inactive', pending: 'pending', approved: 'approved' }, default: :pending
 
