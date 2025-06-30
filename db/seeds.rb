@@ -9,20 +9,20 @@
 #   end
 
 # Seed Companies
-company = Company.find_or_create_by!(name: 'Acme Corp', email: 'info@acme.com', phone_number: '1234567880', address: '123 Main St', status: 'active')
+company = Company.find_or_create_by!(name: 'SR Next', email: 'info@srnext.in', phone_number: '1234567890', address: 'Cabin 10', status: 'active')
 
 # Seed Workspaces
-workspace = Workspace.find_or_create_by!(name: 'Downtown Workspace', building_name: 'Downtown Tower', address: '456 Center Ave', city: 'Metropolis', pincode: '123456', photo: nil, is_active: true)
+workspace = Workspace.find_or_create_by!(name: 'Floor 5', building_name: 'Nextcoworks', address: 'Slice 6 Aranya Nagar Vijay Nagar', city: 'Indore', pincode: '452010', photo: nil, is_active: true)
 
 # Associate Company and Workspace
 CompanyWorkspace.find_or_create_by!(company: company, workspace: workspace)
 
 # Seed Users
-user = User.find_or_create_by!(email: 'admin@acme.com') do |u|
+user = User.find_or_create_by!(email: 'floor_user@gmail.com') do |u|
   u.password = 'password123'
   u.password_confirmation = 'password123'
-  u.role = 'admin'
-  u.name = 'Admin User'
+  u.role = 'floor_user'
+  u.name = 'Floor User'
 end
 
 # Associate User and Company
@@ -32,7 +32,7 @@ CompanyUser.find_or_create_by!(company: company, user: user)
 UserWorkspace.find_or_create_by!(user: user, workspace: workspace)
 
 # Seed Rooms
-room = Room.find_or_create_by!(name: 'Conference Room A', category: 'Conference', workspace_id: workspace.id, capacity: 10, whiteboard: true, projector: true, is_available: true)
-
-# Optionally, seed a booking
-Booking.find_or_create_by!(booker_name: user.name, phone_number: '1234567890', user: user, room: room, start_time: Time.now + 1.day, end_time: Time.now + 1.day + 2.hours, status: 'confirmed')
+Room.find_or_create_by!(name: 'Tesla', category: 'Conference', workspace_id: workspace.id, capacity: 20, whiteboard: true, projector: true, is_available: true)
+Room.find_or_create_by!(name: 'Mercedes', category: 'Conference', workspace_id: workspace.id, capacity: 20, whiteboard: true, projector: true, is_available: true)
+Room.find_or_create_by!(name: 'Alto', category: 'Meeting', workspace_id: workspace.id, capacity: 6, whiteboard: true, projector: true, is_available: true)
+Room.find_or_create_by!(name: 'Nano', category: 'Meeting', workspace_id: workspace.id, capacity: 6, whiteboard: true, projector: true, is_available: true)
