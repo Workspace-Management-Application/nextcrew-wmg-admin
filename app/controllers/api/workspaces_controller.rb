@@ -5,7 +5,13 @@ class Api::WorkspacesController < Api::BaseController
     company = @workspace.companies.find_by(id: params[:company_id])
     room =  company.rooms
     if room && company
-      render_success(room)
+      rooms_with_occupancy = rooms.map do |room|
+        room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
+          is_occupied: room.is_occupied?,
+          workspace_name: @workspace.name
+        )
+      end
+      render_success(rooms_with_occupancy)
     else
       render_error("Room not found", :not_found)
     end
