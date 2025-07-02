@@ -468,6 +468,7 @@ puts "🚪 Creating visitor entries..."
 visitor_entries_data = [
   {
     name: 'Suresh Chandra',
+    person_to_visit_name: 'John Admin',
     workspace: workspace_records[0],
     phone_number: '+91-9345678901',
     email: 'suresh@delivery.com',
@@ -475,6 +476,7 @@ visitor_entries_data = [
   },
   {
     name: 'Meera Kumari',
+    person_to_visit_name: 'Floor Manager One',
     workspace: workspace_records[0],
     phone_number: '+91-9345678902',
     email: 'meera@maintenance.com',
@@ -482,6 +484,7 @@ visitor_entries_data = [
   },
   {
     name: 'Ravi Kumar',
+    person_to_visit_name: 'Sarah Admin',
     workspace: workspace_records[1],
     phone_number: '+91-9345678903',
     email: 'ravi@interview.in',
@@ -489,6 +492,7 @@ visitor_entries_data = [
   },
   {
     name: 'Pooja Mishra',
+    person_to_visit_name: 'Floor Manager Three',
     workspace: workspace_records[2],
     phone_number: '+91-9345678904',
     email: 'pooja@visitor.com',
@@ -496,6 +500,7 @@ visitor_entries_data = [
   },
   {
     name: 'Deepak Verma',
+    person_to_visit_name: 'Alice Employee',
     workspace: workspace_records[0],
     phone_number: '+91-9345678905',
     email: 'deepak@client.com',

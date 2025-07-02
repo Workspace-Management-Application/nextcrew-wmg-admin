@@ -82,7 +82,7 @@ class Api::VisitorEntriesController < Api::BaseController
   end
 
   def visitor_entry_params
-    params.require(:visitor_entry).permit(:name, :workspace_id, :phone_number, :email, :purpose, :photo)
+    params.require(:visitor_entry).permit(:name, :person_to_visit_name, :workspace_id, :phone_number, :email, :purpose, :photo)
   end
 
   def authorize_floor_user!
@@ -95,6 +95,7 @@ class Api::VisitorEntriesController < Api::BaseController
     {
       id: visitor_entry.id,
       name: visitor_entry.name,
+      person_to_visit_name: visitor_entry.person_to_visit_name,
       workspace_id: visitor_entry.workspace_id,
       phone_number: visitor_entry.phone_number,
       email: visitor_entry.email,

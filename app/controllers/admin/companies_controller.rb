@@ -64,7 +64,7 @@ class Admin::CompaniesController < Admin::BaseController
   end
 
   def company_params
-    params.require(:company).permit(:name, :email, :phone, :address, :contact_person)
+    params.require(:company).permit(:name, :email, :phone_number, :address, :status)
   end
 
   def calculate_usage_analytics(company)

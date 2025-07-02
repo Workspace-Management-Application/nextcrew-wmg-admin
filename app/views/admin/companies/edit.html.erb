@@ -1,10 +1,10 @@
-<% content_for :page_title, "Add Company" %>
+<% content_for :page_title, "Edit Company" %>
 
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Add New Company</h2>
-      <%= link_to "← Back to Companies", admin_companies_path, class: "btn btn-outline-primary" %>
+      <h2>Edit Company</h2>
+      <%= link_to "← Back to Company", admin_company_path(@company), class: "btn btn-outline-primary" %>
     </div>
 
     <%= form_with model: [:admin, @company], local: true, class: "needs-validation", novalidate: true do |form| %>
@@ -57,9 +57,9 @@
       </div>
 
       <div class="d-flex gap-2">
-        <%= form.submit "Create Company", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_companies_path, class: "btn btn-secondary" %>
+        <%= form.submit "Update Company", class: "btn btn-primary" %>
+        <%= link_to "Cancel", admin_company_path(@company), class: "btn btn-secondary" %>
       </div>
     <% end %>
   </div>
-</div>
+</div> 
