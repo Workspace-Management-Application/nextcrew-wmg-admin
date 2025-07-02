@@ -118,12 +118,23 @@ bundle_install() {
     log "Installing/updating gems..."
     cd "$APP_DIR"
     
-    # Check if Gemfile.lock has changed
-    if git diff HEAD~1 --name-only | grep -q "Gemfile"; then
-        log "Gemfile changed, running bundle install..."
-        bundle install --deployment --without development test
+    # Check if Gemfile or Gemfile.lock has changed
+    if git diff HEAD~1 --name-only | grep -q -E "(Gemfile|Gemfile.lock)"; then
+        log "Gemfile or Gemfile.lock changed, running bundle install..."
+        
+        # Set bundle config for production deployment
+        bundle config set --local deployment true
+        bundle config set --local without 'development test'
+        
+        # Install gems
+        bundle install
+        
+        if [ $? -ne 0 ]; then
+            error "Bundle install failed. You may need to update Gemfile.lock locally and commit it."
+            return 1
+        fi
     else
-        info "Gemfile unchanged, skipping bundle install"
+        info "No Gemfile changes detected, skipping bundle install"
     fi
 }
 
