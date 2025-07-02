@@ -24,18 +24,77 @@
 # Any libraries that use a connection pool or another resource pool should
 # be configured to provide at least as many connections as the number of
 # threads. This includes Active Record's `pool` parameter in `database.yml`.
-threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
-threads threads_count, threads_count
 
-# Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-port ENV.fetch("PORT", 3000)
+# Puma Configuration for Rails Application
+# Environment-specific settings for both development and production
 
-# Allow puma to be restarted by `bin/rails restart` command.
-plugin :tmp_restart
+# Environment-specific configuration
+environment ENV.fetch("RAILS_ENV") { "development" }
+
+if ENV['RAILS_ENV'] == 'production'
+  # Production Configuration
+  
+  # Application directory
+  app_dir = "/home/ec2-user/workspace-management-rails"
+  
+  # Use Unix socket for nginx communication
+  bind "unix://#{app_dir}/tmp/sockets/puma.sock"
+  
+  # Workers and clustering
+  workers ENV.fetch("WEB_CONCURRENCY", 2)
+  
+  # Thread configuration for production
+  threads 1, 2
+  
+  # Preload the application for better memory usage
+  preload_app!
+  
+  # Set master PID location
+  pidfile "#{app_dir}/tmp/pids/puma.pid"
+  
+  # Set state file location  
+  state_path "#{app_dir}/tmp/pids/puma.state"
+  
+  # Logging
+  stdout_redirect "#{app_dir}/log/puma.stdout.log", "#{app_dir}/log/puma.stderr.log", true
+  
+  # Restart command
+  restart_command "bundle exec puma"
+  
+  # Allow puma to be restarted
+  plugin :tmp_restart
+  
+  # Ensure socket directory exists
+  before_fork do
+    require 'fileutils'
+    FileUtils.mkdir_p("#{app_dir}/tmp/sockets")
+    FileUtils.mkdir_p("#{app_dir}/tmp/pids")
+    FileUtils.mkdir_p("#{app_dir}/log")
+  end
+  
+  # Worker configuration
+  on_worker_boot do
+    # Reconnect to database in worker processes
+    ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+  end
+  
+else
+  # Development Configuration
+  
+  # Thread configuration for development
+  threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
+  threads threads_count, threads_count
+  
+  # Use port 3000 for development
+  port ENV.fetch("PORT", 3000)
+  
+  # Allow puma to be restarted by `bin/rails restart` command
+  plugin :tmp_restart
+  
+  # Specify the PID file for development
+  pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
+  
+end
 
 # Run the Solid Queue supervisor inside of Puma for single-server deployments
 plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
-
-# Specify the PID file. Defaults to tmp/pids/server.pid in development.
-# In other environments, only set the PID file if requested.
-pidfile ENV["PIDFILE"] if ENV["PIDFILE"]

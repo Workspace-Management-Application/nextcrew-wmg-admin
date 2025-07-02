@@ -200,21 +200,38 @@ precompile_assets() {
 restart_services() {
     log "Restarting services..."
     
-    # Restart Puma
-    sudo systemctl restart puma
+    # Stop services first
+    sudo systemctl stop puma
+    sudo systemctl stop nginx
+    
+    # Clean up old socket file if it exists
+    sudo rm -f /home/ec2-user/workspace-management-rails/tmp/sockets/puma.sock
+    
+    # Ensure socket directory exists with proper permissions
+    sudo mkdir -p /home/ec2-user/workspace-management-rails/tmp/sockets
+    sudo chown ec2-user:ec2-user /home/ec2-user/workspace-management-rails/tmp/sockets
+    sudo chmod 755 /home/ec2-user/workspace-management-rails/tmp/sockets
+    
+    # Ensure log directory exists
+    sudo mkdir -p /home/ec2-user/workspace-management-rails/log
+    sudo chown ec2-user:ec2-user /home/ec2-user/workspace-management-rails/log
+    
+    # Start Puma
+    sudo systemctl start puma
     if [ $? -eq 0 ]; then
-        log "Puma restarted successfully ✓"
+        log "Puma started successfully ✓"
     else
-        error "Failed to restart Puma"
+        error "Failed to start Puma"
+        sudo journalctl -u puma --no-pager -n 20
         exit 1
     fi
     
-    # Reload Nginx (faster than restart)
-    sudo systemctl reload nginx
+    # Start Nginx
+    sudo systemctl start nginx
     if [ $? -eq 0 ]; then
-        log "Nginx reloaded successfully ✓"
+        log "Nginx started successfully ✓"
     else
-        error "Failed to reload Nginx"
+        error "Failed to start Nginx"
         exit 1
     fi
 }
