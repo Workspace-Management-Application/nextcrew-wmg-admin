@@ -224,22 +224,56 @@ health_check() {
     log "Performing health check..."
     
     # Wait a moment for services to start
-    sleep 5
+    log "Waiting 10 seconds for services to fully start..."
+    sleep 10
     
-    # Check if application responds
-    if curl -s -o /dev/null -w "%{http_code}" http://localhost | grep -q "302\|200"; then
-        log "Health check passed ✓"
-    else
-        error "Health check failed - application not responding"
+    # Check service status first
+    log "Checking service status..."
+    PUMA_STATUS=$(systemctl is-active puma)
+    NGINX_STATUS=$(systemctl is-active nginx)
+    
+    info "Puma status: $PUMA_STATUS"
+    info "Nginx status: $NGINX_STATUS"
+    
+    if [ "$PUMA_STATUS" != "active" ]; then
+        error "Puma service is not active"
+        sudo systemctl status puma --no-pager
         return 1
     fi
     
-    # Check service status
-    if systemctl is-active --quiet puma && systemctl is-active --quiet nginx; then
-        log "All services are running ✓"
+    if [ "$NGINX_STATUS" != "active" ]; then
+        error "Nginx service is not active"
+        sudo systemctl status nginx --no-pager
+        return 1
+    fi
+    
+    # Check if puma socket exists
+    if [ ! -S "/home/ec2-user/workspace-management-rails/tmp/sockets/puma.sock" ]; then
+        error "Puma socket file does not exist"
+        ls -la "/home/ec2-user/workspace-management-rails/tmp/sockets/"
+        return 1
+    else
+        info "Puma socket file exists ✓"
+    fi
+    
+    # Check if application responds
+    log "Testing application response..."
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost)
+    info "HTTP response code: $HTTP_CODE"
+    
+    if echo "$HTTP_CODE" | grep -q "302\|200"; then
+        log "Health check passed ✓"
         return 0
     else
-        error "Some services are not running"
+        error "Health check failed - HTTP code: $HTTP_CODE"
+        
+        # Additional debugging
+        log "Checking nginx error logs..."
+        sudo tail -10 /var/log/nginx/rails_app_error.log
+        
+        log "Checking puma logs..."
+        sudo journalctl -u puma --no-pager -n 10
+        
         return 1
     fi
 }
