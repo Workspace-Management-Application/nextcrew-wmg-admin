@@ -8,13 +8,12 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # Allow requests from any origin for development
-    # In production, replace '*' with your specific frontend domain(s)
+    # Note: credentials: true cannot be used with origins '*' for security reasons
     origins '*'
 
     resource '*',
       headers: :any,
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: true,
       expose: ['Authorization']
   end
 
@@ -25,7 +24,6 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     resource '/api/*',
       headers: :any,
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: true,
       expose: ['Authorization', 'Content-Type', 'Accept'],
       max_age: 600
   end
