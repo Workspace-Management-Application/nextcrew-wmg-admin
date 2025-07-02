@@ -77,6 +77,8 @@ class PhotoUploadService
       case model_instance.class.name
       when 'Workspace'
         'workspaces'
+      when 'Room'
+        'rooms'
       when 'DayPass'
         'day_passes'
       when 'VisitorEntry'

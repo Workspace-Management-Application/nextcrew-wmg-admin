@@ -14,9 +14,19 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def create
-    @room = @workspace.rooms.build(room_params)
+    @room = @workspace.rooms.build(room_params.except(:photo))
     
     if @room.save
+      # Handle photo upload using Active Storage with auto folder organization
+      if params[:room][:photo].present?
+        photo_result = PhotoUploadService.attach_photo_auto(@room, params[:room][:photo])
+        unless photo_result[:success]
+          flash[:alert] = photo_result[:error]
+          render :new
+          return
+        end
+      end
+      
       redirect_to admin_workspace_rooms_path(@workspace), notice: 'Room was successfully created.'
     else
       render :new
@@ -27,7 +37,17 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def update
-    if @room.update(room_params)
+    if @room.update(room_params.except(:photo))
+      # Handle photo upload using Active Storage with auto folder organization
+      if params[:room][:photo].present?
+        photo_result = PhotoUploadService.attach_photo_auto(@room, params[:room][:photo])
+        unless photo_result[:success]
+          flash[:alert] = photo_result[:error]
+          render :edit
+          return
+        end
+      end
+      
       redirect_to admin_workspace_room_path(@workspace, @room), notice: 'Room was successfully updated.'
     else
       render :edit
@@ -50,6 +70,6 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def room_params
-    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :is_available)
+    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :is_available, :photo)
   end
 end

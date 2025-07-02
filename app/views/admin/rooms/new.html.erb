@@ -46,6 +46,12 @@
         <%= form.number_field :capacity, class: "form-control", required: true, min: 1, placeholder: "Maximum number of people" %>
       </div>
 
+      <div class="mb-3">
+        <%= form.label :photo, "Room Photo", class: "form-label" %>
+        <%= form.file_field :photo, class: "form-control", accept: "image/*" %>
+        <div class="form-text">Upload a photo of the room (optional). Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB.</div>
+      </div>
+
       <div class="row mb-3">
         <div class="col-md-4">
           <%= form.label :whiteboard, "Whiteboard", class: "form-label" %>

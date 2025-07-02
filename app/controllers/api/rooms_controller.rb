@@ -6,7 +6,7 @@ class Api::RoomsController < Api::BaseController
   def index
     rooms = @workspace.rooms
     rooms_with_occupancy = rooms.map do |room|
-      room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
+      room_response(room).merge(
         is_occupied: room.is_occupied?,
         workspace_name: @workspace.name
       )
@@ -17,7 +17,7 @@ class Api::RoomsController < Api::BaseController
   # GET /api/workspaces/:workspace_id/rooms/:id
   def show
     if @room
-      room_data = @room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
+      room_data = room_response(@room).merge(
         workspace_name: @workspace.name
       )
       if params[:date].present?
@@ -38,9 +38,19 @@ class Api::RoomsController < Api::BaseController
 
   # POST /api/workspaces/:workspace_id/rooms
   def create
-    room = @workspace.rooms.new(room_params)
+    room = @workspace.rooms.new(room_params.except(:photo))
+    
     if room.save
-      data = room.as_json(except: [:created_at, :updated_at]).merge(workspace_name: room.workspace.name)
+      # Handle photo upload using Active Storage with auto folder organization
+      if params[:room][:photo].present?
+        photo_result = PhotoUploadService.attach_photo_auto(room, params[:room][:photo])
+        unless photo_result[:success]
+          render_error(photo_result[:error])
+          return
+        end
+      end
+      
+      data = room_response(room).merge(workspace_name: room.workspace.name)
       render_success(data, 'Room created successfully', :created)
     else
       render_error(room.errors.full_messages.join(', '))
@@ -50,10 +60,17 @@ class Api::RoomsController < Api::BaseController
   # PATCH/PUT /api/workspaces/:workspace_id/rooms/:id
   def update
     if @room
-      if @room.update(room_params)
-        data = @room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
-          workspace_name: @workspace.name
-        )
+      if @room.update(room_params.except(:photo))
+        # Handle photo upload using Active Storage with auto folder organization
+        if params[:room][:photo].present?
+          photo_result = PhotoUploadService.attach_photo_auto(@room, params[:room][:photo])
+          unless photo_result[:success]
+            render_error(photo_result[:error])
+            return
+          end
+        end
+        
+        data = room_response(@room).merge(workspace_name: @workspace.name)
         render_success(data, 'Room updated successfully')
       else
         render_error(@room.errors.full_messages.join(', '))
@@ -85,6 +102,13 @@ class Api::RoomsController < Api::BaseController
   end
 
   def room_params
-    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :is_available)
+    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :is_available, :photo)
+  end
+
+  def room_response(room)
+    room.as_json(except: [:created_at, :updated_at, :workspace_id]).merge(
+      photo_url: PhotoUploadService.photo_url(room),
+      photo_attached: PhotoUploadService.photo_attached?(room)
+    )
   end
 end 
