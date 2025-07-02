@@ -104,9 +104,7 @@ end
 puts "🔗 Creating company-workspace associations..."
 company_workspace_associations = [
   { company: company_records[0], workspace: workspace_records[0] },
-  { company: company_records[0], workspace: workspace_records[1] },
-  { company: company_records[1], workspace: workspace_records[0] },
-  { company: company_records[1], workspace: workspace_records[2] },
+  { company: company_records[1], workspace: workspace_records[1] },
   { company: company_records[2], workspace: workspace_records[2] },
   { company: company_records[3], workspace: workspace_records[3] }
 ]
