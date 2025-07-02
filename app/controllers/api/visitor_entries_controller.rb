@@ -23,9 +23,9 @@ class Api::VisitorEntriesController < Api::BaseController
     visitor_entry = @workspace.visitor_entries.new(visitor_entry_params.except(:photo))
     
     if visitor_entry.save
-      # Handle photo upload using Active Storage
-      if params[:photo].present?
-        photo_result = PhotoUploadService.attach_photo(visitor_entry, params[:photo])
+      # Handle photo upload using Active Storage with auto folder organization
+      if params[:visitor_entry][:photo].present?
+        photo_result = PhotoUploadService.attach_photo_auto(visitor_entry, params[:visitor_entry][:photo])
         unless photo_result[:success]
           render_error(photo_result[:error])
           return
@@ -42,9 +42,9 @@ class Api::VisitorEntriesController < Api::BaseController
   def update
     if @visitor_entry
       if @visitor_entry.update(visitor_entry_params.except(:photo))
-        # Handle photo upload using Active Storage
-        if params[:photo].present?
-          photo_result = PhotoUploadService.attach_photo(@visitor_entry, params[:photo])
+        # Handle photo upload using Active Storage with auto folder organization
+        if params[:visitor_entry][:photo].present?
+          photo_result = PhotoUploadService.attach_photo_auto(@visitor_entry, params[:visitor_entry][:photo])
           unless photo_result[:success]
             render_error(photo_result[:error])
             return
@@ -82,7 +82,7 @@ class Api::VisitorEntriesController < Api::BaseController
   end
 
   def visitor_entry_params
-    params.require(:visitor_entry).permit(:name, :person_to_visit_name, :workspace_id, :phone_number, :email, :purpose, :photo)
+    params.require(:visitor_entry).permit(:name, :workspace_id, :phone_number, :email, :purpose, :photo)
   end
 
   def authorize_floor_user!
@@ -92,9 +92,17 @@ class Api::VisitorEntriesController < Api::BaseController
   end
 
   def visitor_entry_response(visitor_entry)
-    visitor_entry.as_json.merge(
+    {
+      id: visitor_entry.id,
+      name: visitor_entry.name,
+      workspace_id: visitor_entry.workspace_id,
+      phone_number: visitor_entry.phone_number,
+      email: visitor_entry.email,
+      purpose: visitor_entry.purpose,
       photo_url: PhotoUploadService.photo_url(visitor_entry),
-      photo_attached: PhotoUploadService.photo_attached?(visitor_entry)
-    )
+      photo_attached: PhotoUploadService.photo_attached?(visitor_entry),
+      created_at: visitor_entry.created_at,
+      updated_at: visitor_entry.updated_at
+    }
   end
 end 

@@ -1,14 +1,23 @@
 class PhotoUploadService
   class << self
-    # Attach photo to a model instance using Active Storage
-    # Usage: PhotoUploadService.attach_photo(workspace, params[:photo])
-    def attach_photo(model_instance, photo_file)
+    # Attach photo to a model instance using Active Storage with folder organization
+    # Usage: PhotoUploadService.attach_photo(workspace, params[:photo], 'workspaces')
+    def attach_photo(model_instance, photo_file, folder = nil)
       return { success: false, error: 'No photo provided' } if photo_file.blank?
       return { success: false, error: 'Invalid file type' } unless valid_image?(photo_file)
       return { success: false, error: 'File too large' } unless valid_size?(photo_file)
 
       begin
-        model_instance.photo.attach(photo_file)
+        # Generate organized filename with folder structure
+        organized_filename = generate_organized_filename(photo_file, folder, model_instance)
+        
+        # Attach with custom filename for S3 organization
+        model_instance.photo.attach(
+          io: photo_file.tempfile,
+          filename: organized_filename,
+          content_type: photo_file.content_type
+        )
+        
         { success: true, message: 'Photo uploaded successfully' }
       rescue => e
         Rails.logger.error("Photo upload failed: #{e.message}")
@@ -45,7 +54,37 @@ class PhotoUploadService
       end
     end
 
+    # Convenience method to auto-detect folder based on model type
+    def attach_photo_auto(model_instance, photo_file)
+      folder = detect_folder_from_model(model_instance)
+      attach_photo(model_instance, photo_file, folder)
+    end
+
     private
+
+    # Generate organized filename with folder structure for S3
+    def generate_organized_filename(photo_file, folder, model_instance)
+      folder ||= detect_folder_from_model(model_instance)
+      timestamp = Time.current.strftime('%Y%m%d_%H%M%S')
+      unique_id = SecureRandom.hex(8)
+      file_extension = File.extname(photo_file.original_filename)
+      
+      "uploads/#{folder}/#{timestamp}_#{unique_id}#{file_extension}"
+    end
+
+    # Auto-detect folder name based on model class
+    def detect_folder_from_model(model_instance)
+      case model_instance.class.name
+      when 'Workspace'
+        'workspaces'
+      when 'DayPass'
+        'day_passes'
+      when 'VisitorEntry'
+        'visitor_entries'
+      else
+        'general'
+      end
+    end
 
     # Validate image file type
     def valid_image?(file)

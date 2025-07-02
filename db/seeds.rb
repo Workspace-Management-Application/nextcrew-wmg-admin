@@ -100,13 +100,13 @@ workspace_records = workspaces.map do |workspace_data|
   end
 end
 
-# 3. Create Company-Workspace associations
+# 3. Create Company-Workspace associations (One company per workspace)
 puts "🔗 Creating company-workspace associations..."
 company_workspace_associations = [
-  { company: company_records[0], workspace: workspace_records[0] },
-  { company: company_records[1], workspace: workspace_records[1] },
-  { company: company_records[2], workspace: workspace_records[2] },
-  { company: company_records[3], workspace: workspace_records[3] }
+  { company: company_records[0], workspace: workspace_records[0] }, # SR Next -> Floor 5 Premium
+  { company: company_records[1], workspace: workspace_records[1] }, # InnovateCorp -> Floor 3 Standard
+  { company: company_records[2], workspace: workspace_records[2] }, # StartupXYZ -> Ground Floor Basic
+  { company: company_records[3], workspace: workspace_records[3] }  # TechSolutions -> Floor 2 Executive
 ]
 
 company_workspace_associations.each do |assoc|
@@ -227,16 +227,25 @@ company_user_associations.each do |assoc|
   CompanyUser.find_or_create_by!(company: assoc[:company], user: assoc[:user])
 end
 
-# 6. Create User-Workspace associations
+# 6. Create User-Workspace associations (Users belong to their company's workspace)
 puts "🏢 Creating user-workspace associations..."
 user_workspace_associations = [
-  { user: user_records[3], workspace: workspace_records[0] }, # floor_user -> Floor 5
-  { user: user_records[4], workspace: workspace_records[1] }, # floor_user2 -> Floor 3
-  { user: user_records[5], workspace: workspace_records[2] }, # floor_user3 -> Ground Floor
-  { user: user_records[6], workspace: workspace_records[0] }, # user1 -> Floor 5
-  { user: user_records[7], workspace: workspace_records[0] }, # user2 -> Floor 5
-  { user: user_records[8], workspace: workspace_records[2] }, # user3 -> Ground Floor
-  { user: user_records[9], workspace: workspace_records[3] }  # user4 -> Floor 2
+  # SR Next Technologies users -> Floor 5 Premium
+  { user: user_records[1], workspace: workspace_records[0] }, # admin@srnext
+  { user: user_records[3], workspace: workspace_records[0] }, # floor_user@gmail
+  { user: user_records[6], workspace: workspace_records[0] }, # user1@srnext
+  
+  # InnovateCorp users -> Floor 3 Standard
+  { user: user_records[2], workspace: workspace_records[1] }, # admin2@innovatecorp
+  { user: user_records[4], workspace: workspace_records[1] }, # floor_user2
+  { user: user_records[7], workspace: workspace_records[1] }, # user2@innovatecorp
+  
+  # StartupXYZ users -> Ground Floor Basic
+  { user: user_records[5], workspace: workspace_records[2] }, # floor_user3
+  { user: user_records[8], workspace: workspace_records[2] }, # user3@startupxyz
+  
+  # TechSolutions users -> Floor 2 Executive
+  { user: user_records[9], workspace: workspace_records[3] }  # user4@techsolutions
 ]
 
 user_workspace_associations.each do |assoc|
@@ -275,15 +284,23 @@ room_records = rooms_data.map do |room_data|
   end
 end
 
-# 8. Create Company-Room associations
+# 8. Create Company-Room associations (Companies access rooms in their workspace only)
 puts "🏛️ Creating company-room associations..."
 company_room_associations = [
+  # SR Next Technologies (Floor 5 Premium workspace) -> Floor 5 rooms
   { company: company_records[0], room: room_records[0] }, # SR Next -> Tesla
   { company: company_records[0], room: room_records[1] }, # SR Next -> Mercedes
   { company: company_records[0], room: room_records[3] }, # SR Next -> Alto
-  { company: company_records[1], room: room_records[2] }, # InnovateCorp -> BMW
+  
+  # InnovateCorp (Floor 3 Standard workspace) -> Floor 3 rooms
   { company: company_records[1], room: room_records[6] }, # InnovateCorp -> Boardroom Alpha
+  { company: company_records[1], room: room_records[7] }, # InnovateCorp -> Meeting Beta
+  
+  # StartupXYZ (Ground Floor Basic workspace) -> Ground Floor rooms
   { company: company_records[2], room: room_records[10] }, # StartupXYZ -> Conference One
+  { company: company_records[2], room: room_records[11] }, # StartupXYZ -> Meeting Two
+  
+  # TechSolutions (Floor 2 Executive workspace) -> Floor 2 rooms
   { company: company_records[3], room: room_records[13] }  # TechSolutions -> Executive Suite
 ]
 
@@ -293,45 +310,46 @@ end
 
 # 9. Create Bookings with different statuses
 puts "📅 Creating bookings..."
+base_date = Date.current.beginning_of_day
 bookings_data = [
   {
     phone_number: '+91-9000000007',
-    user: user_records[6], # Alice Employee
-    room: room_records[0], # Tesla
-    start_time: 2.hours.from_now,
-    end_time: 4.hours.from_now,
+    user: user_records[6], # Alice Employee (SR Next)
+    room: room_records[0], # Tesla (Floor 5 - SR Next workspace)
+    start_time: base_date + 1.day + 9.hours,
+    end_time: base_date + 1.day + 11.hours,
     status: 'confirmed'
   },
   {
     phone_number: '+91-9000000008',
-    user: user_records[7], # Bob Developer
-    room: room_records[1], # Mercedes
-    start_time: 1.day.from_now + 9.hours,
-    end_time: 1.day.from_now + 11.hours,
+    user: user_records[7], # Bob Developer (InnovateCorp)
+    room: room_records[6], # Boardroom Alpha (Floor 3 - InnovateCorp workspace)
+    start_time: base_date + 1.day + 14.hours,
+    end_time: base_date + 1.day + 16.hours,
     status: 'confirmed'
   },
   {
     phone_number: '+91-9000000009',
-    user: user_records[8], # Charlie Designer
-    room: room_records[10], # Conference One
-    start_time: 1.day.from_now + 14.hours,
-    end_time: 1.day.from_now + 16.hours,
+    user: user_records[8], # Charlie Designer (StartupXYZ)
+    room: room_records[10], # Conference One (Ground Floor - StartupXYZ workspace)
+    start_time: base_date + 2.days + 10.hours,
+    end_time: base_date + 2.days + 12.hours,
     status: 'confirmed'
   },
   {
     phone_number: '+91-9000000010',
-    user: user_records[9], # Diana Manager
-    room: room_records[2], # BMW
-    start_time: 2.days.from_now + 10.hours,
-    end_time: 2.days.from_now + 12.hours,
+    user: user_records[9], # Diana Manager (TechSolutions)
+    room: room_records[13], # Executive Suite (Floor 2 - TechSolutions workspace)
+    start_time: base_date + 2.days + 15.hours,
+    end_time: base_date + 2.days + 17.hours,
     status: 'cancelled'
   },
   {
     phone_number: '+91-9000000007',
-    user: user_records[6], # Alice Employee
-    room: room_records[3], # Alto
-    start_time: 3.days.from_now + 15.hours,
-    end_time: 3.days.from_now + 16.hours,
+    user: user_records[6], # Alice Employee (SR Next)
+    room: room_records[3], # Alto (Floor 5 - SR Next workspace)
+    start_time: base_date + 3.days + 9.hours,
+    end_time: base_date + 3.days + 10.hours,
     status: 'confirmed'
   }
 ]

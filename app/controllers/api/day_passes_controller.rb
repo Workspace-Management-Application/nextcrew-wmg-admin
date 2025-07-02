@@ -23,9 +23,9 @@ class Api::DayPassesController < Api::BaseController
     day_pass = @workspace.day_passes.new(day_pass_params.except(:photo))
     
     if day_pass.save
-      # Handle photo upload using Active Storage
-      if params[:photo].present?
-        photo_result = PhotoUploadService.attach_photo(day_pass, params[:photo])
+      # Handle photo upload using Active Storage with auto folder organization
+      if params[:day_pass][:photo].present?
+        photo_result = PhotoUploadService.attach_photo_auto(day_pass, params[:day_pass][:photo])
         unless photo_result[:success]
           render_error(photo_result[:error])
           return
@@ -42,9 +42,9 @@ class Api::DayPassesController < Api::BaseController
   def update
     if @day_pass
       if @day_pass.update(day_pass_params.except(:photo))
-        # Handle photo upload using Active Storage
-        if params[:photo].present?
-          photo_result = PhotoUploadService.attach_photo(@day_pass, params[:photo])
+        # Handle photo upload using Active Storage with auto folder organization
+        if params[:day_pass][:photo].present?
+          photo_result = PhotoUploadService.attach_photo_auto(@day_pass, params[:day_pass][:photo])
           unless photo_result[:success]
             render_error(photo_result[:error])
             return
@@ -92,9 +92,19 @@ class Api::DayPassesController < Api::BaseController
   end
 
   def day_pass_response(day_pass)
-    day_pass.as_json.merge(
+    {
+      id: day_pass.id,
+      workspace_id: day_pass.workspace_id,
+      name: day_pass.name,
+      phone_number: day_pass.phone_number,
+      email: day_pass.email,
+      pass_date: day_pass.pass_date,
+      purpose: day_pass.purpose,
+      company_name: day_pass.company_name,
       photo_url: PhotoUploadService.photo_url(day_pass),
-      photo_attached: PhotoUploadService.photo_attached?(day_pass)
-    )
+      photo_attached: PhotoUploadService.photo_attached?(day_pass),
+      created_at: day_pass.created_at,
+      updated_at: day_pass.updated_at
+    }
   end
 end 

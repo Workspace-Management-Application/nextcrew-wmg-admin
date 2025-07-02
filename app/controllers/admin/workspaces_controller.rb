@@ -17,9 +17,9 @@ class Admin::WorkspacesController < Admin::BaseController
     @workspace = Workspace.new(workspace_params.except(:photo))
     
     if @workspace.save
-      # Handle photo upload using Active Storage
+      # Handle photo upload using Active Storage with auto folder organization
       if params[:workspace][:photo].present?
-        photo_result = PhotoUploadService.attach_photo(@workspace, params[:workspace][:photo])
+        photo_result = PhotoUploadService.attach_photo_auto(@workspace, params[:workspace][:photo])
         unless photo_result[:success]
           flash[:alert] = photo_result[:error]
           render :new
@@ -38,9 +38,9 @@ class Admin::WorkspacesController < Admin::BaseController
 
   def update
     if @workspace.update(workspace_params.except(:photo))
-      # Handle photo upload using Active Storage
+      # Handle photo upload using Active Storage with auto folder organization
       if params[:workspace][:photo].present?
-        photo_result = PhotoUploadService.attach_photo(@workspace, params[:workspace][:photo])
+        photo_result = PhotoUploadService.attach_photo_auto(@workspace, params[:workspace][:photo])
         unless photo_result[:success]
           flash[:alert] = photo_result[:error]
           render :edit
