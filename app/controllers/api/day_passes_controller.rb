@@ -5,14 +5,14 @@ class Api::DayPassesController < Api::BaseController
 
   # GET /api/workspaces/:workspace_id/day_passes
   def index
-    day_passes = @workspace.day_passes
+    day_passes = @workspace.day_passes.map { |day_pass| day_pass_response(day_pass) }
     render_success(day_passes)
   end
 
   # GET /api/workspaces/:workspace_id/day_passes/:id
   def show
     if @day_pass
-      render_success(@day_pass)
+      render_success(day_pass_response(@day_pass))
     else
       render_error('Day pass not found', :not_found)
     end
@@ -21,12 +21,18 @@ class Api::DayPassesController < Api::BaseController
   # POST /api/workspaces/:workspace_id/day_passes
   def create
     day_pass = @workspace.day_passes.new(day_pass_params.except(:photo))
-    if params[:photo].present?
-      photo_url = S3Uploader.upload(params[:photo], folder: 'day_pass_photos')
-      day_pass.photo = photo_url
-    end
+    
     if day_pass.save
-      render_success(day_pass, 'Day pass created successfully', :created)
+      # Handle photo upload using Active Storage
+      if params[:photo].present?
+        photo_result = PhotoUploadService.attach_photo(day_pass, params[:photo])
+        unless photo_result[:success]
+          render_error(photo_result[:error])
+          return
+        end
+      end
+      
+      render_success(day_pass_response(day_pass), 'Day pass created successfully', :created)
     else
       render_error(day_pass.errors.full_messages.join(', '))
     end
@@ -35,12 +41,17 @@ class Api::DayPassesController < Api::BaseController
   # PATCH/PUT /api/workspaces/:workspace_id/day_passes/:id
   def update
     if @day_pass
-      if params[:photo].present?
-        photo_url = S3Uploader.upload(params[:photo], folder: 'day_pass_photos')
-        @day_pass.photo = photo_url
-      end
       if @day_pass.update(day_pass_params.except(:photo))
-        render_success(@day_pass, 'Day pass updated successfully')
+        # Handle photo upload using Active Storage
+        if params[:photo].present?
+          photo_result = PhotoUploadService.attach_photo(@day_pass, params[:photo])
+          unless photo_result[:success]
+            render_error(photo_result[:error])
+            return
+          end
+        end
+        
+        render_success(day_pass_response(@day_pass), 'Day pass updated successfully')
       else
         render_error(@day_pass.errors.full_messages.join(', '))
       end
@@ -78,5 +89,12 @@ class Api::DayPassesController < Api::BaseController
     unless current_user&.role == 'floor_user'
       render_error('Forbidden: Only floor users allowed', :forbidden)
     end
+  end
+
+  def day_pass_response(day_pass)
+    day_pass.as_json.merge(
+      photo_url: PhotoUploadService.photo_url(day_pass),
+      photo_attached: PhotoUploadService.photo_attached?(day_pass)
+    )
   end
 end 

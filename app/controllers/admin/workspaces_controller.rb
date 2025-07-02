@@ -14,8 +14,19 @@ class Admin::WorkspacesController < Admin::BaseController
   end
 
   def create
-    @workspace = Workspace.new(workspace_params)
+    @workspace = Workspace.new(workspace_params.except(:photo))
+    
     if @workspace.save
+      # Handle photo upload using Active Storage
+      if params[:workspace][:photo].present?
+        photo_result = PhotoUploadService.attach_photo(@workspace, params[:workspace][:photo])
+        unless photo_result[:success]
+          flash[:alert] = photo_result[:error]
+          render :new
+          return
+        end
+      end
+      
       redirect_to admin_workspaces_path, notice: 'Workspace was successfully created.'
     else
       render :new
@@ -26,7 +37,17 @@ class Admin::WorkspacesController < Admin::BaseController
   end
 
   def update
-    if @workspace.update(workspace_params)
+    if @workspace.update(workspace_params.except(:photo))
+      # Handle photo upload using Active Storage
+      if params[:workspace][:photo].present?
+        photo_result = PhotoUploadService.attach_photo(@workspace, params[:workspace][:photo])
+        unless photo_result[:success]
+          flash[:alert] = photo_result[:error]
+          render :edit
+          return
+        end
+      end
+      
       redirect_to admin_workspace_path(@workspace), notice: 'Workspace was successfully updated.'
     else
       render :edit
@@ -45,6 +66,6 @@ class Admin::WorkspacesController < Admin::BaseController
   end
 
   def workspace_params
-    params.require(:workspace).permit(:name, :building, :city, :address, :pincode)
+    params.require(:workspace).permit(:name, :building_name, :city, :address, :pincode, :is_active, :photo)
   end
 end

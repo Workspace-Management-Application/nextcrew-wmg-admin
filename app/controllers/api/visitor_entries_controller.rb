@@ -5,14 +5,14 @@ class Api::VisitorEntriesController < Api::BaseController
 
   # GET /api/workspaces/:workspace_id/visitor_entries
   def index
-    visitor_entries = @workspace.visitor_entries
+    visitor_entries = @workspace.visitor_entries.map { |visitor_entry| visitor_entry_response(visitor_entry) }
     render_success(visitor_entries)
   end
 
   # GET /api/workspaces/:workspace_id/visitor_entries/:id
   def show
     if @visitor_entry
-      render_success(@visitor_entry)
+      render_success(visitor_entry_response(@visitor_entry))
     else
       render_error('Visitor entry not found', :not_found)
     end
@@ -21,12 +21,18 @@ class Api::VisitorEntriesController < Api::BaseController
   # POST /api/workspaces/:workspace_id/visitor_entries
   def create
     visitor_entry = @workspace.visitor_entries.new(visitor_entry_params.except(:photo))
-    if params[:photo].present?
-      photo_url = S3Uploader.upload(params[:photo], folder: 'visitor_photos')
-      visitor_entry.photo = photo_url
-    end
+    
     if visitor_entry.save
-      render_success(visitor_entry, 'Visitor entry created successfully', :created)
+      # Handle photo upload using Active Storage
+      if params[:photo].present?
+        photo_result = PhotoUploadService.attach_photo(visitor_entry, params[:photo])
+        unless photo_result[:success]
+          render_error(photo_result[:error])
+          return
+        end
+      end
+      
+      render_success(visitor_entry_response(visitor_entry), 'Visitor entry created successfully', :created)
     else
       render_error(visitor_entry.errors.full_messages.join(', '))
     end
@@ -35,12 +41,17 @@ class Api::VisitorEntriesController < Api::BaseController
   # PATCH/PUT /api/workspaces/:workspace_id/visitor_entries/:id
   def update
     if @visitor_entry
-      if params[:photo].present?
-        photo_url = S3Uploader.upload(params[:photo], folder: 'visitor_photos')
-        @visitor_entry.photo = photo_url
-      end
       if @visitor_entry.update(visitor_entry_params.except(:photo))
-        render_success(@visitor_entry, 'Visitor entry updated successfully')
+        # Handle photo upload using Active Storage
+        if params[:photo].present?
+          photo_result = PhotoUploadService.attach_photo(@visitor_entry, params[:photo])
+          unless photo_result[:success]
+            render_error(photo_result[:error])
+            return
+          end
+        end
+        
+        render_success(visitor_entry_response(@visitor_entry), 'Visitor entry updated successfully')
       else
         render_error(@visitor_entry.errors.full_messages.join(', '))
       end
@@ -78,5 +89,12 @@ class Api::VisitorEntriesController < Api::BaseController
     unless current_user&.role == 'floor_user'
       render_error('Forbidden: Only floor users allowed', :forbidden)
     end
+  end
+
+  def visitor_entry_response(visitor_entry)
+    visitor_entry.as_json.merge(
+      photo_url: PhotoUploadService.photo_url(visitor_entry),
+      photo_attached: PhotoUploadService.photo_attached?(visitor_entry)
+    )
   end
 end 

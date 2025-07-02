@@ -66,7 +66,6 @@ workspaces = [
     address: 'Slice 6 Aranya Nagar Vijay Nagar',
     city: 'Indore',
     pincode: '452010',
-    photo: nil,
     is_active: true
   },
   {
@@ -75,7 +74,6 @@ workspaces = [
     address: 'Slice 6 Aranya Nagar Vijay Nagar',
     city: 'Indore',
     pincode: '452010',
-    photo: nil,
     is_active: true
   },
   {
@@ -84,7 +82,6 @@ workspaces = [
     address: 'AB Road, Sapna Sangeeta',
     city: 'Indore',
     pincode: '452001',
-    photo: nil,
     is_active: true
   },
   {
@@ -93,7 +90,6 @@ workspaces = [
     address: 'Ring Road, Scheme 54',
     city: 'Indore',
     pincode: '452020',
-    photo: nil,
     is_active: false
   }
 ]
