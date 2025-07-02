@@ -122,19 +122,46 @@ bundle_install() {
     if git diff HEAD~1 --name-only | grep -q -E "(Gemfile|Gemfile.lock)"; then
         log "Gemfile or Gemfile.lock changed, running bundle install..."
         
+        # Clean up bundle config first
+        bundle config unset deployment 2>/dev/null || true
+        bundle config unset without 2>/dev/null || true
+        
+        # Remove vendor/bundle if it exists to start fresh
+        if [ -d "$APP_DIR/vendor/bundle" ]; then
+            log "Cleaning existing bundle directory..."
+            rm -rf "$APP_DIR/vendor/bundle"
+        fi
+        
         # Set bundle config for production deployment
         bundle config set --local deployment true
         bundle config set --local without 'development test'
+        bundle config set --local path 'vendor/bundle'
         
-        # Install gems
-        bundle install
+        # Install gems with verbose output
+        log "Running bundle install with verbose output..."
+        bundle install --verbose
         
         if [ $? -ne 0 ]; then
             error "Bundle install failed. You may need to update Gemfile.lock locally and commit it."
             return 1
         fi
+        
+        # Verify the gem was installed
+        if bundle list | grep -q "rack-cors"; then
+            log "rack-cors gem successfully installed ✓"
+        else
+            error "rack-cors gem not found after bundle install"
+            return 1
+        fi
     else
-        info "No Gemfile changes detected, skipping bundle install"
+        info "No Gemfile changes detected, but checking if bundle is properly installed..."
+        
+        # Even if no changes, ensure bundle is properly set up
+        bundle check
+        if [ $? -ne 0 ]; then
+            log "Bundle check failed, running bundle install..."
+            bundle install
+        fi
     fi
 }
 
