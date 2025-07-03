@@ -63,17 +63,45 @@
 
 <% content_for :scripts do %>
 <script>
-  // Booking Chart
-  const ctx = document.getElementById('bookingChart').getContext('2d');
-  const chartData = <%= raw @booking_chart_data.to_json %>;
+  // Chart data from server - use window object to avoid redeclaration issues
+  if (typeof window.dashboardChartData === 'undefined') {
+    window.dashboardChartData = <%= raw @booking_chart_data.to_json %>;
+  }
   
-  new Chart(ctx, {
+  // Use window object for chart instance to avoid redeclaration issues
+  if (typeof window.bookingChart === 'undefined') {
+    window.bookingChart = null;
+  }
+
+  function initializeBookingChart() {
+    const canvas = document.getElementById('bookingChart');
+    if (!canvas) return;
+
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+      console.warn('Chart.js not loaded yet, retrying in 100ms...');
+      setTimeout(initializeBookingChart, 100);
+      return;
+    }
+
+    // Destroy existing chart if it exists
+    if (window.bookingChart && typeof window.bookingChart.destroy === 'function') {
+      try {
+        window.bookingChart.destroy();
+      } catch (error) {
+        console.warn('Error destroying existing chart:', error);
+      }
+    }
+
+    const ctx = canvas.getContext('2d');
+    
+    window.bookingChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: chartData.map(item => item.date),
+        labels: window.dashboardChartData.map(item => item.date),
       datasets: [{
         label: 'Bookings',
-        data: chartData.map(item => item.bookings),
+          data: window.dashboardChartData.map(item => item.bookings),
         backgroundColor: '#ffffff',
         borderColor: '#ffffff',
         borderWidth: 1,
@@ -98,7 +126,7 @@
       scales: {
         y: {
           beginAtZero: true,
-          max: Math.max(...chartData.map(item => item.bookings)) + 5, // Add some padding to max value
+            max: Math.max(...window.dashboardChartData.map(item => item.bookings)) + 5, // Add some padding to max value
           ticks: {
             color: '#cccccc',
             font: {
@@ -130,5 +158,19 @@
       }
     }
   });
+  }
+
+  // Initialize chart on page load
+  document.addEventListener('DOMContentLoaded', initializeBookingChart);
+  
+  // Re-initialize chart after Turbo navigation
+  document.addEventListener('turbo:load', initializeBookingChart);
+  
+  // Also initialize immediately if DOM is already loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeBookingChart);
+  } else {
+    initializeBookingChart();
+  }
 </script>
 <% end %>

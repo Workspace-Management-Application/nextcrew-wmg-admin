@@ -1,0 +1,41 @@
+<% content_for :page_title, "Edit Workspace Type" %>
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Edit Workspace Type</h2>
+      <%= link_to "← Back to Workspace Types", admin_workspace_types_path, class: "btn btn-outline-primary" %>
+    </div>
+
+    <%= form_with model: [:admin, @workspace_type], local: true, class: "needs-validation", novalidate: true do |form| %>
+      <% if @workspace_type.errors.any? %>
+        <div class="alert alert-danger">
+          <h6><%= pluralize(@workspace_type.errors.count, "error") %> prohibited this workspace type from being saved:</h6>
+          <ul class="mb-0">
+            <% @workspace_type.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="bg-dark p-4 rounded">
+        <div class="mb-3">
+          <%= form.label :name, "Workspace Type Name", class: "form-label" %>
+          <%= form.text_field :name, class: "form-control", required: true %>
+        </div>
+
+        <% if WorkspaceType::DEFAULT_TYPES.include?(@workspace_type.name) %>
+          <div class="alert alert-info">
+            <strong>Note:</strong> This is a default workspace type and cannot be modified.
+          </div>
+        <% end %>
+      </div>
+
+      <div class="d-flex gap-2 mt-3">
+        <%= form.submit "Update Workspace Type", class: "btn btn-primary" %>
+        <%= link_to "Cancel", admin_workspace_types_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div> 

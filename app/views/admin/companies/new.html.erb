@@ -26,25 +26,12 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <%= form.label :status, class: "form-label" %>
-          <%= form.select :status, 
-              options_for_select([
-                ['Pending', 'pending'],
-                ['Active', 'active'],
-                ['Approved', 'approved'],
-                ['Inactive', 'inactive']
-              ], @company.status), 
-              {}, 
-              { class: "form-select" } %>
+          <%= form.label :email, class: "form-label" %>
+          <%= form.email_field :email, class: "form-control", required: true %>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-md-6 mb-3">
-          <%= form.label :email, class: "form-label" %>
-          <%= form.email_field :email, class: "form-control", required: true %>
-        </div>
-        
         <div class="col-md-6 mb-3">
           <%= form.label :phone_number, "Phone Number", class: "form-label" %>
           <%= form.telephone_field :phone_number, class: "form-control", required: true %>

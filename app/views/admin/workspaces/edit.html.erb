@@ -48,6 +48,26 @@
         <%= form.text_area :address, class: "form-control", rows: 3, required: true %>
       </div>
 
+      <div class="mb-3">
+        <%= form.label :workspace_type_ids, "Workspace Types", class: "form-label" %>
+        <div class="form-text mb-2">Select one or more workspace types for this workspace</div>
+        <div class="row">
+          <% WorkspaceType.order(:name).each do |workspace_type| %>
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <%= form.check_box :workspace_type_ids, 
+                    { multiple: true, class: "form-check-input" }, 
+                    workspace_type.id, 
+                    nil %>
+                <%= form.label "workspace_type_ids_#{workspace_type.id}", 
+                    workspace_type.name, 
+                    class: "form-check-label" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
       <div class="d-flex gap-2">
         <%= form.submit "Update Workspace", class: "btn btn-primary" %>
         <%= link_to "Cancel", admin_workspaces_path, class: "btn btn-secondary" %>

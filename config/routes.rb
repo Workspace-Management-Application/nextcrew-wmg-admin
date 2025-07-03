@@ -38,6 +38,10 @@ Rails.application.routes.draw do
     
     resources :workspaces do
       resources :rooms
+      member do
+        post :add_company
+        delete :remove_company
+      end
     end
     
     resources :rooms, only: [:index, :show]
@@ -46,6 +50,9 @@ Rails.application.routes.draw do
       member do
         post :add_room
         delete :remove_room
+        post :add_user
+        delete :remove_user
+        patch :quick_status_change
       end
     end
     
@@ -55,6 +62,10 @@ Rails.application.routes.draw do
         patch :assign_workspace
       end
     end
+    
+    resources :office_enquiries
+    resources :visitor_entries
+    resources :workspace_types
     
     resource :profile, only: [:show, :edit, :update], controller: 'profile'
   end

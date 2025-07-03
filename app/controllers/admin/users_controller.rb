@@ -69,10 +69,26 @@ class Admin::UsersController < Admin::BaseController
     @user = User.find(params[:id])
     @workspaces = Workspace.all
     
-    if params[:workspace_id].present?
-      @user.user_workspace&.destroy
-      UserWorkspace.create(user: @user, workspace_id: params[:workspace_id])
-      redirect_to admin_user_path(@user), notice: 'Workspace assigned successfully.'
+    if request.patch?
+      if params[:workspace_ids].present?
+        # Clear existing assignments
+        @user.user_workspaces.destroy_all
+        
+        # Create new assignments for selected workspaces
+        params[:workspace_ids].each do |workspace_id|
+          UserWorkspace.create(user: @user, workspace_id: workspace_id) if workspace_id.present?
+        end
+        
+        redirect_to assign_workspace_admin_user_path(@user), notice: 'Workspaces assigned successfully.'
+      elsif params[:remove_workspace_id].present?
+        # Remove specific workspace assignment
+        @user.user_workspaces.where(workspace_id: params[:remove_workspace_id]).destroy_all
+        redirect_to assign_workspace_admin_user_path(@user), notice: 'Workspace removed successfully.'
+      else
+        # Remove all workspace assignments
+        @user.user_workspaces.destroy_all
+        redirect_to assign_workspace_admin_user_path(@user), notice: 'All workspace assignments removed successfully.'
+      end
     end
   end
 

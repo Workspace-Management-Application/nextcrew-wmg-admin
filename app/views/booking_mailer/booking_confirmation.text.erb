@@ -1,0 +1,49 @@
+NEXTCOWORKS - Booking Confirmation
+=====================================
+
+Dear <%= @user.name %>,
+
+Thank you for booking with NEXTCOWORKS! Your reservation has been successfully confirmed.
+
+BOOKING DETAILS:
+================
+Booking ID: #<%= @booking.id %>
+Room: <%= @room.name %>
+Date: <%= @booking.start_time.strftime("%A, %B %d, %Y") %>
+Time: <%= @booking.start_time.strftime("%I:%M %p") %> - <%= @booking.end_time.strftime("%I:%M %p") %>
+Duration: <%= distance_of_time_in_words(@booking.start_time, @booking.end_time) %>
+Status: <%= @booking.status.titleize %>
+
+WORKSPACE INFORMATION:
+======================
+Workspace: <%= @workspace.name %>
+Room Category: <%= @room.category.titleize %>
+Capacity: <%= @room.capacity %> people
+
+Facilities Available:
+<% if @room.whiteboard %>- Whiteboard<% end %>
+<% if @room.projector %>- Projector<% end %>
+<% if @room.tv %>- TV<% end %>
+- High-speed WiFi
+- Coffee/Tea
+
+IMPORTANT NOTES:
+===============
+- Please arrive 5 minutes before your scheduled time
+- Bring your own laptop and any necessary materials
+- Please keep the room clean and organized
+- Contact us immediately if you need to cancel or reschedule
+
+We look forward to providing you with a productive workspace experience!
+
+CONTACT INFORMATION:
+===================
+Email: support@nextcoworks.com
+Phone: +91-9876543210
+Website: www.nextcoworks.com
+
+---
+NEXTCOWORKS
+Private Cabin | Private Office | Private Desk | Shared Desk
+
+This is an automated email. Please do not reply to this message. 

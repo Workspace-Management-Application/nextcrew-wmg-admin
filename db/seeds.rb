@@ -11,6 +11,10 @@ puts "🌱 Starting database seeding..."
 #    VisitorEntry, OfficeEnquiry, DayPass, Room, User, Company, Workspace].each(&:destroy_all)
 # end
 
+# 0. Create default workspace types
+puts "🏢 Creating default workspace types..."
+WorkspaceType.create_default_types
+
 # 1. Create Companies with different statuses
 puts "🏢 Creating companies..."
 companies = [
@@ -425,7 +429,6 @@ office_enquiries_data = [
     enquirer_name: 'Rohit Agarwal',
     phone_number: '+91-9234567890',
     email: 'rohit@newstartup.com',
-    requirement: 'Dedicated desk for 5 people',
     company_name: 'New Startup Pvt Ltd'
   },
   {
@@ -433,7 +436,6 @@ office_enquiries_data = [
     enquirer_name: 'Kavita Singh',
     phone_number: '+91-9234567891',
     email: 'kavita@expandingbiz.com',
-    requirement: 'Private office for 10 team members',
     company_name: 'Expanding Business Co'
   },
   {
@@ -441,7 +443,6 @@ office_enquiries_data = [
     enquirer_name: 'Vikram Rao',
     phone_number: '+91-9234567892',
     email: 'vikram@freelancer.in',
-    requirement: 'Hot desk for individual use',
     company_name: 'Freelancer'
   },
   {
@@ -449,7 +450,6 @@ office_enquiries_data = [
     enquirer_name: 'Anita Joshi',
     phone_number: '+91-9234567893',
     email: 'anita@consultancy.com',
-    requirement: 'Meeting room access twice a week',
     company_name: 'Consultancy Services Ltd'
   }
 ]

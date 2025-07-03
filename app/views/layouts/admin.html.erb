@@ -119,8 +119,11 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag 'application', 'data-turbo-track': 'reload' %>
     <%= javascript_importmap_tags %>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Bootstrap Select CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
   </head>
 
   <body class="admin-body">
@@ -163,6 +166,21 @@
           <span class="nav-icon">🏭</span>
           <span class="nav-text">Companies</span>
         <% end %>
+        
+        <%= link_to admin_office_enquiries_path, class: "nav-item #{'active' if controller_name == 'office_enquiries'}" do %>
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Office Enquiries</span>
+        <% end %>
+        
+        <%= link_to admin_visitor_entries_path, class: "nav-item #{'active' if controller_name == 'visitor_entries'}" do %>
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Visitor Entries</span>
+        <% end %>
+        
+        <%= link_to admin_workspace_types_path, class: "nav-item #{'active' if controller_name == 'workspace_types'}" do %>
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Workspace Types</span>
+        <% end %>
       </nav>
     </div>
 
@@ -183,12 +201,12 @@
         </div>
         <!-- Profile Dropdown -->
         <div class="profile-dropdown position-absolute end-0 me-4">
-          <button class="profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="profile-btn" data-bs-toggle="dropdown" aria-expanded="false" id="profileDropdownBtn">
             <div class="profile-avatar">
               <%= current_user.name&.first&.upcase || "A" %>
             </div>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end">
+          <ul class="dropdown-menu dropdown-menu-end" id="profileDropdownMenu">
             <li><%= link_to "Edit Profile", admin_profile_path, class: "dropdown-item" %></li>
             <li><hr class="dropdown-divider"></li>
             <li><%= button_to "Logout", destroy_user_session_path, method: :delete, class: "dropdown-item border-0 bg-transparent w-100 text-start", form: { style: "display: inline;" } %></li>
@@ -225,9 +243,63 @@
         sidebar.classList.toggle('show');
       }
 
+      // Initialize Bootstrap components
+      function initializeBootstrapComponents() {
+        // Make sure Bootstrap is available
+        if (typeof bootstrap === 'undefined') {
+          console.warn('Bootstrap not loaded yet, retrying in 100ms...');
+          setTimeout(initializeBootstrapComponents, 100);
+          return;
+        }
+
+        // Initialize all dropdowns
+        const dropdownElementList = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+        dropdownElementList.forEach(function(dropdownToggleEl) {
+          try {
+            // Remove any existing dropdown instance
+            const existingDropdown = bootstrap.Dropdown.getInstance(dropdownToggleEl);
+            if (existingDropdown) {
+              existingDropdown.dispose();
+            }
+            
+            // Create new dropdown instance
+            const dropdown = new bootstrap.Dropdown(dropdownToggleEl);
+            console.log('Dropdown initialized for:', dropdownToggleEl);
+          } catch (error) {
+            console.error('Error initializing dropdown:', error);
+          }
+        });
+
+        // Initialize all tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+          try {
+            const existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+            if (existingTooltip) {
+              existingTooltip.dispose();
+            }
+            const tooltip = new bootstrap.Tooltip(tooltipTriggerEl);
+          } catch (error) {
+            console.error('Error initializing tooltip:', error);
+          }
+        });
+
+        // Initialize all popovers
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+        popoverTriggerList.forEach(function(popoverTriggerEl) {
+          try {
+            const existingPopover = bootstrap.Popover.getInstance(popoverTriggerEl);
+            if (existingPopover) {
+              existingPopover.dispose();
+            }
+            const popover = new bootstrap.Popover(popoverTriggerEl);
+          } catch (error) {
+            console.error('Error initializing popover:', error);
+          }
+        });
+      }
+
       // Handle clickable table rows
-      document.addEventListener('DOMContentLoaded', function() {
-        // Add event listeners for all clickable rows
         function initializeClickableRows() {
           const clickableRows = document.querySelectorAll('.clickable-row');
           
@@ -258,14 +330,103 @@
           }
         }
         
-        // Initialize on page load
+      // Initialize everything on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOMContentLoaded - Initializing components...');
+        initializeBootstrapComponents();
         initializeClickableRows();
-        
-        // Re-initialize after Turbo navigation (for Rails with Turbo)
-        document.addEventListener('turbo:load', initializeClickableRows);
       });
+        
+      // Re-initialize after Turbo navigation
+      document.addEventListener('turbo:load', function() {
+        console.log('turbo:load - Re-initializing components...');
+        initializeBootstrapComponents();
+        initializeClickableRows();
+      });
+
+      // Also initialize immediately if DOM is already loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          console.log('DOMContentLoaded (delayed) - Initializing components...');
+          initializeBootstrapComponents();
+          initializeClickableRows();
+        });
+      } else {
+        console.log('DOM already loaded - Initializing components immediately...');
+        initializeBootstrapComponents();
+        initializeClickableRows();
+      }
+
+      // Additional initialization after a short delay to ensure everything is loaded
+      setTimeout(function() {
+        console.log('Delayed initialization - Ensuring components are ready...');
+        initializeBootstrapComponents();
+      }, 500);
+
+      // Manual fallback for profile dropdown
+      function initializeProfileDropdown() {
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        
+        if (profileBtn && profileMenu) {
+          // Remove existing listeners
+          profileBtn.removeEventListener('click', toggleProfileDropdown);
+          
+          // Add manual click handler as fallback
+          profileBtn.addEventListener('click', toggleProfileDropdown);
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', function(event) {
+            if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+              profileMenu.classList.remove('show');
+              profileBtn.setAttribute('aria-expanded', 'false');
+            }
+          });
+        }
+      }
+      
+      function toggleProfileDropdown(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        
+        if (profileMenu && profileBtn) {
+          const isVisible = profileMenu.classList.contains('show');
+          
+          if (isVisible) {
+            profileMenu.classList.remove('show');
+            profileBtn.setAttribute('aria-expanded', 'false');
+          } else {
+            profileMenu.classList.add('show');
+            profileBtn.setAttribute('aria-expanded', 'true');
+          }
+        }
+      }
+
+      // Initialize profile dropdown on all events
+      document.addEventListener('DOMContentLoaded', initializeProfileDropdown);
+      document.addEventListener('turbo:load', initializeProfileDropdown);
+      
+      // Also initialize immediately if DOM is already loaded
+      if (document.readyState !== 'loading') {
+        initializeProfileDropdown();
+      }
     </script>
 
     <%= yield :scripts %>
+    <%= javascript_include_tag 'application', 'data-turbo-track': 'reload', defer: true %>
+    <!-- jQuery (required for Bootstrap and selectpicker) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS (required for selectpicker) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+    <script>
+      document.addEventListener("turbo:load", function() {
+        $('.selectpicker').selectpicker();
+      });
+    </script>
   </body>
 </html>

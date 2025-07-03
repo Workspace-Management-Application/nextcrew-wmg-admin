@@ -34,6 +34,37 @@
       </div>
     </div>
 
+    <!-- Company Information -->
+    <% if @user.companies.any? %>
+      <div class="bg-dark p-4 rounded mb-4">
+        <h4 class="mb-3">Company Information</h4>
+        <% @user.companies.each do |company| %>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p><strong>Company Name:</strong> <%= company.name %></p>
+              <p><strong>Email:</strong> <%= company.email %></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Phone:</strong> <%= company.phone_number %></p>
+              <p><strong>Status:</strong> 
+                <span class="badge <%= company.status == 'active' ? 'bg-success' : company.status == 'pending' ? 'bg-warning' : 'bg-secondary' %>">
+                  <%= company.status.humanize %>
+                </span>
+              </p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <p><strong>Address:</strong> <%= company.address %></p>
+            </div>
+          </div>
+          <div class="mt-3">
+            <%= link_to "View Company Details", admin_company_path(company), class: "btn btn-outline-primary btn-sm" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <!-- User's Bookings -->
     <h4 class="mb-3">Recent Bookings</h4>
     <% recent_bookings = @user.bookings.includes(:room).order(created_at: :desc).limit(5) %>

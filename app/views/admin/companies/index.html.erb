@@ -43,6 +43,7 @@
           <th>Name</th>
           <th>Email</th>
           <th>Phone</th>
+          <th>Status</th>
           <th>Total Users</th>
           <th>Actions</th>
         </tr>
@@ -53,9 +54,33 @@
             <td><%= company.name %></td>
             <td><%= company.email %></td>
             <td><%= company.phone_number %></td>
+            <td>
+              <span class="badge <%= company.status == 'active' ? 'bg-success' : company.status == 'pending' ? 'bg-warning' : company.status == 'approved' ? 'bg-info' : 'bg-secondary' %>">
+                <%= company.status.humanize %>
+              </span>
+            </td>
             <td><%= company.users.count %></td>
             <td class="action-column">
               <%= link_to "Edit", edit_admin_company_path(company), class: "btn btn-secondary btn-sm me-2" %>
+              
+              <% if current_user.super_admin? && company.status != 'active' %>
+                <%= link_to "Activate", quick_status_change_admin_company_path(company), 
+                            data: { 
+                              turbo_method: :patch,
+                              turbo_confirm: "Are you sure you want to activate this company?" 
+                            },
+                            class: "btn btn-success btn-sm me-2",
+                            style: "display: inline-block;" %>
+              <% elsif current_user.admin? && company.status == 'active' %>
+                <%= link_to "Deactivate", quick_status_change_admin_company_path(company), 
+                            data: { 
+                              turbo_method: :patch,
+                              turbo_confirm: "Are you sure you want to deactivate this company?" 
+                            },
+                            class: "btn btn-warning btn-sm me-2",
+                            style: "display: inline-block;" %>
+              <% end %>
+              
               <%= link_to "Delete", admin_company_path(company), 
                           data: { 
                             turbo_method: :delete, 

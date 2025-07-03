@@ -51,6 +51,7 @@
           <th>Name</th>
           <th>Building</th>
           <th>City</th>
+          <th>Workspace Types</th>
           <th>Address</th>
           <th>Pincode</th>
           <th>Actions</th>
@@ -62,6 +63,17 @@
             <td><%= workspace.name %></td>
             <td><%= workspace.building_name %></td>
             <td><%= workspace.city %></td>
+            <td>
+              <% if workspace.workspace_types.any? %>
+                <div class="d-flex flex-wrap gap-1">
+                  <% workspace.workspace_types.each do |workspace_type| %>
+                    <span class="badge bg-primary badge-sm"><%= workspace_type.name %></span>
+                  <% end %>
+                </div>
+              <% else %>
+                <span class="text-muted">None</span>
+              <% end %>
+            </td>
             <td><%= workspace.address %></td>
             <td><%= workspace.pincode %></td>
             <td class="action-column">

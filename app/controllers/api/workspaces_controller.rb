@@ -22,7 +22,7 @@ class Api::WorkspacesController < Api::BaseController
     if company
       render_success(company)
     else
-      render_error("Company not found", :not_found)
+      render_error("Please enter registered phone number", :not_found)
     end
   end
 

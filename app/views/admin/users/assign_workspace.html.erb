@@ -4,7 +4,7 @@
   <div class="col-lg-8 col-md-10 mx-auto">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>Assign Workspace</h2>
-      <%= link_to "← Back to User", admin_user_path(@user), class: "btn btn-outline-primary" %>
+      <%= link_to "← Back to User", admin_users_path, class: "btn btn-outline-primary" %>
     </div>
 
     <div class="bg-dark p-4 rounded mb-4">
@@ -17,29 +17,75 @@
 
     <%= form_with url: assign_workspace_admin_user_path(@user), method: :patch, local: true do |form| %>
       <div class="mb-4">
-        <%= form.label :workspace_id, "Select Workspace", class: "form-label" %>
-        <%= form.select :workspace_id, 
-                        options_from_collection_for_select(@workspaces, :id, :name, @user.workspaces.first&.id), 
-                        { prompt: 'Select a workspace to assign' }, 
-                        { class: "form-select", required: true } %>
-        <small class="form-text text-muted">This user will be assigned to manage the selected workspace</small>
+        <%= form.label :workspace_ids, "Select Workspaces", class: "form-label" %>
+        <div class="workspace-selection">
+          <% @workspaces.each do |workspace| %>
+            <div class="form-check mb-2">
+              <%= form.check_box "workspace_ids[]", 
+                                { 
+                                  class: "form-check-input", 
+                                  id: "workspace_#{workspace.id}",
+                                  checked: @user.workspaces.include?(workspace)
+                                }, 
+                                workspace.id, 
+                                nil %>
+              <%= form.label "workspace_#{workspace.id}", workspace.name, class: "form-check-label" %>
+              <small class="text-muted d-block ms-4">
+                <%= workspace.building_name %> • <%= workspace.city %>
+              </small>
+            </div>
+          <% end %>
+        </div>
+        <small class="form-text text-muted">Select multiple workspaces to assign this admin user to manage</small>
       </div>
 
       <div class="d-flex gap-2">
-        <%= form.submit "Assign Workspace", class: "btn btn-primary" %>
+        <%= form.submit "Assign Workspaces", class: "btn btn-primary" %>
         <%= link_to "Cancel", admin_user_path(@user), class: "btn btn-secondary" %>
       </div>
     <% end %>
 
     <% if @user.workspaces.any? %>
       <hr class="my-4">
+      <div class="mb-3">
+        <h5>Current Workspace Assignments</h5>
+        <div class="table-responsive">
+          <table class="table table-hover table-dark">
+            <thead>
+              <tr>
+                <th>Workspace Name</th>
+                <th>Building</th>
+                <th>City</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @user.workspaces.each do |workspace| %>
+                <tr>
+                  <td><%= workspace.name %></td>
+                  <td><%= workspace.building_name %></td>
+                  <td><%= workspace.city %></td>
+                  <td>
+                    <%= button_to "Remove", 
+                                assign_workspace_admin_user_path(@user, remove_workspace_id: workspace.id), 
+                                method: :patch,
+                                class: "btn btn-danger btn-sm",
+                                data: { confirm: "Remove #{workspace.name} from this user?" } %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
       <div class="d-flex justify-content-between align-items-center">
-        <h5>Remove Current Assignments</h5>
-        <%= link_to "Remove All Workspace Assignments", 
-                    assign_workspace_admin_user_path(@user, workspace_id: ''), 
+        <h6>Bulk Actions</h6>
+        <%= button_to "Remove All Workspace Assignments", 
+                    assign_workspace_admin_user_path(@user), 
                     method: :patch,
-                    class: "btn btn-danger",
-                    confirm: "Are you sure you want to remove all workspace assignments for this user?" %>
+                    class: "btn btn-danger btn-sm",
+                    data: { confirm: "Are you sure you want to remove all workspace assignments for this user?" } %>
       </div>
     <% end %>
   </div>

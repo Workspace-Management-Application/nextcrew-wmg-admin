@@ -1,0 +1,49 @@
+<% content_for :page_title, "Office Enquiry Details" %>
+
+<div class="content-area bg-dark text-white p-4 rounded">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Office Enquiry Details</h2>
+    <div>
+      <%= link_to "Edit", edit_admin_office_enquiry_path(@office_enquiry), class: "btn btn-secondary me-2" %>
+      <%= link_to "Delete", admin_office_enquiry_path(@office_enquiry),
+                  data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this enquiry?" },
+                  class: "btn btn-danger" %>
+      <%= link_to "Back", admin_office_enquiries_path, class: "btn btn-outline-light ms-2" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6 mb-3">
+      <strong>Enquirer Name:</strong>
+      <div><%= @office_enquiry.enquirer_name %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Email:</strong>
+      <div><%= @office_enquiry.email %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Phone Number:</strong>
+      <div><%= @office_enquiry.phone_number %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Company Name:</strong>
+      <div><%= @office_enquiry.company_name %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Workspace:</strong>
+      <div><%= @office_enquiry.workspace&.name %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Date:</strong>
+      <div><%= @office_enquiry.created_at.strftime("%B %d, %Y") %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Workspace Types:</strong>
+      <div><%= @office_enquiry.workspace_types.map(&:name).join(', ') %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>No. of Seats:</strong>
+      <div><%= @office_enquiry.no_of_seats %></div>
+    </div>
+  </div>
+</div> 

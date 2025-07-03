@@ -48,6 +48,14 @@ class Admin::BookingsController < Admin::BaseController
   def create
     @booking = Booking.new(booking_params)
     if @booking.save
+      # Send booking confirmation email
+      begin
+        BookingMailer.booking_confirmation(@booking).deliver_now
+      rescue => e
+        Rails.logger.error "Failed to send booking confirmation email: #{e.message}"
+        # Don't fail the booking creation if email fails
+      end
+      
       redirect_to admin_bookings_path, notice: 'Booking was successfully created.'
     else
       @workspaces = Workspace.all

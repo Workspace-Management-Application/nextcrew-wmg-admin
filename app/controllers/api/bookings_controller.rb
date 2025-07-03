@@ -24,6 +24,14 @@ class Api::BookingsController < Api::BaseController
       return render_error('Room does not belong to this workspace', :unprocessable_entity)
     end
     if booking.save
+      # Send booking confirmation email
+      begin
+        BookingMailer.booking_confirmation(booking).deliver_now
+      rescue => e
+        Rails.logger.error "Failed to send booking confirmation email: #{e.message}"
+        # Don't fail the booking creation if email fails
+      end
+      
       render_success(booking, 'Booking created successfully', :created)
     else
       render_error(booking.errors.full_messages.join(', '))

@@ -25,9 +25,47 @@
       </div>
     </div>
 
+    <!-- Workspace Information -->
+    <% if @company.workspaces.any? %>
+      <div class="bg-dark p-4 rounded mb-4">
+        <h4 class="mb-3">Workspace Information</h4>
+        <% @company.workspaces.each do |workspace| %>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p><strong>Workspace Name:</strong> <%= workspace.name %></p>
+              <p><strong>Building:</strong> <%= workspace.building_name %></p>
+              <p><strong>City:</strong> <%= workspace.city %></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Address:</strong> <%= workspace.address %></p>
+              <p><strong>Pincode:</strong> <%= workspace.pincode %></p>
+              <p><strong>Total Rooms:</strong> <%= workspace.rooms.count %></p>
+            </div>
+          </div>
+          <div class="mt-3">
+            <%= link_to "View Workspace Details", admin_workspace_path(workspace), class: "btn btn-outline-primary btn-sm" %>
+          </div>
+          <% unless workspace == @company.workspaces.last %>
+            <hr class="my-4" style="border-color: #333;">
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-dark p-4 rounded mb-4">
+        <h4 class="mb-3">Workspace Information</h4>
+        <div class="text-center">
+          <i class="fas fa-building fa-3x text-muted mb-3"></i>
+          <p class="text-muted">No workspaces associated with this company.</p>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Company Users -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4>Company Users (<%= @company_users.count %>)</h4>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <i class="fas fa-plus"></i> Add Users
+      </button>
     </div>
 
     <% if @company_users.any? %>
@@ -43,7 +81,7 @@
           </thead>
           <tbody>
             <% @company_users.each do |user| %>
-              <tr>
+              <tr class="clickable-row" data-href="<%= admin_user_path(user) %>" style="cursor: pointer;">
                 <td><%= user.name %></td>
                 <td><%= user.email %></td>
                 <td>
@@ -52,7 +90,10 @@
                   </span>
                 </td>
                 <td>
-                  <%= link_to "View", admin_user_path(user), class: "btn btn-outline-primary btn-sm" %>
+                  <%= button_to "Remove", remove_user_admin_company_path(@company, user_id: user.id), 
+                              method: :delete, 
+                              class: "btn btn-danger btn-sm", 
+                              data: { confirm: "Are you sure you want to remove this user from the company?" } %>
                 </td>
               </tr>
             <% end %>
@@ -69,6 +110,9 @@
     <div class="mt-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Associated Rooms (<%= @company.rooms.count %>)</h4>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+          <i class="fas fa-plus"></i> Add Rooms
+        </button>
       </div>
       <% if @company.rooms.any? %>
         <div class="table-responsive">
@@ -97,16 +141,7 @@
         </div>
       <% end %>
 
-      <!-- Add Room Form -->
-      <div class="mt-4">
-        <h5>Add Room</h5>
-        <%= form_with url: add_room_admin_company_path(@company), method: :post, local: true do %>
-          <div class="input-group mb-3" style="max-width: 400px;">
-            <%= select_tag :room_id, options_from_collection_for_select(@available_rooms, :id, :name), prompt: "Select a room", class: "form-select" %>
-            <button class="btn btn-success" type="submit">Add Room</button>
-          </div>
-        <% end %>
-      </div>
+
     </div>
   </div>
 
@@ -135,3 +170,124 @@
         <div class="metric-label">Active Users (30 days)</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Add Users to <%= @company.name %></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <% if @available_users.any? %>
+          <div class="table-responsive">
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @available_users.each do |user| %>
+                  <tr>
+                    <td><%= user.name %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.phone_number %></td>
+                    <td>
+                      <%= button_to "Add to Company", add_user_admin_company_path(@company, user_id: user.id), 
+                                  method: :post, 
+                                  class: "btn btn-success btn-sm",
+                                  data: { confirm: "Add #{user.name} to #{@company.name}?" } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-4">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No available users found.</p>
+            <p class="text-muted small">All users with role 'user' are already assigned to companies.</p>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Room Modal -->
+<div class="modal fade" id="addRoomModal" tabindex="-1" aria-labelledby="addRoomModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addRoomModalLabel">Add Rooms to <%= @company.name %></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <% if @available_rooms.any? %>
+          <div class="table-responsive">
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th>Room Name</th>
+                  <th>Category</th>
+                  <th>Capacity</th>
+                  <th>Workspace</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @available_rooms.each do |room| %>
+                  <tr>
+                    <td><%= room.name %></td>
+                    <td><%= room.category.humanize %></td>
+                    <td><%= room.capacity %> people</td>
+                    <td><%= room.workspace.name %></td>
+                    <td>
+                      <%= button_to "Add to Company", add_room_admin_company_path(@company, room_id: room.id), 
+                                  method: :post, 
+                                  class: "btn btn-success btn-sm",
+                                  data: { confirm: "Add #{room.name} to #{@company.name}?" } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-4">
+            <i class="fas fa-door-open fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No available rooms found.</p>
+            <p class="text-muted small">All rooms are already associated with this company.</p>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# Add this script at the end of the file to handle clickable rows %>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".clickable-row").forEach(function(row) {
+      row.addEventListener("click", function(e) {
+        // Prevent click if the target is a button inside the row
+        if (e.target.closest('button, a, form')) return;
+        window.location = row.getAttribute("data-href");
+      });
+    });
+  });
+</script>

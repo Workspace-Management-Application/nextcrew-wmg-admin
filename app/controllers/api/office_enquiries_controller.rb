@@ -63,7 +63,7 @@ class Api::OfficeEnquiriesController < Api::BaseController
   end
 
   def office_enquiry_params
-    params.require(:office_enquiry).permit(:enquirer_name, :phone_number, :email, :requirement, :company_name)
+    params.require(:office_enquiry).permit(:enquirer_name, :phone_number, :email, :company_name)
   end
 
   def authorize_floor_user!

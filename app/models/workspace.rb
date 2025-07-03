@@ -7,6 +7,8 @@ class Workspace < ApplicationRecord
   has_many :day_passes,  dependent: :destroy
   has_many :visitor_entries,  dependent: :destroy
   has_many :office_enquiries, dependent: :destroy
+  has_many :workspace_workspace_types, dependent: :destroy
+  has_many :workspace_types, through: :workspace_workspace_types
 
   # Active Storage attachment for workspace photos
   has_one_attached :photo

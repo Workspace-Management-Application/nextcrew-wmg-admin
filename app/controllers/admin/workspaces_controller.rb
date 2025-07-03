@@ -3,7 +3,7 @@ class Admin::WorkspacesController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @workspaces = Workspace.includes(:companies, :users, :rooms)
+    @workspaces = Workspace.includes(:companies, :users, :rooms, :workspace_types)
     
     # Search functionality
     if @search.present?
@@ -80,13 +80,32 @@ class Admin::WorkspacesController < Admin::BaseController
     redirect_to admin_workspaces_path, notice: 'Workspace was successfully deleted.'
   end
 
+  def add_company
+    @workspace = Workspace.find(params[:id])
+    @company = Company.find(params[:company_id])
+    
+    unless @workspace.companies.include?(@company)
+      @workspace.companies << @company
+      redirect_to admin_workspace_path(@workspace), notice: "Company added to workspace successfully."
+    else
+      redirect_to admin_workspace_path(@workspace), alert: "Company is already assigned to this workspace."
+    end
+  end
+
+  def remove_company
+    @workspace = Workspace.find(params[:id])
+    @company = Company.find(params[:company_id])
+    @workspace.companies.delete(@company)
+    redirect_to admin_workspace_path(@workspace), notice: "Company removed from workspace."
+  end
+
   private
 
   def set_workspace
-    @workspace = Workspace.find(params[:id])
+    @workspace = Workspace.includes(:workspace_types).find(params[:id])
   end
 
   def workspace_params
-    params.require(:workspace).permit(:name, :building_name, :city, :address, :pincode, :is_active, :photo)
+    params.require(:workspace).permit(:name, :building_name, :city, :address, :pincode, :is_active, :photo, workspace_type_ids: [])
   end
 end

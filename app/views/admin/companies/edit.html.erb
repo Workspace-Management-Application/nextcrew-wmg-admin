@@ -26,6 +26,15 @@
         </div>
         
         <div class="col-md-6 mb-3">
+          <%= form.label :email, class: "form-label" %>
+          <%= form.email_field :email, class: "form-control", required: true %>
+        </div>
+      </div>
+
+      <!-- Status field - only visible to super_admin or admin with restrictions -->
+      <% if current_user.super_admin? %>
+        <div class="row">
+          <div class="col-md-6 mb-3">
           <%= form.label :status, class: "form-label" %>
           <%= form.select :status, 
               options_for_select([
@@ -38,6 +47,37 @@
               { class: "form-select" } %>
         </div>
       </div>
+      <% elsif current_user.admin? && @company.status == 'active' %>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <%= form.label :status, class: "form-label" %>
+            <%= form.select :status, 
+                options_for_select([
+                  ['Active', 'active'],
+                  ['Inactive', 'inactive']
+                ], @company.status), 
+                {}, 
+                { class: "form-select" } %>
+            <small class="form-text text-muted">Admin can only change status from Active to Inactive</small>
+          </div>
+        </div>
+      <% else %>
+        <!-- Hidden field to preserve current status -->
+        <%= form.hidden_field :status %>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Current Status</label>
+            <div class="form-control-plaintext">
+              <span class="badge <%= @company.status == 'active' ? 'bg-success' : @company.status == 'pending' ? 'bg-warning' : 'bg-secondary' %>">
+                <%= @company.status.titleize %>
+              </span>
+              <% unless current_user.super_admin? %>
+                <small class="form-text text-muted d-block mt-1">Only Super Admin can change this status</small>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
 
       <div class="row">
         <div class="col-md-6 mb-3">

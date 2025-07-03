@@ -22,7 +22,73 @@
           <p><strong>Address:</strong> <%= @workspace.address %></p>
         </div>
       </div>
+      
+      <% if @workspace.workspace_types.any? %>
+        <div class="mt-3">
+          <p><strong>Workspace Types:</strong></p>
+          <div class="d-flex flex-wrap gap-2">
+            <% @workspace.workspace_types.each do |workspace_type| %>
+              <span class="badge bg-primary"><%= workspace_type.name %></span>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="mt-3">
+          <p><strong>Workspace Types:</strong> <span class="text-muted">None assigned</span></p>
+        </div>
+      <% end %>
     </div>
+
+    <!-- Associated Companies -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>Associated Companies (<%= @workspace.companies.count %>)</h4>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
+        <i class="fas fa-plus"></i> Add Company
+      </button>
+    </div>
+
+    <% if @workspace.companies.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover table-dark">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Total Users</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @workspace.companies.each do |company| %>
+              <tr class="clickable-row" data-href="<%= admin_company_path(company) %>" style="cursor: pointer;">
+                <td><%= company.name %></td>
+                <td><%= company.email %></td>
+                <td><%= company.phone_number %></td>
+                <td>
+                  <span class="badge <%= company.status == 'active' ? 'bg-success' : company.status == 'pending' ? 'bg-warning' : 'bg-secondary' %>">
+                    <%= company.status.humanize %>
+                  </span>
+                </td>
+                <td><%= company.users.count %></td>
+                <td>
+                  <%= button_to "Remove", remove_company_admin_workspace_path(@workspace, company_id: company.id), 
+                              method: :delete, 
+                              class: "btn btn-danger btn-sm", 
+                              data: { confirm: "Are you sure you want to remove this company from the workspace?" } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center mt-4">
+        <i class="fas fa-building fa-3x text-muted mb-3"></i>
+        <p class="text-muted">No companies associated with this workspace.</p>
+      </div>
+    <% end %>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h4>Rooms (<%= @rooms.count %>)</h4>
@@ -67,5 +133,60 @@
         <%= link_to "Add the first room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary" %>
       </div>
     <% end %>
+  </div>
+</div>
+
+<!-- Add Company Modal -->
+<div class="modal fade" id="addCompanyModal" tabindex="-1" aria-labelledby="addCompanyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCompanyModalLabel">Add Companies to <%= @workspace.name %></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <% available_companies = Company.where(status: ['active', 'approved']).left_joins(:company_workspaces).where(company_workspaces: { id: nil }) %>
+        <% if available_companies.any? %>
+          <div class="table-responsive">
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th>Company Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Total Users</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% available_companies.each do |company| %>
+                  <tr>
+                    <td><%= company.name %></td>
+                    <td><%= company.email %></td>
+                    <td><%= company.phone_number %></td>
+                    <td><%= company.users.count %></td>
+                    <td>
+                      <%= button_to "Add to Workspace", add_company_admin_workspace_path(@workspace, company_id: company.id), 
+                                  method: :post, 
+                                  class: "btn btn-success btn-sm",
+                                  data: { confirm: "Add #{company.name} to #{@workspace.name}?" } %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-4">
+            <i class="fas fa-building fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No available companies found.</p>
+            <p class="text-muted small">All active companies are already assigned to workspaces.</p>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
   </div>
 </div>
