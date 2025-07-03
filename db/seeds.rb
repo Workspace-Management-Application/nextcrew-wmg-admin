@@ -257,26 +257,26 @@ end
 puts "🏛️ Creating rooms..."
 rooms_data = [
   # Floor 5 Premium rooms
-  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, whiteboard: true, projector: true, is_available: true },
-  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, whiteboard: true, projector: true, is_available: true },
-  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, whiteboard: true, projector: true, is_available: true },
-  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, whiteboard: true, projector: false, is_available: true },
-  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, whiteboard: true, projector: false, is_available: true },
-  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, whiteboard: true, projector: true, is_available: false },
+  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, whiteboard: true, projector: true, is_available: true, tv: true},
+  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, whiteboard: true, projector: true, is_available: true , tv: true},
+  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, whiteboard: true, projector: true, is_available: true , tv: true},
+  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, whiteboard: true, projector: false, is_available: true , tv: true},
+  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, whiteboard: true, projector: false, is_available: true , tv: true},
+  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, whiteboard: true, projector: true, is_available: false , tv: true},
   
   # Floor 3 Standard rooms
-  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, whiteboard: true, projector: true, is_available: true },
-  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, whiteboard: true, projector: false, is_available: true },
-  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, whiteboard: false, projector: false, is_available: true },
-  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, whiteboard: true, projector: true, is_available: true },
+  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, whiteboard: true, projector: true, is_available: true , tv: false},
+  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, whiteboard: true, projector: false, is_available: true , tv: true},
+  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, whiteboard: false, projector: false, is_available: true , tv: true},
+  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, whiteboard: true, projector: true, is_available: true , tv: true},
   
   # Ground Floor Basic rooms
-  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, whiteboard: true, projector: false, is_available: true },
-  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, whiteboard: false, projector: false, is_available: true },
-  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, whiteboard: true, projector: true, is_available: true },
+  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, whiteboard: true, projector: false, is_available: true , tv: true},
+  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, whiteboard: false, projector: false, is_available: true , tv: true},
+  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, whiteboard: true, projector: true, is_available: true , tv: true},
   
   # Floor 2 Executive rooms (inactive workspace)
-  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, whiteboard: true, projector: true, is_available: false }
+  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, whiteboard: true, projector: true, is_available: false , tv: true}
 ]
 
 room_records = rooms_data.map do |room_data|
