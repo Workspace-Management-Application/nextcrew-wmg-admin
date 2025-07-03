@@ -116,6 +116,6 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def room_params
-    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :is_available, :photo)
+    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :tv, :is_available, :photo)
   end
 end
