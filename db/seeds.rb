@@ -17,35 +17,35 @@ companies = [
   {
     name: 'SR Next Technologies',
     email: 'contact@srnext.in',
-    phone_number: '+91-9876543210',
+    phone_number: '9876543210',
     address: 'Cabin 10, Tech Park, Vijay Nagar',
     status: 'active'
   },
   {
     name: 'InnovateCorp',
     email: 'hello@innovatecorp.com',
-    phone_number: '+91-9876543211',
+    phone_number: '9876543211',
     address: 'Floor 3, Innovation Hub, Sapna Sangeeta',
     status: 'active'
   },
   {
     name: 'StartupXYZ',
     email: 'team@startupxyz.in',
-    phone_number: '+91-9876543212',
+    phone_number: '9876543212',
     address: 'Coworking Space, AB Road',
     status: 'pending'
   },
   {
     name: 'TechSolutions Ltd',
     email: 'info@techsolutions.co.in',
-    phone_number: '+91-9876543213',
+    phone_number: '9876543213',
     address: 'Office Complex, Ring Road',
     status: 'approved'
   },
   {
     name: 'Inactive Company',
     email: 'old@inactive.com',
-    phone_number: '+91-9876543214',
+    phone_number: '9876543214',
     address: 'Old Building, Scheme 54',
     status: 'inactive'
   }
