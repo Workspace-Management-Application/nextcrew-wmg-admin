@@ -208,7 +208,14 @@ precompile_assets() {
     
     # Check if asset files have changed
     if git diff HEAD~1 --name-only | grep -E "(app/assets|app/javascript|Gemfile)" > /dev/null; then
-        log "Asset-related files changed, precompiling assets..."
+        log "Asset-related files changed, clearing and precompiling assets..."
+        
+        # Clear all compiled assets first
+        log "Clearing existing compiled assets..."
+        RAILS_ENV=production bundle exec rails assets:clobber
+        
+        # Precompile assets
+        log "Precompiling assets..."
         RAILS_ENV=production bundle exec rails assets:precompile
     else
         info "No asset changes detected, skipping precompilation"
