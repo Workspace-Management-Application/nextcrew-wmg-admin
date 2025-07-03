@@ -2,7 +2,27 @@ class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
 
   def index
-    @users = User.all
+    @search = params[:search]
+    @users = User.includes(:workspaces)
+    
+    # Search functionality
+    if @search.present?
+      @users = @users.where(
+        "name ILIKE ? OR email ILIKE ? OR role ILIKE ?",
+        "%#{@search}%", "%#{@search}%", "%#{@search}%"
+      )
+    end
+    
+    # Filter by role if specified
+    if params[:role].present?
+      @users = @users.where(role: params[:role])
+    end
+    
+    # Order by name
+    @users = @users.order(:name)
+    
+    # Pagination
+    @users = @users.page(params[:page]).per(10)
   end
 
   def show

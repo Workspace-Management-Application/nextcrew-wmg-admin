@@ -2,9 +2,37 @@ class Admin::BookingsController < Admin::BaseController
   before_action :set_booking, only: [:show, :edit, :update, :destroy]
 
   def index
-    @bookings = Booking.includes(:user, :room).order(created_at: :desc)
-    @bookings = @bookings.where('DATE(start_time) = ?', Date.parse(params[:date])) if params[:date].present?
-    @bookings = @bookings.joins(:room).where(rooms: { workspace_id: params[:workspace_id] }) if params[:workspace_id].present?
+    @search = params[:search]
+    @bookings = Booking.includes(:user, :room, room: :workspace)
+    
+    # Search functionality
+    if @search.present?
+      @bookings = @bookings.joins(:user, :room).where(
+        "users.name ILIKE ? OR users.email ILIKE ? OR rooms.name ILIKE ? OR bookings.phone_number ILIKE ?",
+        "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
+      )
+    end
+    
+    # Filter by date if specified
+    if params[:date].present?
+      @bookings = @bookings.where('DATE(start_time) = ?', Date.parse(params[:date]))
+    end
+    
+    # Filter by workspace if specified
+    if params[:workspace_id].present?
+      @bookings = @bookings.joins(:room).where(rooms: { workspace_id: params[:workspace_id] })
+    end
+    
+    # Filter by status if specified
+    if params[:status].present?
+      @bookings = @bookings.where(status: params[:status])
+    end
+    
+    # Order by start time descending
+    @bookings = @bookings.order(start_time: :desc)
+    
+    # Pagination
+    @bookings = @bookings.page(params[:page]).per(15)
   end
 
   def show

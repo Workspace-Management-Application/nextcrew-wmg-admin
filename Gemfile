@@ -71,3 +71,6 @@ end
 gem 'pry', '~> 0.15.0'
 gem 'aws-sdk-s3'
 gem 'dotenv-rails'
+
+# Pagination
+gem 'kaminari'

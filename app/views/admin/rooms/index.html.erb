@@ -1,11 +1,78 @@
-<% content_for :page_title, "Rooms in \\#{@workspace.name}" %>
+<% content_for :page_title, "All Rooms" %>
 
 <div class="content-area bg-dark text-white p-4 rounded">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Rooms in <%= @workspace.name %></h2>
+    <h2>All Rooms</h2>
+  </div>
+
+  <!-- Search Form -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
+        <%= form.hidden_field :filter, value: params[:filter] if params[:filter].present? %>
+        <%= form.hidden_field :availability, value: params[:availability] if params[:availability].present? %>
+        <%= form.hidden_field :workspace_id, value: params[:workspace_id] if params[:workspace_id].present? %>
+        <%= form.text_field :search, placeholder: "Search by room name, category, or workspace...", 
+                           value: params[:search], 
+                           class: "form-control form-control-dark me-2" %>
+        <%= form.submit "Search", class: "btn btn-outline-primary" %>
+        <% if params[:search].present? || params[:filter].present? || params[:workspace_id].present? %>
+          <%= link_to "Clear", admin_rooms_path, class: "btn btn-outline-secondary ms-2" %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="col-md-3">
+      <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
+        <%= form.hidden_field :search, value: params[:search] if params[:search].present? %>
+        <%= form.hidden_field :availability, value: params[:availability] if params[:availability].present? %>
+        <%= form.hidden_field :workspace_id, value: params[:workspace_id] if params[:workspace_id].present? %>
+        <%= form.select :filter, 
+                       options_for_select([
+                         ['All Categories', ''],
+                         ['Meeting Room', 'meeting_room'],
+                         ['Conference Room', 'conference_room'],
+                         ['Private Office', 'private_office'],
+                         ['Hot Desk', 'hot_desk']
+                       ], params[:filter]), 
+                       {}, 
+                       { class: "form-select form-control-dark me-2", onchange: "this.form.submit();" } %>
+      <% end %>
+    </div>
+    <div class="col-md-2">
+      <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
+        <%= form.hidden_field :search, value: params[:search] if params[:search].present? %>
+        <%= form.hidden_field :filter, value: params[:filter] if params[:filter].present? %>
+        <%= form.hidden_field :workspace_id, value: params[:workspace_id] if params[:workspace_id].present? %>
+        <%= form.select :availability, 
+                       options_for_select([
+                         ['All Status', ''],
+                         ['Available', 'available'],
+                         ['Unavailable', 'unavailable']
+                       ], params[:availability]), 
+                       {}, 
+                       { class: "form-select form-control-dark", onchange: "this.form.submit();" } %>
+      <% end %>
+    </div>
+    <div class="col-md-3">
+      <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
+        <%= form.hidden_field :search, value: params[:search] if params[:search].present? %>
+        <%= form.hidden_field :filter, value: params[:filter] if params[:filter].present? %>
+        <%= form.hidden_field :availability, value: params[:availability] if params[:availability].present? %>
+        <%= form.select :workspace_id, 
+                       options_from_collection_for_select(current_user.workspaces, :id, :name, params[:workspace_id].to_i), 
+                       { prompt: 'All Workspaces' }, 
+                       { class: "form-select form-control-dark", onchange: "this.form.submit();" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Results Info -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <%= link_to "Add Room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary me-2" %>
-      <%= link_to "← Back to Workspace", admin_workspace_path(@workspace), class: "btn btn-outline-primary" %>
+      <%= pagination_info(@rooms) %>
+    </div>
+    <div>
+      <%= paginate @rooms %>
     </div>
   </div>
 
@@ -14,6 +81,7 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Workspace</th>
           <th>Category</th>
           <th>Capacity</th>
           <th>Whiteboard</th>
@@ -24,8 +92,9 @@
       </thead>
       <tbody>
         <% @rooms.each do |room| %>
-          <tr>
+          <tr class="clickable-row" data-href="<%= admin_room_path(room) %>" style="cursor: pointer;">
             <td><%= room.name %></td>
+            <td><%= room.workspace.name %></td>
             <td><%= room.category.humanize %></td>
             <td><%= room.capacity %> people</td>
             <td>
@@ -49,10 +118,9 @@
                 <span class="badge bg-danger">Inactive</span>
               <% end %>
             </td>
-            <td>
-              <%= link_to "View", admin_workspace_room_path(@workspace, room), class: "btn btn-outline-primary btn-sm me-2" %>
-              <%= link_to "Edit", edit_admin_workspace_room_path(@workspace, room), class: "btn btn-secondary btn-sm me-2" %>
-              <%= link_to "Delete", admin_workspace_room_path(@workspace, room), 
+            <td class="action-column">
+              <%= link_to "Edit", edit_admin_workspace_room_path(room.workspace, room), class: "btn btn-secondary btn-sm me-2" %>
+              <%= link_to "Delete", admin_workspace_room_path(room.workspace, room), 
                           data: { 
                             turbo_method: :delete, 
                             turbo_confirm: "Are you sure you want to delete this room?" 
@@ -67,8 +135,23 @@
 
   <% if @rooms.empty? %>
     <div class="text-center mt-5">
-      <p class="text-muted">No rooms found in this workspace.</p>
-      <%= link_to "Add the first room", new_admin_workspace_room_path(@workspace), class: "btn btn-primary" %>
+      <% if params[:search].present? || params[:filter].present? || params[:workspace_id].present? %>
+        <p class="text-muted">No rooms found matching your search criteria.</p>
+        <%= link_to "Clear filters", admin_rooms_path, class: "btn btn-outline-secondary" %>
+      <% else %>
+        <p class="text-muted">No rooms found in your workspaces.</p>
+        <%= link_to "Go to Workspaces", admin_workspaces_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  <% else %>
+    <!-- Bottom Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div>
+        <%= pagination_info(@rooms) %>
+      </div>
+      <div>
+        <%= paginate @rooms %>
+      </div>
     </div>
   <% end %>
 </div>

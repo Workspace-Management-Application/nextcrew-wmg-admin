@@ -12,14 +12,14 @@
       <p><strong>Name:</strong> <%= @user.name %></p>
       <p><strong>Email:</strong> <%= @user.email %></p>
       <p><strong>Role:</strong> <%= @user.role.humanize %></p>
-      <p><strong>Current Workspace:</strong> <%= @user.workspace&.name || 'Not assigned' %></p>
+      <p><strong>Current Workspaces:</strong> <%= @user.workspaces.any? ? @user.workspaces.pluck(:name).join(', ') : 'Not assigned' %></p>
     </div>
 
     <%= form_with url: assign_workspace_admin_user_path(@user), method: :patch, local: true do |form| %>
       <div class="mb-4">
         <%= form.label :workspace_id, "Select Workspace", class: "form-label" %>
         <%= form.select :workspace_id, 
-                        options_from_collection_for_select(@workspaces, :id, :name, @user.workspace&.id), 
+                        options_from_collection_for_select(@workspaces, :id, :name, @user.workspaces.first&.id), 
                         { prompt: 'Select a workspace to assign' }, 
                         { class: "form-select", required: true } %>
         <small class="form-text text-muted">This user will be assigned to manage the selected workspace</small>
@@ -31,15 +31,15 @@
       </div>
     <% end %>
 
-    <% if @user.workspace %>
+    <% if @user.workspaces.any? %>
       <hr class="my-4">
       <div class="d-flex justify-content-between align-items-center">
-        <h5>Remove Current Assignment</h5>
-        <%= link_to "Remove Workspace Assignment", 
+        <h5>Remove Current Assignments</h5>
+        <%= link_to "Remove All Workspace Assignments", 
                     assign_workspace_admin_user_path(@user, workspace_id: ''), 
                     method: :patch,
                     class: "btn btn-danger",
-                    confirm: "Are you sure you want to remove the workspace assignment for this user?" %>
+                    confirm: "Are you sure you want to remove all workspace assignments for this user?" %>
       </div>
     <% end %>
   </div>

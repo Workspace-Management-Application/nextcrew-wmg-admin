@@ -1,129 +1,150 @@
-<% content_for :page_title, "Room - #{@room.name}" %>
+<% content_for :page_title, "#{@room.name} - #{@workspace.name}" %>
 
-<div class="row">
-  <div class="col-lg-8 col-md-10 mx-auto">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2><%= @room.name %></h2>
-      <div>
-        <%= link_to "Edit", edit_admin_workspace_room_path(@workspace, @room), class: "btn btn-primary me-2" %>
-        <%= link_to "← Back to Rooms", admin_workspace_rooms_path(@workspace), class: "btn btn-outline-primary" %>
-      </div>
+<div class="content-area bg-dark text-white p-4 rounded">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><%= @room.name %> <small class="text-muted">in <%= @workspace.name %></small></h2>
+    <div>
+      <%= link_to "Edit Room", edit_admin_workspace_room_path(@workspace, @room), class: "btn btn-primary me-2" %>
+      <%= link_to "← Back to All Rooms", admin_rooms_path, class: "btn btn-outline-primary me-2" %>
+      <%= link_to "View Workspace", admin_workspace_path(@workspace), class: "btn btn-outline-secondary" %>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-body">
-        <% if @room.photo.attached? %>
-          <div class="row mb-4">
-            <div class="col-12">
-              <strong>Room Photo:</strong>
-              <div class="mt-2">
-                <%= image_tag @room.photo, class: "img-fluid rounded", style: "max-width: 100%; height: auto; max-height: 400px;" %>
-              </div>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card bg-dark text-white" style="border: 1px solid #555;">
+        <div class="card-body">
+          <h5 class="card-title text-white">Room Details</h5>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <p class="text-white"><strong>Workspace:</strong> <%= @workspace.name %></p>
+              <p class="text-white"><strong>Category:</strong> <%= @room.category.humanize %></p>
+              <p class="text-white"><strong>Capacity:</strong> <%= @room.capacity %> people</p>
+            </div>
+            <div class="col-md-6">
+              <p class="text-white">
+                <strong>Whiteboard:</strong> 
+                <% if @room.whiteboard %>
+                  <span class="badge bg-success">Available</span>
+                <% else %>
+                  <span class="badge bg-secondary">Not Available</span>
+                <% end %>
+              </p>
+              <p class="text-white">
+                <strong>Projector:</strong> 
+                <% if @room.projector %>
+                  <span class="badge bg-success">Available</span>
+                <% else %>
+                  <span class="badge bg-secondary">Not Available</span>
+                <% end %>
+              </p>
             </div>
           </div>
-        <% end %>
-
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Room Name:</strong>
-          </div>
-          <div class="col-sm-9">
-            <%= @room.name %>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Category:</strong>
-          </div>
-          <div class="col-sm-9">
-            <%= @room.category.humanize %>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Capacity:</strong>
-          </div>
-          <div class="col-sm-9">
-            <%= @room.capacity %> people
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Whiteboard:</strong>
-          </div>
-          <div class="col-sm-9">
-            <% if @room.whiteboard %>
-              <span class="badge bg-success">Available</span>
-            <% else %>
-              <span class="badge bg-secondary">Not Available</span>
-            <% end %>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Projector:</strong>
-          </div>
-          <div class="col-sm-9">
-            <% if @room.projector %>
-              <span class="badge bg-success">Available</span>
-            <% else %>
-              <span class="badge bg-secondary">Not Available</span>
-            <% end %>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Status:</strong>
-          </div>
-          <div class="col-sm-9">
+          
+          <p class="text-white">
+            <strong>Status:</strong> 
             <% if @room.is_available %>
               <span class="badge bg-success">Active</span>
             <% else %>
               <span class="badge bg-danger">Inactive</span>
             <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card bg-dark text-white" style="border: 1px solid #555;">
+        <div class="card-body">
+          <h5 class="card-title text-white">Room Photo</h5>
+          
+          <% if @room.photo.attached? %>
+            <%= image_tag @room.photo, class: "img-fluid rounded mb-3", alt: @room.name %>
+          <% else %>
+            <div class="text-center mb-3 p-4" style="border: 2px dashed #555; border-radius: 8px;">
+              <i class="fas fa-image fa-3x text-muted mb-2"></i>
+              <p class="text-muted mb-0">No photo uploaded</p>
+            </div>
+          <% end %>
+          
+          <!-- Inline Photo Upload Form -->
+          <%= form_with model: [:admin, @workspace, @room], local: true, multipart: true, class: "photo-upload-form" do |form| %>
+            <div class="mb-3">
+              <%= form.file_field :photo, class: "form-control form-control-sm", accept: "image/*", id: "room_photo_upload" %>
+              <div class="form-text text-muted">JPG, PNG, GIF, WebP. Max 5MB.</div>
+            </div>
+            <div class="d-grid">
+              <%= form.submit "Upload Photo", class: "btn btn-outline-primary btn-sm" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workspace Info Section -->
+  <div class="mt-4">
+    <div class="card bg-dark text-white" style="border: 1px solid #555;">
+      <div class="card-body">
+        <h5 class="card-title text-white">Workspace Information</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p class="text-white"><strong>Building:</strong> <%= @workspace.building_name %></p>
+            <p class="text-white"><strong>City:</strong> <%= @workspace.city %></p>
+          </div>
+          <div class="col-md-6">
+            <p class="text-white"><strong>Address:</strong> <%= @workspace.address %></p>
+            <p class="text-white"><strong>Pincode:</strong> <%= @workspace.pincode %></p>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Currently:</strong>
-          </div>
-          <div class="col-sm-9">
-            <% if @room.is_occupied? %>
-              <span class="badge bg-warning">Occupied</span>
-            <% else %>
-              <span class="badge bg-success">Available</span>
+  <!-- Bookings Section -->
+  <div class="mt-4">
+    <h4>Recent Bookings</h4>
+    <% if @room.bookings.any? %>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @room.bookings.includes(:user).order(start_time: :desc).limit(10).each do |booking| %>
+              <tr>
+                <td><%= booking.user.name %></td>
+                <td><%= booking.start_time.strftime("%b %d, %Y %I:%M %p") if booking.start_time %></td>
+                <td><%= booking.end_time.strftime("%b %d, %Y %I:%M %p") if booking.end_time %></td>
+                <td>
+                  <% if booking.start_time && booking.start_time > Time.current %>
+                    <span class="badge bg-secondary">Upcoming</span>
+                  <% elsif booking.end_time && booking.end_time < Time.current %>
+                    <span class="badge bg-dark">Completed</span>
+                  <% else %>
+                    <span class="badge bg-light text-dark">Active</span>
+                  <% end %>
+                </td>
+                <td>
+                  <%= link_to "View", admin_booking_path(booking), class: "btn btn-outline-primary btn-sm" %>
+                </td>
+              </tr>
             <% end %>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <div class="col-sm-3">
-            <strong>Workspace:</strong>
-          </div>
-          <div class="col-sm-9">
-            <%= link_to @workspace.name, admin_workspace_path(@workspace), class: "text-decoration-none" %>
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
-    </div>
-
-    <div class="mt-4">
-      <div class="d-flex gap-2">
-        <%= link_to "Edit Room", edit_admin_workspace_room_path(@workspace, @room), class: "btn btn-primary" %>
-        <%= link_to "Delete Room", admin_workspace_room_path(@workspace, @room), 
-                    data: { 
-                      turbo_method: :delete, 
-                      turbo_confirm: "Are you sure you want to delete this room? This action cannot be undone." 
-                    },
-                    class: "btn btn-danger" %>
-        <%= link_to "Back to Rooms", admin_workspace_rooms_path(@workspace), class: "btn btn-secondary" %>
+      <div class="text-center mt-3">
+        <%= link_to "View All Bookings", admin_bookings_path, class: "btn btn-outline-primary" %>
       </div>
-    </div>
+    <% else %>
+      <p class="text-white">No bookings found for this room.</p>
+    <% end %>
   </div>
 </div>

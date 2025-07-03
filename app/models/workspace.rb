@@ -13,4 +13,23 @@ class Workspace < ApplicationRecord
 
   validates :name, :building_name, :address, :city, :pincode, presence: true
   validates :is_active, inclusion: { in: [true, false] }
+
+  # Callbacks
+  after_create :associate_super_admins
+
+  private
+
+  # Automatically associate all super_admin users with newly created workspace
+  def associate_super_admins
+    User.where(role: 'super_admin').find_each do |super_admin|
+      UserWorkspace.create!(
+        user: super_admin,
+        workspace: self
+      )
+    end
+    
+    Rails.logger.info "Associated #{User.where(role: 'super_admin').count} super_admin users with workspace '#{self.name}'"
+  rescue => e
+    Rails.logger.error "Failed to associate super_admins with workspace #{self.id}: #{e.message}"
+  end
 end

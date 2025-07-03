@@ -23,8 +23,8 @@
                   <%= @user.role.humanize %>
                 </span>
               </p>
-              <% if @user.workspace %>
-                <p><strong>Assigned Workspace:</strong> <%= @user.workspace.name %></p>
+              <% if @user.workspaces.any? %>
+                <p><strong>Assigned Workspaces:</strong> <%= @user.workspaces.pluck(:name).join(', ') %></p>
               <% end %>
             </div>
           </div>

@@ -6,10 +6,16 @@
     <%= link_to "Create Booking", new_admin_booking_path, class: "btn btn-primary" %>
   </div>
 
-  <!-- Filters -->
+  <!-- Search and Filters -->
   <div class="bg-dark p-3 rounded mb-4">
     <%= form_with url: admin_bookings_path, method: :get, local: true, class: "row g-3" do |form| %>
-      <div class="col-md-3">
+      <div class="col-md-4">
+        <%= form.label :search, "Search", class: "form-label" %>
+        <%= form.text_field :search, placeholder: "Search by user, room, phone...", 
+                           value: params[:search], 
+                           class: "form-control form-control-dark" %>
+      </div>
+      <div class="col-md-2">
         <%= form.label :date, "Filter by Date", class: "form-label" %>
         <%= form.date_field :date, value: params[:date], class: "form-control" %>
       </div>
@@ -21,10 +27,20 @@
                         { class: "form-select" } %>
       </div>
       <div class="col-md-3 d-flex align-items-end">
-        <%= form.submit "Filter", class: "btn btn-outline-primary me-2" %>
+        <%= form.submit "Search/Filter", class: "btn btn-outline-primary me-2" %>
         <%= link_to "Clear", admin_bookings_path, class: "btn btn-secondary" %>
       </div>
     <% end %>
+  </div>
+
+  <!-- Results Info -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <%= pagination_info(@bookings) %>
+    </div>
+    <div>
+      <%= paginate @bookings %>
+    </div>
   </div>
 
   <div class="table-responsive">
@@ -42,7 +58,7 @@
       </thead>
       <tbody>
         <% @bookings.each do |booking| %>
-          <tr>
+          <tr class="clickable-row" data-href="<%= admin_booking_path(booking) %>" style="cursor: pointer;">
             <td><%= booking.user.name %> </td>
             <td><%= booking.room.name %></td>
             <td><%= booking.room.workspace.name %></td>
@@ -57,8 +73,7 @@
                 <span class="badge bg-light text-dark">Active</span>
               <% end %>
             </td>
-            <td>
-              <%= link_to "View", admin_booking_path(booking), class: "btn btn-outline-primary btn-sm me-2" %>
+            <td class="action-column">
               <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-secondary btn-sm me-2" %>
               <%= link_to "Cancel", admin_booking_path(booking), 
                           data: { 
@@ -77,6 +92,16 @@
     <div class="text-center mt-5">
       <p class="text-muted">No bookings found.</p>
       <%= link_to "Create the first booking", new_admin_booking_path, class: "btn btn-primary" %>
+    </div>
+  <% else %>
+    <!-- Bottom Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div>
+        <%= pagination_info(@bookings) %>
+      </div>
+      <div>
+        <%= paginate @bookings %>
+      </div>
     </div>
   <% end %>
 </div>

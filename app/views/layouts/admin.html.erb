@@ -14,13 +14,107 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <!-- Google Fonts - Inter -->
+    <!-- Google Fonts - Catamaran and Mukta -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@300;400;500;600;700&family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom Font Styling -->
+    <style>
+      /* Apply Catamaran to body and normal text */
+      body, .admin-body {
+        font-family: 'Catamaran', sans-serif !important;
+      }
+      
+      /* Apply Mukta to headings */
+      h1, h2, h3, h4, h5, h6, .sidebar-title {
+        font-family: 'Mukta', sans-serif !important;
+      }
+      
+      /* Special styling for NEXTCOWORKS branding */
+      .brand-heading {
+        font-family: 'Mukta', sans-serif !important;
+        font-weight: 700;
+        letter-spacing: 3px;
+      }
+      
+      /* Apply Catamaran to sidebar nav items and other text */
+      .nav-text, .nav-item, p, span, div, td, th, .btn, .dropdown-item {
+        font-family: 'Catamaran', sans-serif;
+      }
+      
+      /* Dark theme pagination styling */
+      .pagination {
+        --bs-pagination-bg: #2d2d2d;
+        --bs-pagination-border-color: #555;
+        --bs-pagination-color: #fff;
+        --bs-pagination-hover-bg: #404040;
+        --bs-pagination-hover-border-color: #666;
+        --bs-pagination-hover-color: #fff;
+        --bs-pagination-active-bg: #007bff;
+        --bs-pagination-active-border-color: #007bff;
+        --bs-pagination-active-color: #fff;
+        --bs-pagination-disabled-bg: #1a1a1a;
+        --bs-pagination-disabled-border-color: #333;
+        --bs-pagination-disabled-color: #666;
+      }
+      
+      .pagination .page-link {
+        background-color: var(--bs-pagination-bg);
+        border-color: var(--bs-pagination-border-color);
+        color: var(--bs-pagination-color);
+      }
+      
+      .pagination .page-link:hover {
+        background-color: var(--bs-pagination-hover-bg);
+        border-color: var(--bs-pagination-hover-border-color);
+        color: var(--bs-pagination-hover-color);
+      }
+      
+      .pagination .page-item.active .page-link {
+        background-color: var(--bs-pagination-active-bg);
+        border-color: var(--bs-pagination-active-border-color);
+        color: var(--bs-pagination-active-color);
+      }
+      
+      .pagination .page-item.disabled .page-link {
+        background-color: var(--bs-pagination-disabled-bg);
+        border-color: var(--bs-pagination-disabled-border-color);
+        color: var(--bs-pagination-disabled-color);
+      }
+      
+      /* Clickable row styling */
+      .clickable-row:hover {
+        background-color: #404040 !important;
+      }
+      
+      .action-column {
+        pointer-events: all;
+      }
+      
+      /* Fix sidebar header alignment */
+      .sidebar-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 1rem;
+        min-height: 60px;
+      }
+      
+      .sidebar-title {
+        margin-bottom: 0 !important;
+        line-height: 1.5;
+      }
+      
+      .sidebar-toggle {
+        padding: 0.25rem 0.5rem !important;
+        line-height: 1 !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+      }
+    </style>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -50,6 +144,11 @@
           <span class="nav-text">Workspace</span>
         <% end %>
         
+        <%= link_to admin_rooms_path, class: "nav-item #{'active' if controller_name == 'rooms'}" do %>
+          <span class="nav-icon">🚪</span>
+          <span class="nav-text">Rooms</span>
+        <% end %>
+        
         <%= link_to admin_bookings_path, class: "nav-item #{'active' if controller_name == 'bookings'}" do %>
           <span class="nav-icon">📅</span>
           <span class="nav-text">Bookings</span>
@@ -77,10 +176,10 @@
       <!-- Top Header -->
       <header class="top-header d-flex align-items-center" style="min-height: 120px; background: #000 !important; color: #fff !important; position: relative;">
         <div class="flex-grow-1 text-center">
-          <h2 class="fw-bold mb-1" style="letter-spacing: 2px;">NEXTCOWORKS</h2>
+          <h2 class="brand-heading fw-bold mb-1">NEXTCOWORKS</h2>
           <hr style="width: 60px; margin: 0.5rem auto; border-top: 2px solid #fff; opacity: 1;">
-          <div>Coworking Spaces</div>
-          <div>Private Cabin | Private Office | Private Desk | Shared Desk</div>
+          <div style="font-family: 'Catamaran', sans-serif; font-size: 1.1rem;">Coworking Spaces</div>
+          <div style="font-family: 'Catamaran', sans-serif; font-size: 1rem;">Private Cabin | Private Office | Private Desk | Shared Desk</div>
         </div>
         <!-- Profile Dropdown -->
         <div class="profile-dropdown position-absolute end-0 me-4">
@@ -125,6 +224,46 @@
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('show');
       }
+
+      // Handle clickable table rows
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners for all clickable rows
+        function initializeClickableRows() {
+          const clickableRows = document.querySelectorAll('.clickable-row');
+          
+          clickableRows.forEach(function(row) {
+            // Remove any existing listeners to avoid duplicates
+            row.removeEventListener('click', handleRowClick);
+            
+            // Add the click listener
+            row.addEventListener('click', handleRowClick);
+          });
+        }
+        
+        function handleRowClick(e) {
+          // Don't navigate if clicking on action buttons, links, or form elements
+          if (e.target.closest('.action-column') || 
+              e.target.closest('.btn') || 
+              e.target.closest('a') ||
+              e.target.closest('button') ||
+              e.target.closest('form') ||
+              e.target.closest('input') ||
+              e.target.closest('select')) {
+            return;
+          }
+          
+          const href = this.getAttribute('data-href');
+          if (href) {
+            window.location.href = href;
+          }
+        }
+        
+        // Initialize on page load
+        initializeClickableRows();
+        
+        // Re-initialize after Turbo navigation (for Rails with Turbo)
+        document.addEventListener('turbo:load', initializeClickableRows);
+      });
     </script>
 
     <%= yield :scripts %>

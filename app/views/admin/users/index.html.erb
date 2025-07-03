@@ -6,6 +6,36 @@
     <%= link_to "Add User", new_admin_user_path, class: "btn btn-primary" %>
   </div>
 
+  <!-- Search and Filter Form -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <%= form_with url: admin_users_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
+        <%= form.text_field :search, value: @search, placeholder: "Search by name, email, or role...", 
+                           class: "form-control", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;" %>
+        <%= form.submit "Search", class: "btn btn-outline-light" %>
+        <% if @search.present? || params[:role].present? %>
+          <%= link_to "Clear", admin_users_path, class: "btn btn-outline-secondary" %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="col-md-4">
+      <%= form_with url: admin_users_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
+        <%= form.hidden_field :search, value: @search %>
+        <%= form.select :role, 
+                       options_for_select([
+                         ['All Roles', ''],
+                         ['Super Admin', 'super_admin'],
+                         ['Admin', 'admin'],
+                         ['Floor User', 'floor_user'],
+                         ['User', 'user']
+                       ], params[:role]), 
+                       {}, 
+                       { class: "form-select", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;",
+                         onchange: "this.form.submit();" } %>
+      <% end %>
+    </div>
+  </div>
+
   <div class="table-responsive">
     <table class="table table-hover table-dark">
       <thead>
@@ -19,7 +49,7 @@
       </thead>
       <tbody>
         <% @users.each do |user| %>
-          <tr>
+          <tr class="clickable-row" data-href="<%= admin_user_path(user) %>" style="cursor: pointer;">
             <td><%= user.name %></td>
             <td><%= user.email %></td>
             <td>
@@ -27,9 +57,8 @@
                 <%= user.role.humanize %>
               </span>
             </td>
-            <td><%= user.workspace&.name || 'Not assigned' %></td>
-            <td>
-              <%= link_to "View", admin_user_path(user), class: "btn btn-outline-primary btn-sm me-2" %>
+            <td><%= user.workspaces.any? ? user.workspaces.pluck(:name).join(', ') : 'Not assigned' %></td>
+            <td class="action-column">
               <%= link_to "Edit", edit_admin_user_path(user), class: "btn btn-secondary btn-sm me-2" %>
               <% if current_user.super_admin? && user.admin? %>
                 <%= link_to "Assign Workspace", assign_workspace_admin_user_path(user), class: "btn btn-outline-primary btn-sm me-2" %>
@@ -47,10 +76,25 @@
     </table>
   </div>
 
+  <!-- Pagination and Results Info -->
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <div class="text-muted">
+      <%= pagination_info(@users) %>
+    </div>
+    <div>
+      <%= paginate @users %>
+    </div>
+  </div>
+
   <% if @users.empty? %>
     <div class="text-center mt-5">
-      <p class="text-muted">No users found.</p>
-      <%= link_to "Add the first user", new_admin_user_path, class: "btn btn-primary" %>
+      <% if @search.present? || params[:role].present? %>
+        <p class="text-muted">No users found matching your search criteria.</p>
+        <%= link_to "Clear filters", admin_users_path, class: "btn btn-outline-secondary" %>
+      <% else %>
+        <p class="text-muted">No users found.</p>
+        <%= link_to "Add the first user", new_admin_user_path, class: "btn btn-primary" %>
+      <% end %>
     </div>
   <% end %>
 </div>

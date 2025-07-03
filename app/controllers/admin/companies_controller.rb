@@ -2,7 +2,27 @@ class Admin::CompaniesController < Admin::BaseController
   before_action :set_company, only: [:show, :edit, :update, :destroy]
 
   def index
-    @companies = Company.all
+    @search = params[:search]
+    @companies = Company.includes(:users, :workspaces)
+    
+    # Search functionality
+    if @search.present?
+      @companies = @companies.where(
+        "name ILIKE ? OR email ILIKE ? OR phone_number ILIKE ? OR address ILIKE ? OR status ILIKE ?",
+        "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
+      )
+    end
+    
+    # Filter by status if specified
+    if params[:status].present?
+      @companies = @companies.where(status: params[:status])
+    end
+    
+    # Order by name
+    @companies = @companies.order(:name)
+    
+    # Pagination
+    @companies = @companies.page(params[:page]).per(10)
   end
 
   def show

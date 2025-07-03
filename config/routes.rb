@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       resources :rooms
     end
     
+    resources :rooms, only: [:index, :show]
     resources :bookings
     resources :companies do
       member do

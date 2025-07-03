@@ -2,7 +2,28 @@ class Admin::WorkspacesController < Admin::BaseController
   before_action :set_workspace, only: [:show, :edit, :update, :destroy]
 
   def index
-    @workspaces = Workspace.all
+    @search = params[:search]
+    @workspaces = Workspace.includes(:companies, :users, :rooms)
+    
+    # Search functionality
+    if @search.present?
+      @workspaces = @workspaces.where(
+        "name ILIKE ? OR building_name ILIKE ? OR city ILIKE ? OR address ILIKE ? OR pincode ILIKE ?",
+        "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
+      )
+    end
+    
+    # Filter by status if specified
+    if params[:status].present?
+      is_active = params[:status] == 'active'
+      @workspaces = @workspaces.where(is_active: is_active)
+    end
+    
+    # Order by name
+    @workspaces = @workspaces.order(:name)
+    
+    # Pagination
+    @workspaces = @workspaces.page(params[:page]).per(10)
   end
 
   def show

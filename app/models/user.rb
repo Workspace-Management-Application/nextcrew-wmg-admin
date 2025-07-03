@@ -8,8 +8,8 @@ class User < ApplicationRecord
 
   has_many :company_users
   has_many :companies, through: :company_users
-  has_one :user_workspace
-  has_one :workspace, through: :user_workspace
+  has_many :user_workspaces
+  has_many :workspaces, through: :user_workspaces
   has_many :bookings
 
   # Enum declaration with a default value

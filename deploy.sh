@@ -97,7 +97,15 @@ git_operations() {
     cd "$APP_DIR"
     
     # Stash any local changes
-    git stash save "Auto-stash before deploy $(date)"
+    STASH_RESULT=$(git stash save "Auto-stash before deploy $(date)")
+    STASH_CREATED=false
+    
+    if [[ "$STASH_RESULT" != "No local changes to save" ]]; then
+        STASH_CREATED=true
+        log "Local changes stashed"
+    else
+        info "No local changes to stash"
+    fi
     
     # Fetch latest changes
     git fetch origin
@@ -105,6 +113,17 @@ git_operations() {
     # Checkout and pull the specified branch
     git checkout "$BRANCH"
     git pull origin "$BRANCH"
+    
+    # Pop stash if we created one
+    if [ "$STASH_CREATED" = true ]; then
+        log "Restoring stashed local changes..."
+        git stash pop
+        if [ $? -eq 0 ]; then
+            log "Stashed changes restored successfully"
+        else
+            warning "Failed to restore stashed changes - there might be conflicts"
+        fi
+    fi
     
     log "Successfully updated to branch '$BRANCH'"
     
@@ -171,15 +190,15 @@ database_operations() {
     cd "$APP_DIR"
     
     # Check if there are pending migrations
-    if bundle exec rails db:migrate:status RAILS_ENV="$RAILS_ENV" | grep -q "down"; then
+    if RAILS_ENV=production bundle exec rails db:migrate:status | grep -q "down"; then
         log "Running database migrations..."
-        bundle exec rails db:migrate RAILS_ENV="$RAILS_ENV"
+        RAILS_ENV=production bundle exec rails db:migrate
     else
         info "No pending migrations"
     fi
     
     # Optional: Load seeds if needed (uncomment if required)
-    # bundle exec rails db:seed RAILS_ENV="$RAILS_ENV"
+    # RAILS_ENV=production bundle exec rails db:seed
 }
 
 # Precompile assets
@@ -190,7 +209,7 @@ precompile_assets() {
     # Check if asset files have changed
     if git diff HEAD~1 --name-only | grep -E "(app/assets|app/javascript|Gemfile)" > /dev/null; then
         log "Asset-related files changed, precompiling assets..."
-        bundle exec rails assets:precompile RAILS_ENV="$RAILS_ENV"
+        RAILS_ENV=production bundle exec rails assets:precompile
     else
         info "No asset changes detected, skipping precompilation"
     fi

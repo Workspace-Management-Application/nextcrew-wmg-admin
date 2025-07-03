@@ -47,7 +47,7 @@
                 <td><%= room.category %></td>
                 <td><%= room.capacity %></td>
                 <td>
-                  <%= link_to "View", admin_workspace_room_path(@workspace, room), class: "btn btn-outline-primary btn-sm me-2" %>
+                  <%= link_to "View", admin_room_path(room), class: "btn btn-outline-primary btn-sm me-2" %>
                   <%= link_to "Edit", edit_admin_workspace_room_path(@workspace, room), class: "btn btn-secondary btn-sm me-2" %>
                   <%= link_to "Delete", admin_workspace_room_path(@workspace, room), 
                               data: { 

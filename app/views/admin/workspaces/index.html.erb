@@ -6,6 +6,44 @@
     <%= link_to "Add Workspace", new_admin_workspace_path, class: "btn btn-primary" %>
   </div>
 
+  <!-- Search Form -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <%= form_with url: admin_workspaces_path, method: :get, local: true, class: "d-flex" do |form| %>
+        <%= form.text_field :search, placeholder: "Search by name, building, city, address, pincode...", 
+                           value: params[:search], 
+                           class: "form-control form-control-dark me-2" %>
+        <%= form.submit "Search", class: "btn btn-outline-primary" %>
+        <% if params[:search].present? || params[:filter].present? %>
+          <%= link_to "Clear", admin_workspaces_path, class: "btn btn-outline-secondary ms-2" %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="col-md-4">
+      <%= form_with url: admin_workspaces_path, method: :get, local: true, class: "d-flex" do |form| %>
+        <%= form.hidden_field :search, value: params[:search] %>
+        <%= form.select :filter, 
+                       options_for_select([
+                         ['All Status', ''],
+                         ['Active', 'active'],
+                         ['Inactive', 'inactive']
+                       ], params[:filter]), 
+                       {}, 
+                       { class: "form-select form-control-dark me-2", onchange: "this.form.submit();" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Results Info -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <%= pagination_info(@workspaces) %>
+    </div>
+    <div>
+      <%= paginate @workspaces %>
+    </div>
+  </div>
+
   <div class="table-responsive">
     <table class="table table-hover table-dark">
       <thead>
@@ -20,16 +58,14 @@
       </thead>
       <tbody>
         <% @workspaces.each do |workspace| %>
-          <tr>
+          <tr class="clickable-row" data-href="<%= admin_workspace_path(workspace) %>" style="cursor: pointer;">
             <td><%= workspace.name %></td>
             <td><%= workspace.building_name %></td>
             <td><%= workspace.city %></td>
             <td><%= workspace.address %></td>
             <td><%= workspace.pincode %></td>
-            <td>
-              <%= link_to "View", admin_workspace_path(workspace), class: "btn btn-outline-primary btn-sm me-2" %>
+            <td class="action-column">
               <%= link_to "Edit", edit_admin_workspace_path(workspace), class: "btn btn-secondary btn-sm me-2" %>
-              <%= link_to "Rooms", admin_workspace_rooms_path(workspace), class: "btn btn-outline-primary btn-sm me-2" %>
               <%= link_to "Delete", admin_workspace_path(workspace), 
                           data: { 
                             turbo_method: :delete, 
@@ -47,6 +83,16 @@
     <div class="text-center mt-5">
       <p class="text-muted">No workspaces found.</p>
       <%= link_to "Add your first workspace", new_admin_workspace_path, class: "btn btn-primary" %>
+    </div>
+  <% else %>
+    <!-- Bottom Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div>
+        <%= pagination_info(@workspaces) %>
+      </div>
+      <div>
+        <%= paginate @workspaces %>
+      </div>
     </div>
   <% end %>
 </div>

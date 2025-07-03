@@ -6,6 +6,36 @@
     <%= link_to "Add Company", new_admin_company_path, class: "btn btn-primary" %>
   </div>
 
+  <!-- Search and Filter Form -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <%= form_with url: admin_companies_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
+        <%= form.text_field :search, value: @search, placeholder: "Search by name, email, phone, or address...", 
+                           class: "form-control", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;" %>
+        <%= form.submit "Search", class: "btn btn-outline-light" %>
+        <% if @search.present? || params[:status].present? %>
+          <%= link_to "Clear", admin_companies_path, class: "btn btn-outline-secondary" %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="col-md-4">
+      <%= form_with url: admin_companies_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
+        <%= form.hidden_field :search, value: @search %>
+        <%= form.select :status, 
+                       options_for_select([
+                         ['All Status', ''],
+                         ['Active', 'active'],
+                         ['Pending', 'pending'],
+                         ['Approved', 'approved'],
+                         ['Inactive', 'inactive']
+                       ], params[:status]), 
+                       {}, 
+                       { class: "form-select", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;",
+                         onchange: "this.form.submit();" } %>
+      <% end %>
+    </div>
+  </div>
+
   <div class="table-responsive">
     <table class="table table-hover table-dark">
       <thead>
@@ -19,13 +49,12 @@
       </thead>
       <tbody>
         <% @companies.each do |company| %>
-          <tr>
+          <tr class="clickable-row" data-href="<%= admin_company_path(company) %>" style="cursor: pointer;">
             <td><%= company.name %></td>
             <td><%= company.email %></td>
             <td><%= company.phone_number %></td>
             <td><%= company.users.count %></td>
-            <td>
-              <%= link_to "View", admin_company_path(company), class: "btn btn-outline-primary btn-sm me-2" %>
+            <td class="action-column">
               <%= link_to "Edit", edit_admin_company_path(company), class: "btn btn-secondary btn-sm me-2" %>
               <%= link_to "Delete", admin_company_path(company), 
                           data: { 
@@ -40,10 +69,25 @@
     </table>
   </div>
 
+  <!-- Pagination and Results Info -->
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <div class="text-muted">
+      <%= pagination_info(@companies) %>
+    </div>
+    <div>
+      <%= paginate @companies %>
+    </div>
+  </div>
+
   <% if @companies.empty? %>
     <div class="text-center mt-5">
-      <p class="text-muted">No companies found.</p>
-      <%= link_to "Add the first company", new_admin_company_path, class: "btn btn-primary" %>
+      <% if @search.present? || params[:status].present? %>
+        <p class="text-muted">No companies found matching your search criteria.</p>
+        <%= link_to "Clear filters", admin_companies_path, class: "btn btn-outline-secondary" %>
+      <% else %>
+        <p class="text-muted">No companies found.</p>
+        <%= link_to "Add the first company", new_admin_company_path, class: "btn btn-primary" %>
+      <% end %>
     </div>
   <% end %>
 </div>

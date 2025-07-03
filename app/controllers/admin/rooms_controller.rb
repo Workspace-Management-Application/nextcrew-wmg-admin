@@ -1,12 +1,50 @@
 class Admin::RoomsController < Admin::BaseController
-  before_action :set_workspace
+  before_action :set_workspace, only: [:new, :create, :edit, :update, :destroy]
   before_action :set_room, only: [:show, :edit, :update, :destroy]
 
   def index
-    @rooms = @workspace.rooms
+    @search = params[:search]
+    
+    # All rooms from user's workspaces
+    user_workspace_ids = current_user.workspaces.pluck(:id)
+    @rooms = Room.joins(:workspace).where(workspace_id: user_workspace_ids).includes(:workspace, :bookings)
+    
+    # Search functionality
+    if @search.present?
+      @rooms = @rooms.where(
+        "rooms.name ILIKE ? OR rooms.category ILIKE ? OR workspaces.name ILIKE ?",
+        "%#{@search}%", "%#{@search}%", "%#{@search}%"
+      )
+    end
+    
+    # Filter by category if specified
+    if params[:filter].present?
+      @rooms = @rooms.where(category: params[:filter])
+    end
+    
+    # Filter by availability if specified
+    if params[:availability].present?
+      is_available = params[:availability] == 'available'
+      @rooms = @rooms.where(is_available: is_available)
+    end
+    
+    # Filter by workspace if specified
+    if params[:workspace_id].present?
+      @rooms = @rooms.where(workspace_id: params[:workspace_id])
+    end
+    
+    # Order by workspace name, then room name
+    @rooms = @rooms.order('workspaces.name, rooms.name')
+    
+    # Pagination
+    @rooms = @rooms.page(params[:page]).per(10)
   end
 
   def show
+    # Global room view - find room from user's workspaces
+    user_workspace_ids = current_user.workspaces.pluck(:id)
+    @room = Room.joins(:workspace).where(workspace_id: user_workspace_ids).find(params[:id])
+    @workspace = @room.workspace
   end
 
   def new
@@ -27,7 +65,7 @@ class Admin::RoomsController < Admin::BaseController
         end
       end
       
-      redirect_to admin_workspace_rooms_path(@workspace), notice: 'Room was successfully created.'
+      redirect_to admin_rooms_path, notice: 'Room was successfully created.'
     else
       render :new
     end
@@ -48,7 +86,7 @@ class Admin::RoomsController < Admin::BaseController
         end
       end
       
-      redirect_to admin_workspace_room_path(@workspace, @room), notice: 'Room was successfully updated.'
+      redirect_to admin_room_path(@room), notice: 'Room was successfully updated.'
     else
       render :edit
     end
@@ -56,7 +94,7 @@ class Admin::RoomsController < Admin::BaseController
 
   def destroy
     @room.destroy
-    redirect_to admin_workspace_rooms_path(@workspace), notice: 'Room was successfully deleted.'
+    redirect_to admin_rooms_path, notice: 'Room was successfully deleted.'
   end
 
   private
@@ -66,7 +104,15 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def set_room
-    @room = @workspace.rooms.find(params[:id])
+    if params[:workspace_id].present?
+      # Workspace-scoped room (for edit/update/delete)
+      @room = @workspace.rooms.find(params[:id])
+    else
+      # Global room view
+      user_workspace_ids = current_user.workspaces.pluck(:id)
+      @room = Room.joins(:workspace).where(workspace_id: user_workspace_ids).find(params[:id])
+      @workspace = @room.workspace
+    end
   end
 
   def room_params

@@ -57,63 +57,7 @@ company_records = companies.map do |company_data|
   end
 end
 
-# 2. Create Workspaces
-puts "🏠 Creating workspaces..."
-workspaces = [
-  {
-    name: 'Floor 5 - Premium',
-    building_name: 'Nextcoworks Central',
-    address: 'Slice 6 Aranya Nagar Vijay Nagar',
-    city: 'Indore',
-    pincode: '452010',
-    is_active: true
-  },
-  {
-    name: 'Floor 3 - Standard',
-    building_name: 'Nextcoworks Central',
-    address: 'Slice 6 Aranya Nagar Vijay Nagar',
-    city: 'Indore',
-    pincode: '452010',
-    is_active: true
-  },
-  {
-    name: 'Ground Floor - Basic',
-    building_name: 'Business Hub',
-    address: 'AB Road, Sapna Sangeeta',
-    city: 'Indore',
-    pincode: '452001',
-    is_active: true
-  },
-  {
-    name: 'Floor 2 - Executive',
-    building_name: 'Corporate Tower',
-    address: 'Ring Road, Scheme 54',
-    city: 'Indore',
-    pincode: '452020',
-    is_active: false
-  }
-]
-
-workspace_records = workspaces.map do |workspace_data|
-  Workspace.find_or_create_by!(name: workspace_data[:name], building_name: workspace_data[:building_name]) do |workspace|
-    workspace.assign_attributes(workspace_data)
-  end
-end
-
-# 3. Create Company-Workspace associations (One company per workspace)
-puts "🔗 Creating company-workspace associations..."
-company_workspace_associations = [
-  { company: company_records[0], workspace: workspace_records[0] }, # SR Next -> Floor 5 Premium
-  { company: company_records[1], workspace: workspace_records[1] }, # InnovateCorp -> Floor 3 Standard
-  { company: company_records[2], workspace: workspace_records[2] }, # StartupXYZ -> Ground Floor Basic
-  { company: company_records[3], workspace: workspace_records[3] }  # TechSolutions -> Floor 2 Executive
-]
-
-company_workspace_associations.each do |assoc|
-  CompanyWorkspace.find_or_create_by!(company: assoc[:company], workspace: assoc[:workspace])
-end
-
-# 4. Create Users with all roles and password "123456789"
+# 2. Create Users with all roles and password "123456789"
 puts "👥 Creating users with all roles..."
 users_data = [
   # Super Admin
@@ -209,6 +153,62 @@ user_records = users_data.map do |user_data|
   end
 end
 
+# 3. Create Workspaces (after users so super_admin callback works)
+puts "🏠 Creating workspaces..."
+workspaces = [
+  {
+    name: 'Floor 5 - Premium',
+    building_name: 'Nextcoworks Central',
+    address: 'Slice 6 Aranya Nagar Vijay Nagar',
+    city: 'Indore',
+    pincode: '452010',
+    is_active: true
+  },
+  {
+    name: 'Floor 3 - Standard',
+    building_name: 'Nextcoworks Central',
+    address: 'Slice 6 Aranya Nagar Vijay Nagar',
+    city: 'Indore',
+    pincode: '452010',
+    is_active: true
+  },
+  {
+    name: 'Ground Floor - Basic',
+    building_name: 'Business Hub',
+    address: 'AB Road, Sapna Sangeeta',
+    city: 'Indore',
+    pincode: '452001',
+    is_active: true
+  },
+  {
+    name: 'Floor 2 - Executive',
+    building_name: 'Corporate Tower',
+    address: 'Ring Road, Scheme 54',
+    city: 'Indore',
+    pincode: '452020',
+    is_active: false
+  }
+]
+
+workspace_records = workspaces.map do |workspace_data|
+  Workspace.find_or_create_by!(name: workspace_data[:name], building_name: workspace_data[:building_name]) do |workspace|
+    workspace.assign_attributes(workspace_data)
+  end
+end
+
+# 4. Create Company-Workspace associations (One company per workspace)
+puts "🔗 Creating company-workspace associations..."
+company_workspace_associations = [
+  { company: company_records[0], workspace: workspace_records[0] }, # SR Next -> Floor 5 Premium
+  { company: company_records[1], workspace: workspace_records[1] }, # InnovateCorp -> Floor 3 Standard
+  { company: company_records[2], workspace: workspace_records[2] }, # StartupXYZ -> Ground Floor Basic
+  { company: company_records[3], workspace: workspace_records[3] }  # TechSolutions -> Floor 2 Executive
+]
+
+company_workspace_associations.each do |assoc|
+  CompanyWorkspace.find_or_create_by!(company: assoc[:company], workspace: assoc[:workspace])
+end
+
 # 5. Create Company-User associations
 puts "👤 Creating company-user associations..."
 company_user_associations = [
@@ -227,7 +227,8 @@ company_user_associations.each do |assoc|
   CompanyUser.find_or_create_by!(company: assoc[:company], user: assoc[:user])
 end
 
-# 6. Create User-Workspace associations (Users belong to their company's workspace)
+# 6. Create User-Workspace associations (Regular users belong to their company's workspace)
+# Note: Super admin users are already associated with ALL workspaces via the after_create callback
 puts "🏢 Creating user-workspace associations..."
 user_workspace_associations = [
   # SR Next Technologies users -> Floor 5 Premium
