@@ -378,7 +378,6 @@ day_passes_data = [
     phone_number: '+91-9123456789',
     email: 'rajesh@gmail.com',
     pass_date: Date.current,
-    purpose: 'Client meeting with SR Next team',
     company_name: 'External Client Corp'
   },
   {
@@ -387,7 +386,6 @@ day_passes_data = [
     phone_number: '+91-9123456790',
     email: 'priya.sharma@consultant.com',
     pass_date: Date.tomorrow,
-    purpose: 'Technical consultation',
     company_name: 'Freelance Consultant'
   },
   {
@@ -396,7 +394,6 @@ day_passes_data = [
     phone_number: '+91-9123456791',
     email: 'amit@vendor.com',
     pass_date: Date.current + 2.days,
-    purpose: 'Product demonstration',
     company_name: 'Tech Vendor Solutions'
   },
   {
@@ -405,7 +402,6 @@ day_passes_data = [
     phone_number: '+91-9123456792',
     email: 'sneha@interview.com',
     pass_date: Date.current + 3.days,
-    purpose: 'Job interview',
     company_name: 'Job Seeker'
   }
 ]
