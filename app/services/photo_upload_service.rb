@@ -1,18 +1,19 @@
 class PhotoUploadService
   class << self
     # Attach photo to a model instance using Active Storage with folder organization
-    # Usage: PhotoUploadService.attach_photo(workspace, params[:photo], 'workspaces')
-    def attach_photo(model_instance, photo_file, folder = nil)
+    # Usage: PhotoUploadService.attach_photo(workspace, params[:photo], 'workspaces', 'photo')
+    def attach_photo(model_instance, photo_file, folder = nil, attachment_type = 'photo')
       return { success: false, error: 'No photo provided' } if photo_file.blank?
       return { success: false, error: 'Invalid file type' } unless valid_image?(photo_file)
       return { success: false, error: 'File too large' } unless valid_size?(photo_file)
 
       begin
         # Generate organized filename with folder structure
-        organized_filename = generate_organized_filename(photo_file, folder, model_instance)
+        organized_filename = generate_organized_filename(photo_file, folder, model_instance, attachment_type)
         
         # Attach with custom filename for S3 organization
-        model_instance.photo.attach(
+        attachment = model_instance.send(attachment_type)
+        attachment.attach(
           io: photo_file.tempfile,
           filename: organized_filename,
           content_type: photo_file.content_type
@@ -26,27 +27,30 @@ class PhotoUploadService
     end
 
     # Get photo URL (works in both development and production)
-    def photo_url(model_instance)
-      return nil unless model_instance.photo.attached?
+    def photo_url(model_instance, attachment_type = 'photo')
+      attachment = model_instance.send(attachment_type)
+      return nil unless attachment.attached?
 
       if Rails.env.development?
-        Rails.application.routes.url_helpers.rails_blob_url(model_instance.photo, host: 'localhost:3000')
+        Rails.application.routes.url_helpers.rails_blob_url(attachment, host: 'localhost:3000')
       else
-        model_instance.photo.url
+        attachment.url
       end
     end
 
     # Check if model has photo attached
-    def photo_attached?(model_instance)
-      model_instance.photo.attached?
+    def photo_attached?(model_instance, attachment_type = 'photo')
+      attachment = model_instance.send(attachment_type)
+      attachment.attached?
     end
 
     # Remove photo attachment
-    def remove_photo(model_instance)
-      return { success: false, error: 'No photo to remove' } unless model_instance.photo.attached?
+    def remove_photo(model_instance, attachment_type = 'photo')
+      attachment = model_instance.send(attachment_type)
+      return { success: false, error: 'No photo to remove' } unless attachment.attached?
 
       begin
-        model_instance.photo.purge
+        attachment.purge
         { success: true, message: 'Photo removed successfully' }
       rescue => e
         Rails.logger.error("Photo removal failed: #{e.message}")
@@ -55,21 +59,21 @@ class PhotoUploadService
     end
 
     # Convenience method to auto-detect folder based on model type
-    def attach_photo_auto(model_instance, photo_file)
+    def attach_photo_auto(model_instance, photo_file, attachment_type = 'photo')
       folder = detect_folder_from_model(model_instance)
-      attach_photo(model_instance, photo_file, folder)
+      attach_photo(model_instance, photo_file, folder, attachment_type)
     end
 
     private
 
     # Generate organized filename with folder structure for S3
-    def generate_organized_filename(photo_file, folder, model_instance)
+    def generate_organized_filename(photo_file, folder, model_instance, attachment_type = 'photo')
       folder ||= detect_folder_from_model(model_instance)
       timestamp = Time.current.strftime('%Y%m%d_%H%M%S')
       unique_id = SecureRandom.hex(8)
       file_extension = File.extname(photo_file.original_filename)
       
-      "uploads/#{folder}/#{timestamp}_#{unique_id}#{file_extension}"
+      "uploads/#{folder}/#{attachment_type}/#{timestamp}_#{unique_id}#{file_extension}"
     end
 
     # Auto-detect folder name based on model class

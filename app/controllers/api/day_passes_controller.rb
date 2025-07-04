@@ -20,14 +20,23 @@ class Api::DayPassesController < Api::BaseController
 
   # POST /api/workspaces/:workspace_id/day_passes
   def create
-    day_pass = @workspace.day_passes.new(day_pass_params.except(:photo))
+    day_pass = @workspace.day_passes.new(day_pass_params.except(:photo, :id_proof))
     
     if day_pass.save
       # Handle photo upload using Active Storage with auto folder organization
       if params[:day_pass][:photo].present?
-        photo_result = PhotoUploadService.attach_photo_auto(day_pass, params[:day_pass][:photo])
+        photo_result = PhotoUploadService.attach_photo_auto(day_pass, params[:day_pass][:photo], 'photo')
         unless photo_result[:success]
           render_error(photo_result[:error])
+          return
+        end
+      end
+      
+      # Handle ID proof upload using Active Storage with auto folder organization
+      if params[:day_pass][:id_proof].present?
+        id_proof_result = PhotoUploadService.attach_photo_auto(day_pass, params[:day_pass][:id_proof], 'id_proof')
+        unless id_proof_result[:success]
+          render_error(id_proof_result[:error])
           return
         end
       end
@@ -41,12 +50,21 @@ class Api::DayPassesController < Api::BaseController
   # PATCH/PUT /api/workspaces/:workspace_id/day_passes/:id
   def update
     if @day_pass
-      if @day_pass.update(day_pass_params.except(:photo))
+      if @day_pass.update(day_pass_params.except(:photo, :id_proof))
         # Handle photo upload using Active Storage with auto folder organization
         if params[:day_pass][:photo].present?
-          photo_result = PhotoUploadService.attach_photo_auto(@day_pass, params[:day_pass][:photo])
+          photo_result = PhotoUploadService.attach_photo_auto(@day_pass, params[:day_pass][:photo], 'photo')
           unless photo_result[:success]
             render_error(photo_result[:error])
+            return
+          end
+        end
+        
+        # Handle ID proof upload using Active Storage with auto folder organization
+        if params[:day_pass][:id_proof].present?
+          id_proof_result = PhotoUploadService.attach_photo_auto(@day_pass, params[:day_pass][:id_proof], 'id_proof')
+          unless id_proof_result[:success]
+            render_error(id_proof_result[:error])
             return
           end
         end
@@ -82,7 +100,7 @@ class Api::DayPassesController < Api::BaseController
   end
 
   def day_pass_params
-    params.require(:day_pass).permit(:name, :phone_number, :email, :company_name, :pass_date, :purpose, :photo)
+    params.require(:day_pass).permit(:name, :phone_number, :email, :company_name, :pass_date, :photo, :id_proof)
   end
 
   def authorize_floor_user!
@@ -99,10 +117,11 @@ class Api::DayPassesController < Api::BaseController
       phone_number: day_pass.phone_number,
       email: day_pass.email,
       pass_date: day_pass.pass_date,
-      purpose: day_pass.purpose,
       company_name: day_pass.company_name,
-      photo_url: PhotoUploadService.photo_url(day_pass),
-      photo_attached: PhotoUploadService.photo_attached?(day_pass),
+      photo_url: PhotoUploadService.photo_url(day_pass, 'photo'),
+      photo_attached: PhotoUploadService.photo_attached?(day_pass, 'photo'),
+      id_proof_url: PhotoUploadService.photo_url(day_pass, 'id_proof'),
+      id_proof_attached: PhotoUploadService.photo_attached?(day_pass, 'id_proof'),
       created_at: day_pass.created_at,
       updated_at: day_pass.updated_at
     }

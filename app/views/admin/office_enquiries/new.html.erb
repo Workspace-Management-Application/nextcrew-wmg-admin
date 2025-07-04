@@ -48,13 +48,13 @@
         </div>
         <div class="col-md-6 mb-3">
           <%= form.label :workspace_type_ids, "Workspace Types", class: "form-label" %>
-          <%= form.collection_select :workspace_type_ids, WorkspaceType.order(:name), :id, :name, { multiple: true }, { class: "form-select selectpicker", multiple: true, required: true, 'data-live-search': true, title: "Select Workspace Types", 'data-style': 'btn-dark' } %>
+          <%= form.collection_select :workspace_type_ids, WorkspaceType.order(:name), :id, :name, { multiple: true }, { class: "selectpicker", multiple: true, required: true, 'data-live-search': true, title: "Select Workspace Types", 'data-style': 'btn-dark' } %>
         </div>
       </div>
 
       <div class="mb-3">
         <%= form.label :workspace_id, "Workspace", class: "form-label" %>
-        <%= form.collection_select :workspace_id, Workspace.order(:name), :id, :name, { prompt: "Select Workspace" }, { class: "form-select", required: true } %>
+        <%= form.collection_select :workspace_id, Workspace.order(:name), :id, :name, { prompt: "Select Workspace" }, { class: "selectpicker", required: true, 'data-live-search': true, title: "Select Workspace", 'data-style': 'btn-dark' } %>
       </div>
 
       <div class="d-flex gap-2">

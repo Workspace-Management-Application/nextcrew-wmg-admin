@@ -59,7 +59,7 @@ class Admin::OfficeEnquiriesController < Admin::BaseController
 
   def update
     if @office_enquiry.update(office_enquiry_params)
-      redirect_to admin_office_enquiry_path(@office_enquiry), notice: 'Office enquiry was successfully updated.'
+      redirect_to admin_office_enquiries_path, notice: 'Office enquiry was successfully updated.'
     else
       render :edit
     end
