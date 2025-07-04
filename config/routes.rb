@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       member do
         get 'search_by_phone_number'
         get 'get_data_for_room'
+        get :workspace_types
       end
       resources :visitor_entries
       resources :bookings

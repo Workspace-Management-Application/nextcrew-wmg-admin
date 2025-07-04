@@ -26,6 +26,11 @@ class Api::WorkspacesController < Api::BaseController
     end
   end
 
+  def workspace_types
+    workspace_types = @workspace.workspace_types
+    render_success(workspace_types)
+  end
+
   def set_workspace
     @workspace = Workspace.find_by(id: params[:id])
   end
