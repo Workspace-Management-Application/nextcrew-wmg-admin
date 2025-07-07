@@ -35,7 +35,6 @@ class Api::WorkspacesController < Api::BaseController
     company = @workspace.companies.find_by(id: params[:company_id])
     
     if company
-      # Get today's bookings for the company's rooms in this workspace
       today_bookings = Booking.joins(:room, :user)
                              .joins("JOIN company_rooms ON rooms.id = company_rooms.room_id")
                              .where(company_rooms: { company_id: company.id })

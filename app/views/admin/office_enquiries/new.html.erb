@@ -7,7 +7,7 @@
       <%= link_to "← Back to Enquiries", admin_office_enquiries_path, class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @office_enquiry], local: true, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @office_enquiry], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @office_enquiry.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@office_enquiry.errors.count, "error") %> prohibited this enquiry from being saved:</h6>

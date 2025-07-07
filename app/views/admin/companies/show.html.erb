@@ -18,9 +18,15 @@
         <div class="col-md-6">
           <p><strong>Email:</strong> <%= @company.email %></p>
           <p><strong>Phone:</strong> <%= @company.phone_number %></p>
+          <p><strong>Cabin Number:</strong> <%= @company.cabin_number %></p>
+          <p><strong>Number of Employees:</strong> <%= @company.no_of_employee %></p>
         </div>
         <div class="col-md-6">
           <p><strong>Address:</strong> <%= @company.address %></p>
+          <p><strong>Meeting Time Limit per Month:</strong> <%= @company.meeting_time_limit_per_month %> hours</p>
+          <p><strong>Meeting Time Limit per Day:</strong> <%= @company.meeting_time_limit_per_day %> minutes</p>
+          <p><strong>Number of Meetings per Day:</strong> <%= @company.no_of_meeting_per_day %></p>
+          <p><strong>Meeting Duration Limits:</strong> <%= @company.minimum_minutes_meeting_limit %> - <%= @company.max_minutes_meeting_limit %> minutes</p>
         </div>
       </div>
     </div>

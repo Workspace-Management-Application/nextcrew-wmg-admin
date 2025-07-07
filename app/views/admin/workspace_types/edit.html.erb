@@ -7,7 +7,7 @@
       <%= link_to "← Back to Workspace Types", admin_workspace_types_path, class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @workspace_type], local: true, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @workspace_type], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @workspace_type.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@workspace_type.errors.count, "error") %> prohibited this workspace type from being saved:</h6>

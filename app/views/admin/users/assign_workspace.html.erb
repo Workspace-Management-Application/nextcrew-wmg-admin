@@ -15,7 +15,7 @@
       <p><strong>Current Workspaces:</strong> <%= @user.workspaces.any? ? @user.workspaces.pluck(:name).join(', ') : 'Not assigned' %></p>
     </div>
 
-    <%= form_with url: assign_workspace_admin_user_path(@user), method: :patch, local: true do |form| %>
+          <%= form_with url: assign_workspace_admin_user_path(@user), method: :patch, local: true, data: { turbo: false } do |form| %>
       <div class="mb-4">
         <%= form.label :workspace_ids, "Select Workspaces", class: "form-label" %>
         <div class="workspace-selection">

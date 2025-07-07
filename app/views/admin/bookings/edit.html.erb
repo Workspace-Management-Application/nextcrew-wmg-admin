@@ -7,7 +7,7 @@
       <%= link_to "← Back to Booking", admin_booking_path(@booking), class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @booking], local: true, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @booking], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @booking.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@booking.errors.count, "error") %> prohibited this booking from being saved:</h6>

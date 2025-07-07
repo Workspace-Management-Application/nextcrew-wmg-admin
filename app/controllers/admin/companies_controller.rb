@@ -8,8 +8,8 @@ class Admin::CompaniesController < Admin::BaseController
     # Search functionality
     if @search.present?
       @companies = @companies.where(
-        "name ILIKE ? OR email ILIKE ? OR phone_number ILIKE ? OR address ILIKE ? OR status ILIKE ?",
-        "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
+        "name ILIKE ? OR email ILIKE ? OR phone_number ILIKE ? OR address ILIKE ? OR status ILIKE ? OR cabin_number ILIKE ?",
+        "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
       )
     end
     
@@ -141,7 +141,7 @@ class Admin::CompaniesController < Admin::BaseController
   end
 
   def company_params
-    permitted_params = [:name, :email, :phone_number, :address]
+    permitted_params = [:name, :email, :phone_number, :address, :cabin_number, :no_of_employee, :meeting_time_limit_per_month, :no_of_meeting_per_day, :meeting_time_limit_per_day, :minimum_minutes_meeting_limit, :max_minutes_meeting_limit]
     
     # Only allow status parameter for super_admin or admin with restrictions
     if current_user.super_admin?

@@ -10,7 +10,7 @@
   <div class="row mb-4">
     <div class="col-md-8">
       <%= form_with url: admin_companies_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
-        <%= form.text_field :search, value: @search, placeholder: "Search by name, email, phone, or address...", 
+        <%= form.text_field :search, value: @search, placeholder: "Search by name, email, phone, address, or cabin number...", 
                            class: "form-control", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;" %>
         <%= form.submit "Search", class: "btn btn-outline-light" %>
         <% if @search.present? || params[:status].present? %>

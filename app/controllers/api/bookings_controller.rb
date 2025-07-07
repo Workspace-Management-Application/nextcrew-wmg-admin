@@ -32,6 +32,9 @@ class Api::BookingsController < Api::BaseController
         # Don't fail the booking creation if email fails
       end
       
+      # Note: Monthly limit exceeded notification is automatically sent by the model validation
+      # if the company exceeds their monthly limit
+      
       render_success(booking, 'Booking created successfully', :created)
     else
       render_error(booking.errors.full_messages.join(', '))

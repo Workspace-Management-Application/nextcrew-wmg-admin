@@ -7,7 +7,7 @@
       <%= link_to "← Back to Rooms", admin_room_path(@room), class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @workspace, @room], local: true, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @workspace, @room], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @room.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@room.errors.count, "error") %> prohibited this room from being saved:</h6>

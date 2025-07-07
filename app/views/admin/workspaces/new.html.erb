@@ -7,7 +7,7 @@
       <%= link_to "← Back to Workspaces", admin_workspaces_path, class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @workspace], local: true, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @workspace], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @workspace.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@workspace.errors.count, "error") %> prohibited this workspace from being saved:</h6>

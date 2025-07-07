@@ -47,6 +47,7 @@ class Admin::BookingsController < Admin::BaseController
 
   def create
     @booking = Booking.new(booking_params)
+    @booking.acting_user = current_user
     if @booking.save
       # Send booking confirmation email
       begin
@@ -55,6 +56,9 @@ class Admin::BookingsController < Admin::BaseController
         Rails.logger.error "Failed to send booking confirmation email: #{e.message}"
         # Don't fail the booking creation if email fails
       end
+      
+      # Note: Monthly limit exceeded notification is automatically sent by the model validation
+      # if the company exceeds their monthly limit
       
       redirect_to admin_bookings_path, notice: 'Booking was successfully created.'
     else
@@ -72,6 +76,7 @@ class Admin::BookingsController < Admin::BaseController
   end
 
   def update
+    @booking.acting_user = current_user
     if @booking.update(booking_params)
       redirect_to admin_booking_path(@booking), notice: 'Booking was successfully updated.'
     else

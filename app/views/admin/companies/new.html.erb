@@ -7,7 +7,7 @@
       <%= link_to "← Back to Companies", admin_companies_path, class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @company], local: true, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @company], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @company.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@company.errors.count, "error") %> prohibited this company from being saved:</h6>
@@ -35,6 +35,40 @@
         <div class="col-md-6 mb-3">
           <%= form.label :phone_number, "Phone Number", class: "form-label" %>
           <%= form.telephone_field :phone_number, class: "form-control", required: true %>
+        </div>
+        <div class="col-md-6 mb-3">
+          <%= form.label :cabin_number, "Cabin Number", class: "form-label" %>
+          <%= form.text_field :cabin_number, class: "form-control", required: true %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :no_of_employee, "Number of Employees", class: "form-label" %>
+          <%= form.number_field :no_of_employee, class: "form-control", required: true, min: 1 %>
+        </div>
+        <div class="col-md-6 mb-3">
+          <%= form.label :meeting_time_limit_per_month, "Meeting Time Limit per Month (minutes)", class: "form-label" %>
+          <%= form.number_field :meeting_time_limit_per_month, class: "form-control", required: true, min: 1 %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <%= form.label :no_of_meeting_per_day, "Number of Meetings per Day", class: "form-label" %>
+          <%= form.number_field :no_of_meeting_per_day, class: "form-control", required: true, min: 1 %>
+        </div>
+        <div class="col-md-3 mb-3">
+          <%= form.label :meeting_time_limit_per_day, "Daily Meeting Time Limit (minutes)", class: "form-label" %>
+          <%= form.number_field :meeting_time_limit_per_day, class: "form-control", required: true, min: 1 %>
+        </div>
+        <div class="col-md-3 mb-3">
+          <%= form.label :minimum_minutes_meeting_limit, "Minimum Meeting Duration (minutes)", class: "form-label" %>
+          <%= form.number_field :minimum_minutes_meeting_limit, class: "form-control", required: true, min: 1 %>
+        </div>
+        <div class="col-md-3 mb-3">
+          <%= form.label :max_minutes_meeting_limit, "Maximum Meeting Duration (minutes)", class: "form-label" %>
+          <%= form.number_field :max_minutes_meeting_limit, class: "form-control", required: true, min: 1 %>
         </div>
       </div>
 

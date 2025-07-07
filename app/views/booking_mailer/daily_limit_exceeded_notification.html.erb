@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Meeting Limit Exceeded</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .alert-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .alert-box h2 {
+            color: #856404;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .alert-box h2::before {
+            content: "⚠️";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .alert-box p {
+            color: #856404;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1;
+            margin: 5px;
+            min-width: 150px;
+        }
+        
+        .stat-box h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .booking-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .booking-details h3 {
+            color: #495057;
+            font-size: 18px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff6b6b;
+            padding-bottom: 10px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .detail-value {
+            color: #6c757d;
+        }
+        
+        .action-section {
+            background-color: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .action-section h3 {
+            color: #155724;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .action-section p {
+            color: #155724;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .footer h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .footer p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #495057;
+        }
+        
+        .contact-info a {
+            color: #17a2b8;
+            text-decoration: none;
+        }
+        
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .stat-box {
+                margin: 5px 0;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+            }
+            
+            .detail-label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Daily Meeting Limit Exceeded</h1>
+            <p>Your company has exceeded its daily meeting time limit</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert-box">
+                <h2>Daily Limit Exceeded</h2>
+                <p>Dear <%= @user.name %>,</p>
+                <p>Your company <strong><%= @company.name %></strong> has exceeded its daily meeting time limit. The booking has been created successfully, but please be aware of your daily usage.</p>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <h3>Daily Limit</h3>
+                    <div class="value"><%= @daily_limit %></div>
+                    <small>minutes</small>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Used Today</h3>
+                    <div class="value"><%= @total_daily_minutes.round(1) %></div>
+                    <small>minutes</small>
+                </div>
+                <div class="stat-box">
+                    <h3>Exceeded By</h3>
+                    <div class="value"><%= @exceeded_minutes.round(1) %></div>
+                    <small>minutes</small>
+                </div>
+            </div>
+            
+            <div class="booking-details">
+                <h3>Latest Booking Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Room:</span>
+                    <span class="detail-value"><%= @room.name %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Workspace:</span>
+                    <span class="detail-value"><%= @workspace.name %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value"><%= @booking.start_time.strftime('%B %d, %Y') %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value"><%= @booking.start_time.strftime('%I:%M %p') %> - <%= @booking.end_time.strftime('%I:%M %p') %></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duration:</span>
+                    <span class="detail-value"><%= @booking.duration_minutes %> minutes</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value"><%= @booking.status.titleize %></span>
+                </div>
+            </div>
+            
+            <div class="action-section">
+                <h3>What This Means</h3>
+                <p>Your booking has been successfully created, but your company has exceeded its daily meeting time limit. Please consider this when planning future meetings.</p>
+                <p><strong>Note:</strong> This is a notification only. Your booking remains active and confirmed.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h4>NextCo Workspaces</h4>
+            <p>Thank you for using our workspace management system.</p>
+            <p>This is an automated notification. Please do not reply to this email.</p>
+            
+            <div class="contact-info">
+                <p>For support, contact us at: <a href="mailto:support@nextcoworks.com">support@nextcoworks.com</a></p>
+                <p>Visit our website: <a href="https://nextcoworks.com">nextcoworks.com</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

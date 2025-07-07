@@ -7,7 +7,7 @@
       <%= link_to "← Back to Users", admin_users_path, class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @user], local: true, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @user], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @user.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h6>
