@@ -31,6 +31,30 @@ class Api::WorkspacesController < Api::BaseController
     render_success(workspace_types)
   end
 
+  def company_today_bookings
+    company = @workspace.companies.find_by(id: params[:company_id])
+    
+    if company
+      # Get today's bookings for the company's rooms in this workspace
+      today_bookings = Booking.joins(:room, :user)
+                             .joins("JOIN company_rooms ON rooms.id = company_rooms.room_id")
+                             .where(company_rooms: { company_id: company.id })
+                             .where(rooms: { workspace_id: @workspace.id })
+                             .where('DATE(bookings.start_time) = ?', Date.current)
+                             .includes(:room, :user)
+      
+      bookings_with_room_name = today_bookings.map do |booking|
+        booking.as_json(except: [:booker_name, :phone_number, :user_id, :room_id, :created_at, :updated_at]).merge(
+          room_name: booking.room.name
+        )
+      end
+      
+      render_success(bookings_with_room_name)
+    else
+      render_error("Company not found", :not_found)
+    end
+  end
+
   def set_workspace
     @workspace = Workspace.find_by(id: params[:id])
   end
