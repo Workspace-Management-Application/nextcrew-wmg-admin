@@ -8,7 +8,6 @@ class Booking < ApplicationRecord
   validates :phone_number, :user_id, :room_id, :start_time, :end_time, :status, presence: true
   validate :start_and_end_time_validity
   validate :no_time_overlap_for_room
-  validate :check_company_daily_meeting_limit
   validate :check_meeting_duration_limits
   validate :check_company_time_slot_overlap
   validate :company_room_association_exists
@@ -102,6 +101,25 @@ class Booking < ApplicationRecord
     (acting_user || user)&.admin? || (acting_user || user)&.super_admin?
   end
 
+  # Method to get all validation errors as an array
+  def all_validation_errors
+    # Run validations if not already run
+    valid? unless errors.any?
+    
+    # Collect all error messages
+    error_messages = []
+    
+    errors.each do |error|
+      if error.attribute == :base
+        error_messages << error.message
+      else
+        error_messages << "#{error.attribute.to_s.humanize} #{error.message}"
+      end
+    end
+    
+    error_messages
+  end
+
   # Helper method to get overlapping company bookings
   def overlapping_company_bookings
     return Booking.none if company.blank? || start_time.blank? || end_time.blank? || room.blank? || room.workspace_id.blank?
@@ -134,33 +152,6 @@ class Booking < ApplicationRecord
     end
   end
 
-  def check_company_daily_meeting_limit
-    return if user.blank? || start_time.blank?
-    return unless user.user? || user.floor_user?
-    return if company.blank?
-    # DO NOT allow override for daily meeting limit
-
-    # Get the workspace of the current booking's room
-    workspace_id = room&.workspace_id
-    return if workspace_id.blank?
-
-    # Get the date of the booking
-    booking_date = start_time.to_date
-
-    # Count existing bookings for this user's company in the same workspace on the same date
-    existing_bookings_count = Booking.joins(user: :companies, room: :workspace)
-                                    .where(companies: { id: company.id })
-                                    .where(rooms: { workspace_id: workspace_id })
-                                    .where('DATE(bookings.start_time) = ?', booking_date)
-                                    .where.not(id: id) # Exclude current booking if updating
-                                    .count
-
-    # Check if adding this booking would exceed the company's daily limit
-    if existing_bookings_count >= company.no_of_meeting_per_day
-      errors.add(:base, "Your company has reached the daily meeting limit of #{company.no_of_meeting_per_day} meetings per day for this workspace.")
-    end
-  end
-
   def check_meeting_duration_limits
     return if user.blank? || start_time.blank? || end_time.blank?
     return unless user.user? || user.floor_user?
@@ -170,7 +161,8 @@ class Booking < ApplicationRecord
     # Check if duration is within company limits
     if duration_minutes < company.minimum_minutes_meeting_limit
       errors.add(:base, "Meeting duration must be at least #{company.minimum_minutes_meeting_limit} minutes. Your booking is for #{duration_minutes} minutes.")
-    elsif duration_minutes > company.max_minutes_meeting_limit
+    end
+    if duration_minutes > company.max_minutes_meeting_limit
       errors.add(:base, "Meeting duration cannot exceed #{company.max_minutes_meeting_limit} minutes. Your booking is for #{duration_minutes} minutes.")
     end
   end
@@ -196,9 +188,10 @@ class Booking < ApplicationRecord
     return if start_time.blank? || end_time.blank?
 
     if start_time == end_time
-      return errors.add(:end_time, "cannot be the same as start time")
-    elsif end_time < start_time
-      return errors.add(:end_time, "cannot be before start time")
+      errors.add(:end_time, "cannot be the same as start time")
+    end
+    if end_time < start_time
+      errors.add(:end_time, "cannot be before start time")
     end
   end
 
@@ -246,7 +239,6 @@ class Booking < ApplicationRecord
       # Rule 1: Can't book before an existing booking's start time in the same room
       if start_time < existing_booking.start_time
         errors.add(:start_time, "cannot be before the existing booking at #{existing_booking.start_time.strftime('%I:%M %p')} in #{existing_booking.room.name}")
-        return
       end
     end
   end
@@ -274,7 +266,6 @@ class Booking < ApplicationRecord
         
         if current_time < forward_booking_threshold
           errors.add(:start_time, "cannot be booked for #{start_time.strftime('%I:%M %p')} because forward booking is only allowed after #{forward_booking_threshold.strftime('%I:%M %p')} (10 minutes before your existing booking ends at #{existing_booking.end_time.strftime('%I:%M %p')} in #{existing_booking.room.name})")
-          return
         end
       end
     end

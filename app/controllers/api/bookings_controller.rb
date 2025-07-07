@@ -37,7 +37,7 @@ class Api::BookingsController < Api::BaseController
       
       render_success(booking, 'Booking created successfully', :created)
     else
-      render_error(booking.errors.full_messages.join(', '))
+      render_error(booking.all_validation_errors)
     end
   end
 
@@ -50,7 +50,7 @@ class Api::BookingsController < Api::BaseController
       if @booking.update(booking_params)
         render_success(@booking, 'Booking updated successfully')
       else
-        render_error(@booking.errors.full_messages.join(', '))
+        render_error(@booking.all_validation_errors)
       end
     else
       render_error('Booking not found', :not_found)

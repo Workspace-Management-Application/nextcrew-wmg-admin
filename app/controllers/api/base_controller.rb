@@ -61,7 +61,11 @@ class Api::BaseController < ApplicationController
 
   # Method to render a standard error response
   def render_error(message, status = :unprocessable_entity)
-    render json: { message: message }, status: status
+    if message.is_a?(Array)
+      render json: { errors: message }, status: status
+    else
+      render json: { message: message }, status: status
+    end
   end
 
   # Method to render a successful response
