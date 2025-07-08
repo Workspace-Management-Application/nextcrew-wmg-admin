@@ -84,9 +84,7 @@
           <th>Workspace</th>
           <th>Category</th>
           <th>Capacity</th>
-          <th>Whiteboard</th>
-          <th>Projector</th>
-          <th>TV</th>
+          <th>Amenities</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -99,24 +97,14 @@
             <td><%= room.category.humanize %></td>
             <td><%= room.capacity %> people</td>
             <td>
-              <% if room.whiteboard %>
-                <span class="badge bg-success">Yes</span>
+              <% if room.amenities.any? %>
+                <div class="d-flex flex-wrap gap-1">
+                  <% room.amenities.each do |amenity| %>
+                    <span class="badge bg-warning"><%= amenity.name %></span>
+                  <% end %>
+                </div>
               <% else %>
-                <span class="badge bg-secondary">No</span>
-              <% end %>
-            </td>
-            <td>
-              <% if room.projector %>
-                <span class="badge bg-success">Yes</span>
-              <% else %>
-                <span class="badge bg-secondary">No</span>
-              <% end %>
-            </td>
-            <td>
-              <% if room.tv %>
-                <span class="badge bg-success">Yes</span>
-              <% else %>
-                <span class="badge bg-secondary">No</span>
+                <span class="text-muted">None</span>
               <% end %>
             </td>
             <td>

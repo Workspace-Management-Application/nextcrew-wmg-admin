@@ -182,6 +182,11 @@
           <span class="nav-text">Workspace Types</span>
         <% end %>
         
+        <%= link_to admin_amenities_path, class: "nav-item #{'active' if controller_name == 'amenities'}" do %>
+          <span class="nav-icon">🛠️</span>
+          <span class="nav-text">Amenities</span>
+        <% end %>
+        
         <%= link_to admin_exports_path, class: "nav-item #{'active' if controller_name == 'exports'}" do %>
           <span class="nav-icon">📊</span>
           <span class="nav-text">Export</span>

@@ -49,6 +49,17 @@
       <h5 class="mb-3">Room Details</h5>
       <p><strong>Category:</strong> <%= @booking.room.category %></p>
       <p><strong>Capacity:</strong> <%= @booking.room.capacity %> people</p>
+      
+      <% if @booking.room.amenities.any? %>
+        <div class="mt-3">
+          <h6>Amenities:</h6>
+          <div class="d-flex flex-wrap gap-1">
+            <% @booking.room.amenities.each do |amenity| %>
+              <span class="badge bg-secondary"><%= amenity.name %></span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

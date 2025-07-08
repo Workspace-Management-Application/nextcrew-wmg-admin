@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_08_000000) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_08_112908) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_000000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "amenities", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "bookings", force: :cascade do |t|
@@ -136,17 +142,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_000000) do
     t.index ["workspace_type_id"], name: "index_office_enquiry_workspace_types_on_workspace_type_id"
   end
 
+  create_table "room_amenities", force: :cascade do |t|
+    t.bigint "room_id", null: false
+    t.bigint "amenity_id", null: false
+    t.boolean "has_amenity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["amenity_id"], name: "index_room_amenities_on_amenity_id"
+    t.index ["room_id"], name: "index_room_amenities_on_room_id"
+  end
+
   create_table "rooms", force: :cascade do |t|
     t.string "name"
     t.string "category"
     t.bigint "workspace_id", null: false
     t.integer "capacity"
-    t.boolean "whiteboard", default: false
-    t.boolean "projector", default: false
     t.boolean "is_available", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "tv", default: false
     t.index ["workspace_id"], name: "index_rooms_on_workspace_id"
   end
 
@@ -229,6 +242,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_000000) do
   add_foreign_key "company_rooms", "rooms"
   add_foreign_key "office_enquiry_workspace_types", "office_enquiries"
   add_foreign_key "office_enquiry_workspace_types", "workspace_types"
+  add_foreign_key "room_amenities", "amenities"
+  add_foreign_key "room_amenities", "rooms"
   add_foreign_key "rooms", "workspaces"
   add_foreign_key "workspace_workspace_types", "workspace_types"
   add_foreign_key "workspace_workspace_types", "workspaces"

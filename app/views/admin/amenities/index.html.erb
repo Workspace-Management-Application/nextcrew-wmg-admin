@@ -1,0 +1,65 @@
+<% content_for :page_title, "Amenities" %>
+
+<div class="content-area bg-dark text-white p-4 rounded">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Amenities</h2>
+  </div>
+
+  <div class="mb-4">
+    <%= form_with model: [:admin, @amenity], url: admin_amenities_path, method: :post, local: true, class: "row g-2 align-items-end" do |form| %>
+      <div class="col-md-6">
+        <%= form.label :name, "Add New Amenity", class: "form-label" %>
+        <%= form.text_field :name, class: "form-control", required: true, placeholder: "e.g., Whiteboard, Projector, TV" %>
+      </div>
+      <div class="col-md-2">
+        <%= form.submit "Add Amenity", class: "btn btn-primary w-100" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-dark">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Rooms Count</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @amenities.each do |amenity| %>
+          <tr>
+            <td><%= amenity.name %></td>
+            <td>
+              <% if Amenity::DEFAULT_TYPES.include?(amenity.name) %>
+                <span class="badge bg-info">Default</span>
+              <% else %>
+                <span class="badge bg-secondary">Custom</span>
+              <% end %>
+            </td>
+            <td><%= amenity.rooms.count %></td>
+            <td class="action-column">
+              <% unless Amenity::DEFAULT_TYPES.include?(amenity.name) %>
+                <%= link_to "Delete", admin_amenity_path(amenity), 
+                            data: { 
+                              turbo_method: :delete, 
+                              turbo_confirm: "Are you sure you want to delete this amenity?" 
+                            },
+                            class: "btn btn-danger btn-sm" %>
+              <% else %>
+                <span class="text-muted">Default type - cannot be modified</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @amenities.empty? %>
+    <div class="text-center mt-5">
+      <p class="text-muted">No amenities found.</p>
+    </div>
+  <% end %>
+</div>

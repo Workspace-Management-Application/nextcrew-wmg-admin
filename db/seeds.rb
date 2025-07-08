@@ -11,9 +11,12 @@ puts "🌱 Starting database seeding..."
 #    VisitorEntry, OfficeEnquiry, DayPass, Room, User, Company, Workspace].each(&:destroy_all)
 # end
 
-# 0. Create default workspace types
+# 0. Create default workspace types and amenities
 puts "🏢 Creating default workspace types..."
 WorkspaceType.create_default_types
+
+puts "🏢 Creating default amenities..."
+Amenity.create_default_types
 
 # 1. Create Companies with different statuses
 puts "🏢 Creating companies..."
@@ -213,26 +216,26 @@ end
 puts "🏛️ Creating rooms..."
 rooms_data = [
   # Floor 5 Premium rooms
-  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, whiteboard: true, projector: true, is_available: true, tv: true},
-  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, whiteboard: true, projector: true, is_available: true , tv: true},
-  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, whiteboard: true, projector: true, is_available: true , tv: true},
-  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, whiteboard: true, projector: false, is_available: true , tv: true},
-  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, whiteboard: true, projector: false, is_available: true , tv: true},
-  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, whiteboard: true, projector: true, is_available: false , tv: true},
+  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true},
+  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true},
+  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, is_available: true},
+  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, is_available: true},
+  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, is_available: true},
+  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, is_available: false},
   
   # Floor 3 Standard rooms
-  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, whiteboard: true, projector: true, is_available: true , tv: false},
-  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, whiteboard: true, projector: false, is_available: true , tv: true},
-  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, whiteboard: false, projector: false, is_available: true , tv: true},
-  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, whiteboard: true, projector: true, is_available: true , tv: true},
+  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, is_available: true},
+  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, is_available: true},
+  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, is_available: true},
+  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, is_available: true},
   
   # Ground Floor Basic rooms
-  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, whiteboard: true, projector: false, is_available: true , tv: true},
-  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, whiteboard: false, projector: false, is_available: true , tv: true},
-  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, whiteboard: true, projector: true, is_available: true , tv: true},
+  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, is_available: true},
+  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, is_available: true},
+  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, is_available: true},
   
   # Floor 2 Executive rooms (inactive workspace)
-  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, whiteboard: true, projector: true, is_available: false , tv: true}
+  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, is_available: false}
 ]
 
 room_records = rooms_data.map do |room_data|
@@ -263,6 +266,84 @@ company_room_associations = [
 
 company_room_associations.each do |assoc|
   CompanyRoom.find_or_create_by!(company: assoc[:company], room: assoc[:room])
+end
+
+# 9. Create Room-Amenity associations
+puts "🏛️ Creating room-amenity associations..."
+# Get default amenities
+whiteboard_amenity = Amenity.find_by(name: 'Whiteboard')
+projector_amenity = Amenity.find_by(name: 'Projector')
+tv_amenity = Amenity.find_by(name: 'TV')
+
+# Associate amenities with rooms based on room names/characteristics
+room_amenity_associations = [
+  # Tesla - Conference room with all amenities
+  { room: room_records[0], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[0], amenity: projector_amenity, has_amenity: true },
+  { room: room_records[0], amenity: tv_amenity, has_amenity: true },
+  
+  # Mercedes - Conference room with all amenities
+  { room: room_records[1], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[1], amenity: projector_amenity, has_amenity: true },
+  { room: room_records[1], amenity: tv_amenity, has_amenity: true },
+  
+  # BMW - Conference room with all amenities
+  { room: room_records[2], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[2], amenity: projector_amenity, has_amenity: true },
+  { room: room_records[2], amenity: tv_amenity, has_amenity: true },
+  
+  # Alto - Meeting room with whiteboard and TV
+  { room: room_records[3], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[3], amenity: tv_amenity, has_amenity: true },
+  
+  # Nano - Meeting room with whiteboard and TV
+  { room: room_records[4], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[4], amenity: tv_amenity, has_amenity: true },
+  
+  # Swift - Meeting room with all amenities (but unavailable)
+  { room: room_records[5], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[5], amenity: projector_amenity, has_amenity: true },
+  { room: room_records[5], amenity: tv_amenity, has_amenity: true },
+  
+  # Boardroom Alpha - Conference room with all amenities
+  { room: room_records[6], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[6], amenity: projector_amenity, has_amenity: true },
+  
+  # Meeting Beta - Meeting room with whiteboard and TV
+  { room: room_records[7], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[7], amenity: tv_amenity, has_amenity: true },
+  
+  # Discussion Gamma - Meeting room with TV only
+  { room: room_records[8], amenity: tv_amenity, has_amenity: true },
+  
+  # Presentation Delta - Presentation room with all amenities
+  { room: room_records[9], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[9], amenity: projector_amenity, has_amenity: true },
+  { room: room_records[9], amenity: tv_amenity, has_amenity: true },
+  
+  # Conference One - Conference room with whiteboard and TV
+  { room: room_records[10], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[10], amenity: tv_amenity, has_amenity: true },
+  
+  # Meeting Two - Meeting room with TV only
+  { room: room_records[11], amenity: tv_amenity, has_amenity: true },
+  
+  # Training Room - Training room with all amenities
+  { room: room_records[12], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[12], amenity: projector_amenity, has_amenity: true },
+  { room: room_records[12], amenity: tv_amenity, has_amenity: true },
+  
+  # Executive Suite - Executive room with all amenities
+  { room: room_records[13], amenity: whiteboard_amenity, has_amenity: true },
+  { room: room_records[13], amenity: projector_amenity, has_amenity: true },
+  { room: room_records[13], amenity: tv_amenity, has_amenity: true }
+]
+
+room_amenity_associations.each do |assoc|
+  next unless assoc[:amenity] # Skip if amenity doesn't exist
+  RoomAmenity.find_or_create_by!(room: assoc[:room], amenity: assoc[:amenity]) do |ra|
+    ra.has_amenity = assoc[:has_amenity]
+  end
 end
 
 # 9. Create Bookings for Companies (not users)

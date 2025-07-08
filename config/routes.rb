@@ -72,6 +72,7 @@ Rails.application.routes.draw do
     resources :office_enquiries
     resources :visitor_entries
     resources :workspace_types
+    resources :amenities
     
     resource :profile, only: [:show, :edit, :update], controller: 'profile'
     

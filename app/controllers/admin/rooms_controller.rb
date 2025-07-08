@@ -7,7 +7,7 @@ class Admin::RoomsController < Admin::BaseController
     
     # All rooms from user's workspaces
     user_workspace_ids = current_user.workspaces.pluck(:id)
-    @rooms = Room.joins(:workspace).where(workspace_id: user_workspace_ids).includes(:workspace, :bookings)
+    @rooms = Room.joins(:workspace).where(workspace_id: user_workspace_ids).includes(:workspace, :bookings, :amenities)
     
     # Search functionality
     if @search.present?
@@ -43,18 +43,22 @@ class Admin::RoomsController < Admin::BaseController
   def show
     # Global room view - find room from user's workspaces
     user_workspace_ids = current_user.workspaces.pluck(:id)
-    @room = Room.joins(:workspace).where(workspace_id: user_workspace_ids).find(params[:id])
+    @room = Room.joins(:workspace).where(workspace_id: user_workspace_ids).includes(:amenities).find(params[:id])
     @workspace = @room.workspace
   end
 
   def new
     @room = @workspace.rooms.build
+    @amenities = Amenity.order(:name)
   end
 
   def create
-    @room = @workspace.rooms.build(room_params.except(:photo))
+    @room = @workspace.rooms.build(room_params.except(:photo, :amenity_ids))
     
     if @room.save
+      # Handle amenity associations
+      handle_amenity_associations(@room, params[:room][:amenity_ids])
+      
       # Handle photo upload using Active Storage with auto folder organization
       if params[:room][:photo].present?
         photo_result = PhotoUploadService.attach_photo_auto(@room, params[:room][:photo])
@@ -67,15 +71,20 @@ class Admin::RoomsController < Admin::BaseController
       
       redirect_to admin_rooms_path, notice: 'Room was successfully created.'
     else
+      @amenities = Amenity.order(:name)
       render :new
     end
   end
 
   def edit
+    @amenities = Amenity.order(:name)
   end
 
   def update
-    if @room.update(room_params.except(:photo))
+    if @room.update(room_params.except(:photo, :amenity_ids))
+      # Handle amenity associations
+      handle_amenity_associations(@room, params[:room][:amenity_ids])
+      
       # Handle photo upload using Active Storage with auto folder organization
       if params[:room][:photo].present?
         photo_result = PhotoUploadService.attach_photo_auto(@room, params[:room][:photo])
@@ -88,6 +97,7 @@ class Admin::RoomsController < Admin::BaseController
       
       redirect_to admin_room_path(@room), notice: 'Room was successfully updated.'
     else
+      @amenities = Amenity.order(:name)
       render :edit
     end
   end
@@ -106,16 +116,30 @@ class Admin::RoomsController < Admin::BaseController
   def set_room
     if params[:workspace_id].present?
       # Workspace-scoped room (for edit/update/delete)
-      @room = @workspace.rooms.find(params[:id])
+      @room = @workspace.rooms.includes(:amenities).find(params[:id])
     else
       # Global room view
       user_workspace_ids = current_user.workspaces.pluck(:id)
-      @room = Room.joins(:workspace).where(workspace_id: user_workspace_ids).find(params[:id])
+      @room = Room.joins(:workspace).where(workspace_id: user_workspace_ids).includes(:amenities).find(params[:id])
       @workspace = @room.workspace
     end
   end
 
   def room_params
-    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :tv, :is_available, :photo)
+    params.require(:room).permit(:name, :category, :capacity, :is_available, :photo, amenity_ids: [])
+  end
+
+  def handle_amenity_associations(room, amenity_ids)
+    return unless amenity_ids.present?
+    
+    # Clear existing associations
+    room.room_amenities.destroy_all
+    
+    # Create new associations
+    amenity_ids.each do |amenity_id|
+      next if amenity_id.blank?
+      amenity = Amenity.find(amenity_id)
+      RoomAmenity.create!(room: room, amenity: amenity, has_amenity: true)
+    end
   end
 end

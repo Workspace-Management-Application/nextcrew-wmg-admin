@@ -58,61 +58,30 @@
         <div class="form-text">Upload a new photo to replace the current one (optional). Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB.</div>
       </div>
 
-      <div class="row mb-3">
-        <div class="col-md-3">
-          <%= form.label :whiteboard, "Whiteboard", class: "form-label" %>
-          <div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :whiteboard, true, class: "form-check-input", id: "whiteboard_yes" %>
-              <%= form.label :whiteboard_yes, "Yes", class: "form-check-label" %>
+      <div class="mb-3">
+        <%= form.label :amenity_ids, "Room Amenities", class: "form-label" %>
+        <div class="form-text mb-2">Select the amenities available in this room</div>
+        <div class="row">
+          <% @amenities.each do |amenity| %>
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <%= form.check_box :amenity_ids, 
+                    { multiple: true, class: "form-check-input" }, 
+                    amenity.id, 
+                    nil %>
+                <%= form.label "amenity_ids_#{amenity.id}", 
+                    amenity.name, 
+                    class: "form-check-label" %>
+              </div>
             </div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :whiteboard, false, class: "form-check-input", id: "whiteboard_no" %>
-              <%= form.label :whiteboard_no, "No", class: "form-check-label" %>
-            </div>
-          </div>
+          <% end %>
         </div>
-        
-        <div class="col-md-3">
-          <%= form.label :projector, "Projector", class: "form-label" %>
-          <div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :projector, true, class: "form-check-input", id: "projector_yes" %>
-              <%= form.label :projector_yes, "Yes", class: "form-check-label" %>
-            </div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :projector, false, class: "form-check-input", id: "projector_no" %>
-              <%= form.label :projector_no, "No", class: "form-check-label" %>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-md-3">
-          <%= form.label :tv, "TV", class: "form-label" %>
-          <div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :tv, true, class: "form-check-input", id: "tv_yes" %>
-              <%= form.label :tv_yes, "Yes", class: "form-check-label" %>
-            </div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :tv, false, class: "form-check-input", id: "tv_no" %>
-              <%= form.label :tv_no, "No", class: "form-check-label" %>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-md-3">
-          <%= form.label :is_available, "Active", class: "form-label" %>
-          <div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :is_available, true, class: "form-check-input", id: "is_available_yes" %>
-              <%= form.label :is_available_yes, "Yes", class: "form-check-label" %>
-            </div>
-            <div class="form-check form-check-inline">
-              <%= form.radio_button :is_available, false, class: "form-check-input", id: "is_available_no" %>
-              <%= form.label :is_available_no, "No", class: "form-check-label" %>
-            </div>
-          </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="form-check">
+          <%= form.check_box :is_available, { class: "form-check-input" } %>
+          <%= form.label :is_available, "Active", class: "form-check-label" %>
         </div>
       </div>
 
