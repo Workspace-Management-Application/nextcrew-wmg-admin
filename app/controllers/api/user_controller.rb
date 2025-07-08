@@ -5,7 +5,7 @@ class Api::UserController < Api::BaseController
     begin
       payload = JWT.decode(token, Rails.application.credentials.devise_jwt_secret_key)[0]
       user = User.find_by(id: payload['sub'])
-      data = user.as_json(only: [:id, :email, :name, :role]).merge(workspace_id: user.workspace&.id)
+      data = user.as_json(only: [:id, :email, :name, :role]).merge(workspace_id: user.workspaces.first&.id)
       if user
         render_success(data)
       else
