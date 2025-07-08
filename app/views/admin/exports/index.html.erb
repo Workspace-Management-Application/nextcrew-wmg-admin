@@ -1,0 +1,102 @@
+<% content_for :page_title, "Export Company Details" %>
+
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Export Company Details</h2>
+      <%= link_to "← Back to Dashboard", admin_dashboard_path, class: "btn btn-outline-primary" %>
+    </div>
+
+    <div class="bg-dark p-4 rounded">
+      <h4 class="mb-3">Export Settings</h4>
+      
+      <%= form_with url: admin_exports_company_details_path, method: :post, local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <%= form.label :workspace_id, "Workspace", class: "form-label" %>
+            <%= form.select :workspace_id, 
+                options_for_select([['All Workspaces', 'all']] + @workspaces.map { |w| [w.name, w.id] }), 
+                { selected: 'all' }, 
+                { class: "form-select", id: "workspace-select" } %>
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <%= form.label :company_id, "Company", class: "form-label" %>
+            <%= form.select :company_id, 
+                options_for_select([['All Companies', 'all']] + @companies.map { |c| [c.name, c.id] }), 
+                { selected: 'all' }, 
+                { class: "form-select", id: "company-select" } %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <%= form.label :start_date, "Start Date", class: "form-label" %>
+            <%= form.date_field :start_date, 
+                value: Date.current.beginning_of_month.strftime('%Y-%m-%d'), 
+                class: "form-control" %>
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <%= form.label :end_date, "End Date", class: "form-label" %>
+            <%= form.date_field :end_date, 
+                value: Date.current.end_of_month.strftime('%Y-%m-%d'), 
+                class: "form-control" %>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <h6>Export Information:</h6>
+          <ul class="mb-0">
+            <li>Company details including contact information and meeting limits</li>
+            <li>Total exceeded hours per day (sum of all daily limit exceedances)</li>
+            <li>Total exceeded hours per month (monthly limit exceedances)</li>
+            <li>Total bookings and meeting hours in the selected period</li>
+            <li>Data will be exported as a CSV file (.csv)</li>
+          </ul>
+        </div>
+
+        <div class="d-flex gap-2">
+          <%= form.submit "Export to CSV", class: "btn btn-primary" %>
+          <%= link_to "Cancel", admin_dashboard_path, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const workspaceSelect = document.getElementById('workspace-select');
+  const companySelect = document.getElementById('company-select');
+  
+  workspaceSelect.addEventListener('change', function() {
+    const selectedWorkspaceId = this.value;
+    
+    // Clear current options
+    companySelect.innerHTML = '<option value="all">All Companies</option>';
+    
+    if (selectedWorkspaceId === 'all') {
+      // Load all companies via AJAX
+      fetch('/admin/exports/companies_by_workspace?workspace_id=all')
+        .then(response => response.json())
+        .then(companies => {
+          companies.forEach(company => {
+            const option = new Option(company.name, company.id);
+            companySelect.add(option);
+          });
+        });
+    } else {
+      // Load companies for specific workspace via AJAX
+      fetch(`/admin/exports/companies_by_workspace?workspace_id=${selectedWorkspaceId}`)
+        .then(response => response.json())
+        .then(companies => {
+          companies.forEach(company => {
+            const option = new Option(company.name, company.id);
+            companySelect.add(option);
+          });
+        });
+    }
+  });
+});
+</script> 

@@ -1,9 +1,9 @@
-<% content_for :page_title, "Add User" %>
+<% content_for :page_title, "Edit User" %>
 
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Add New User</h2>
+      <h2>Edit User</h2>
       <%= link_to "← Back to Users", admin_users_path, class: "btn btn-outline-primary" %>
     </div>
 
@@ -24,7 +24,6 @@
           <%= form.label :name, class: "form-label" %>
           <%= form.text_field :name, class: "form-control", required: true %>
         </div>
-        
         <div class="col-md-6 mb-3">
           <%= form.label :phone_number, class: "form-label" %>
           <%= form.telephone_field :phone_number, class: "form-control" %>
@@ -36,10 +35,9 @@
           <%= form.label :email, class: "form-label" %>
           <%= form.email_field :email, class: "form-control", required: true %>
         </div>
-        
         <div class="col-md-6 mb-3">
-          <%= form.label :password, "Password", class: "form-label" %>
-          <%= form.password_field :password, class: "form-control", required: true %>
+          <%= form.label :password, "Password (leave blank to keep current)", class: "form-label" %>
+          <%= form.password_field :password, class: "form-control", autocomplete: "new-password" %>
         </div>
       </div>
 
@@ -51,7 +49,7 @@
                           ['Floor User', 'floor_user'],
                           ['Admin', 'admin'],
                           ['Super Admin', 'super_admin']
-                        ]), 
+                        ], @user.role), 
                         { prompt: 'Select Role' }, 
                         { class: "form-select", required: true } %>
       </div>
@@ -72,9 +70,9 @@
       <% end %>
 
       <div class="d-flex gap-2">
-        <%= form.submit "Create User", class: "btn btn-primary" %>
+        <%= form.submit "Update User", class: "btn btn-primary" %>
         <%= link_to "Cancel", admin_users_path, class: "btn btn-secondary" %>
       </div>
     <% end %>
   </div>
-</div>
+</div> 

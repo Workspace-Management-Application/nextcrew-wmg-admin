@@ -70,6 +70,11 @@ Rails.application.routes.draw do
     resources :workspace_types
     
     resource :profile, only: [:show, :edit, :update], controller: 'profile'
+    
+    # Export routes
+    get 'exports', to: 'exports#index'
+    post 'exports/company_details', to: 'exports#export_company_details'
+    get 'exports/companies_by_workspace', to: 'exports#get_companies_by_workspace'
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

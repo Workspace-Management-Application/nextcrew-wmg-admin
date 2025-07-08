@@ -6,6 +6,7 @@ class Company < ApplicationRecord
   has_many :day_passes
   has_many :company_rooms, dependent: :destroy
   has_many :rooms, through: :company_rooms
+  has_many :bookings
 
   enum :status, { active: 'active', inactive: 'inactive', pending: 'pending', approved: 'approved' }, default: :pending
 

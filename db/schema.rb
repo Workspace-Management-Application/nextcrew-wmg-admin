@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_08_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -45,13 +45,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
   create_table "bookings", force: :cascade do |t|
     t.string "booker_name"
     t.string "phone_number"
-    t.integer "user_id"
     t.integer "room_id"
     t.datetime "start_time"
     t.datetime "end_time"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "company_id"
+    t.index ["company_id"], name: "index_bookings_on_company_id"
   end
 
   create_table "companies", force: :cascade do |t|
@@ -62,6 +63,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "cabin_number"
+    t.integer "no_of_employee"
+    t.integer "meeting_time_limit_per_month"
+    t.integer "no_of_meeting_per_day"
+    t.integer "minimum_minutes_meeting_limit"
+    t.integer "max_minutes_meeting_limit"
+    t.integer "meeting_time_limit_per_day", null: false
   end
 
   create_table "company_rooms", force: :cascade do |t|
@@ -93,7 +101,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
     t.string "phone_number"
     t.string "email"
     t.date "pass_date"
-    t.text "purpose"
     t.string "photo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -114,10 +121,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
     t.string "visitor_name"
     t.string "phone_number"
     t.string "email"
-    t.string "requirement"
     t.string "company_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "no_of_seats"
+  end
+
+  create_table "office_enquiry_workspace_types", force: :cascade do |t|
+    t.bigint "office_enquiry_id", null: false
+    t.bigint "workspace_type_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["office_enquiry_id"], name: "index_office_enquiry_workspace_types_on_office_enquiry_id"
+    t.index ["workspace_type_id"], name: "index_office_enquiry_workspace_types_on_workspace_type_id"
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -130,6 +146,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
     t.boolean "is_available", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "tv", default: false
     t.index ["workspace_id"], name: "index_rooms_on_workspace_id"
   end
 
@@ -177,6 +194,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "workspace_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_workspace_types_on_name", unique: true
+  end
+
+  create_table "workspace_workspace_types", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "workspace_type_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_workspace_workspace_types_on_workspace_id"
+    t.index ["workspace_type_id"], name: "index_workspace_workspace_types_on_workspace_type_id"
+  end
+
   create_table "workspaces", force: :cascade do |t|
     t.string "name"
     t.string "building_name"
@@ -191,7 +224,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_02_093657) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "bookings", "companies"
   add_foreign_key "company_rooms", "companies"
   add_foreign_key "company_rooms", "rooms"
+  add_foreign_key "office_enquiry_workspace_types", "office_enquiries"
+  add_foreign_key "office_enquiry_workspace_types", "workspace_types"
   add_foreign_key "rooms", "workspaces"
+  add_foreign_key "workspace_workspace_types", "workspace_types"
+  add_foreign_key "workspace_workspace_types", "workspaces"
 end

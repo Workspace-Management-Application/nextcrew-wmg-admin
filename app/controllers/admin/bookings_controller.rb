@@ -3,12 +3,12 @@ class Admin::BookingsController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @bookings = Booking.includes(:user, :room, room: :workspace)
+    @bookings = Booking.includes(:company, :room, room: :workspace)
     
     # Search functionality
     if @search.present?
-      @bookings = @bookings.joins(:user, :room).where(
-        "users.name ILIKE ? OR users.email ILIKE ? OR rooms.name ILIKE ? OR bookings.phone_number ILIKE ?",
+      @bookings = @bookings.joins(:company, :room).where(
+        "companies.name ILIKE ? OR companies.email ILIKE ? OR rooms.name ILIKE ? OR bookings.phone_number ILIKE ?",
         "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
       )
     end
@@ -40,9 +40,8 @@ class Admin::BookingsController < Admin::BaseController
 
   def new
     @booking = Booking.new
-    @workspaces = Workspace.all
+    @companies = Company.all
     @rooms = Room.all
-    @users = User.all
   end
 
   def create
@@ -62,17 +61,15 @@ class Admin::BookingsController < Admin::BaseController
       
       redirect_to admin_bookings_path, notice: 'Booking was successfully created.'
     else
-      @workspaces = Workspace.all
+      @companies = Company.all
       @rooms = Room.all
-      @users = User.all
       render :new
     end
   end
 
   def edit
-    @workspaces = Workspace.all
+    @companies = Company.all
     @rooms = Room.all
-    @users = User.all
   end
 
   def update
@@ -80,9 +77,8 @@ class Admin::BookingsController < Admin::BaseController
     if @booking.update(booking_params)
       redirect_to admin_booking_path(@booking), notice: 'Booking was successfully updated.'
     else
-      @workspaces = Workspace.all
+      @companies = Company.all
       @rooms = Room.all
-      @users = User.all
       render :edit
     end
   end
@@ -99,6 +95,6 @@ class Admin::BookingsController < Admin::BaseController
   end
 
   def booking_params
-    params.require(:booking).permit(:user_id, :room_id, :phone_number, :start_time, :end_time)
+    params.require(:booking).permit(:company_id, :room_id, :phone_number, :start_time, :end_time)
   end
 end

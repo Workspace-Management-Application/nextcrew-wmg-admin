@@ -1,11 +1,11 @@
 class Booking < ApplicationRecord
   attr_accessor :acting_user
-  belongs_to :user
+  belongs_to :company
   belongs_to :room
 
   enum :status, { confirmed: 'confirmed', cancelled: 'cancelled' }, default: :confirmed
 
-  validates :phone_number, :user_id, :room_id, :start_time, :end_time, :status, presence: true
+  validates :phone_number, :company_id, :room_id, :start_time, :end_time, :status, presence: true
   validate :start_and_end_time_validity
   validate :no_time_overlap_for_room
   validate :check_meeting_duration_limits
@@ -16,11 +16,6 @@ class Booking < ApplicationRecord
 
   after_commit :check_monthly_meeting_time_limit, on: :create
   after_commit :check_daily_meeting_time_limit, on: :create
-
-  # Helper methods for checking company limits
-  def company
-    user&.companies&.first
-  end
 
   def duration_minutes
     return 0 if start_time.blank? || end_time.blank?
@@ -36,7 +31,7 @@ class Booking < ApplicationRecord
     return 0 if company.blank? || start_time.blank?
     
     booking_month = start_time.beginning_of_month
-    Booking.joins(user: :companies)
+    Booking.joins(:company)
            .where(companies: { id: company.id })
            .where('bookings.start_time >= ? AND bookings.start_time < ?', booking_month, booking_month.next_month)
            .where.not(id: id) # Exclude current booking if updating
@@ -47,7 +42,7 @@ class Booking < ApplicationRecord
     return 0 if company.blank? || start_time.blank?
     
     booking_date = start_time.to_date
-    Booking.joins(user: :companies)
+    Booking.joins(:company)
            .where(companies: { id: company.id })
            .where('DATE(bookings.start_time) = ?', booking_date)
            .where.not(id: id) # Exclude current booking if updating
@@ -98,7 +93,7 @@ class Booking < ApplicationRecord
 
   # Helper method to check if user can override company restrictions
   def can_override_company_restrictions?
-    (acting_user || user)&.admin? || (acting_user || user)&.super_admin?
+    acting_user&.admin? || acting_user&.super_admin?
   end
 
   # Method to get all validation errors as an array
@@ -124,12 +119,12 @@ class Booking < ApplicationRecord
   def overlapping_company_bookings
     return Booking.none if company.blank? || start_time.blank? || end_time.blank? || room.blank? || room.workspace_id.blank?
 
-    Booking.joins(user: :companies, room: :workspace)
+    Booking.joins(:company, room: :workspace)
            .where(companies: { id: company.id })
            .where(rooms: { workspace_id: room.workspace_id }) # Only same workspace
            .where('bookings.start_time < ? AND bookings.end_time > ?', end_time, start_time)
            .where.not(id: id) # Exclude current booking if updating
-           .includes(:user, :room, room: :workspace)
+           .includes(:company, :room, room: :workspace)
   end
 
   # Helper method to check if company has time slot conflicts
@@ -153,9 +148,8 @@ class Booking < ApplicationRecord
   end
 
   def check_meeting_duration_limits
-    return if user.blank? || start_time.blank? || end_time.blank?
-    return unless user.user? || user.floor_user?
-    return if company.blank?
+    return if company.blank? || start_time.blank? || end_time.blank?
+    return unless acting_user&.user? || acting_user&.floor_user?
     return if can_override_company_restrictions?
     
     # Check if duration is within company limits
@@ -168,16 +162,13 @@ class Booking < ApplicationRecord
   end
 
   def check_company_time_slot_overlap
-    return if user.blank? || start_time.blank? || end_time.blank?
-    return if company.blank?
-    
-    # Allow admins and super_admins to override this restriction
+    return if company.blank? || start_time.blank? || end_time.blank?
     return if can_override_company_restrictions?
     
     # Check if the company has any other bookings in the same time slot
     if company_has_time_slot_conflicts?
       overlapping_details = overlapping_company_bookings.map do |booking|
-        "#{booking.user.name} - #{booking.room.name} (#{booking.room.workspace.name})"
+        "#{booking.company.name} - #{booking.room.name} (#{booking.room.workspace.name})"
       end.join(', ')
       
       errors.add(:base, "Your company already has a booking in this time slot: #{overlapping_details}. Please contact an administrator if you need to make this booking.")
@@ -223,8 +214,8 @@ class Booking < ApplicationRecord
   end
 
   def check_user_booking_time_restrictions
-    return if user.blank? || start_time.blank? || end_time.blank?
-    return unless user.user? || user.floor_user?
+    return if company.blank? || start_time.blank? || end_time.blank?
+    return unless acting_user&.user? || acting_user&.floor_user?
     return if can_override_company_restrictions?
 
     # Check if user has any existing bookings on the same date
@@ -244,8 +235,8 @@ class Booking < ApplicationRecord
   end
 
   def check_user_forward_booking_restrictions
-    return if user.blank? || start_time.blank? || end_time.blank?
-    return unless user.user? || user.floor_user?
+    return if company.blank? || start_time.blank? || end_time.blank?
+    return unless acting_user&.user? || acting_user&.floor_user?
     return if can_override_company_restrictions?
 
     # Check if there are any existing bookings in the same room on the same date

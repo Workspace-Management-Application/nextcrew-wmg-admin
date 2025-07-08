@@ -23,35 +23,56 @@ companies = [
     email: 'contact@srnext.in',
     phone_number: '9876543210',
     address: 'Cabin 10, Tech Park, Vijay Nagar',
-    status: 'active'
+    status: 'active',
+    cabin_number: '10A',
+    no_of_employee: 50,
+    meeting_time_limit_per_month: 1200,
+    no_of_meeting_per_day: 5,
+    meeting_time_limit_per_day: 100,
+    minimum_minutes_meeting_limit: 15,
+    max_minutes_meeting_limit: 240
   },
   {
     name: 'InnovateCorp',
     email: 'hello@innovatecorp.com',
     phone_number: '9876543211',
     address: 'Floor 3, Innovation Hub, Sapna Sangeeta',
-    status: 'active'
+    status: 'active',
+    cabin_number: '3B',
+    no_of_employee: 30,
+    meeting_time_limit_per_month: 900,
+    no_of_meeting_per_day: 4,
+    meeting_time_limit_per_day: 80,
+    minimum_minutes_meeting_limit: 10,
+    max_minutes_meeting_limit: 180
   },
   {
     name: 'StartupXYZ',
     email: 'team@startupxyz.in',
     phone_number: '9876543212',
     address: 'Coworking Space, AB Road',
-    status: 'pending'
+    status: 'pending',
+    cabin_number: '1C',
+    no_of_employee: 15,
+    meeting_time_limit_per_month: 600,
+    no_of_meeting_per_day: 3,
+    meeting_time_limit_per_day: 60,
+    minimum_minutes_meeting_limit: 10,
+    max_minutes_meeting_limit: 120
   },
   {
     name: 'TechSolutions Ltd',
     email: 'info@techsolutions.co.in',
     phone_number: '9876543213',
     address: 'Office Complex, Ring Road',
-    status: 'approved'
-  },
-  {
-    name: 'Inactive Company',
-    email: 'old@inactive.com',
-    phone_number: '9876543214',
-    address: 'Old Building, Scheme 54',
-    status: 'inactive'
+    status: 'approved',
+    cabin_number: '2D',
+    no_of_employee: 40,
+    meeting_time_limit_per_month: 1000,
+    no_of_meeting_per_day: 4,
+    meeting_time_limit_per_day: 90,
+    minimum_minutes_meeting_limit: 15,
+    max_minutes_meeting_limit: 200
   }
 ]
 
@@ -61,100 +82,44 @@ company_records = companies.map do |company_data|
   end
 end
 
-# 2. Create Users with all roles and password "123456789"
-puts "👥 Creating users with all roles..."
+# 2. Create Users (SuperAdmin, Admin, FloorUser per workspace, company users as user role)
 users_data = [
-  # Super Admin
-  {
-    email: 'superadmin@workspace.com',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Super Administrator',
-    phone_number: '+91-9000000001',
-    role: 'super_admin'
-  },
-  # Admins
-  {
-    email: 'admin@srnext.in',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'John Admin',
-    phone_number: '+91-9000000002',
-    role: 'admin'
-  },
-  {
-    email: 'admin2@innovatecorp.com',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Sarah Admin',
-    phone_number: '+91-9000000003',
-    role: 'admin'
-  },
-  # Floor Users
-  {
-    email: 'floor_user@gmail.com',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Floor Manager One',
-    phone_number: '+91-9000000004',
-    role: 'floor_user'
-  },
-  {
-    email: 'floor_user2@workspace.com',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Floor Manager Two',
-    phone_number: '+91-9000000005',
-    role: 'floor_user'
-  },
-  {
-    email: 'floor_user3@workspace.com',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Floor Manager Three',
-    phone_number: '+91-9000000006',
-    role: 'floor_user'
-  },
-  # Regular Users
-  {
-    email: 'user1@srnext.in',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Alice Employee',
-    phone_number: '+91-9000000007',
-    role: 'user'
-  },
-  {
-    email: 'user2@innovatecorp.com',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Bob Developer',
-    phone_number: '+91-9000000008',
-    role: 'user'
-  },
-  {
-    email: 'user3@startupxyz.in',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Charlie Designer',
-    phone_number: '+91-9000000009',
-    role: 'user'
-  },
-  {
-    email: 'user4@techsolutions.co.in',
-    password: '123456789',
-    password_confirmation: '123456789',
-    name: 'Diana Manager',
-    phone_number: '+91-9000000010',
-    role: 'user'
-  }
+  # Global users
+  { email: 'superadmin@workspace.com', password: '123456789', name: 'Super Administrator', phone_number: '+91-9000000001', role: 'super_admin' },
+  { email: 'admin@workspace.com', password: '123456789', name: 'Global Admin', phone_number: '+91-9000000002', role: 'admin' },
+
+  # Floor users (one per workspace)
+  { email: 'floor_user1@workspace.com', password: '123456789', name: 'Floor User 1', phone_number: '+91-9000000003', role: 'floor_user' },
+  { email: 'floor_user2@workspace.com', password: '123456789', name: 'Floor User 2', phone_number: '+91-9000000004', role: 'floor_user' },
+  { email: 'floor_user3@workspace.com', password: '123456789', name: 'Floor User 3', phone_number: '+91-9000000005', role: 'floor_user' },
+  { email: 'floor_user4@workspace.com', password: '123456789', name: 'Floor User 4', phone_number: '+91-9000000006', role: 'floor_user' },
+
+  # Company users (one per company, role: 'user')
+  { email: 'user1@srnext.in', password: '123456789', name: 'SR Next User', phone_number: '+91-9000000010', role: 'user' },
+  { email: 'user1@innovatecorp.com', password: '123456789', name: 'InnovateCorp User', phone_number: '+91-9000000011', role: 'user' },
+  { email: 'user1@startupxyz.in', password: '123456789', name: 'StartupXYZ User', phone_number: '+91-9000000012', role: 'user' },
+  { email: 'user1@techsolutions.co.in', password: '123456789', name: 'TechSolutions User', phone_number: '+91-9000000013', role: 'user' }
 ]
+
+user_company_map = {
+  'user1@srnext.in' => 'SR Next Technologies',
+  'user1@innovatecorp.com' => 'InnovateCorp',
+  'user1@startupxyz.in' => 'StartupXYZ',
+  'user1@techsolutions.co.in' => 'TechSolutions Ltd'
+}
 
 user_records = users_data.map do |user_data|
   User.find_or_create_by!(email: user_data[:email]) do |user|
     user.assign_attributes(user_data)
     user.confirmed_at = Time.current # Auto-confirm users
   end
+end
+
+# After user_records and company_records are created
+# Only associate users with role 'user' to companies
+user_records.select { |u| u.role == 'user' }.each do |user|
+  company = company_records.find { |c| c.name == user_company_map[user.email] }
+  CompanyUser.find_or_create_by!(company: company, user: user) if company
 end
 
 # 3. Create Workspaces (after users so super_admin callback works)
@@ -313,59 +278,21 @@ company_room_associations.each do |assoc|
   CompanyRoom.find_or_create_by!(company: assoc[:company], room: assoc[:room])
 end
 
-# 9. Create Bookings with different statuses
+# 9. Create Bookings for Companies (not users)
 puts "📅 Creating bookings..."
 base_date = Date.current.beginning_of_day
 bookings_data = [
-  {
-    phone_number: '+91-9000000007',
-    user: user_records[6], # Alice Employee (SR Next)
-    room: room_records[0], # Tesla (Floor 5 - SR Next workspace)
-    start_time: base_date + 1.day + 9.hours,
-    end_time: base_date + 1.day + 11.hours,
-    status: 'confirmed'
-  },
-  {
-    phone_number: '+91-9000000008',
-    user: user_records[7], # Bob Developer (InnovateCorp)
-    room: room_records[6], # Boardroom Alpha (Floor 3 - InnovateCorp workspace)
-    start_time: base_date + 1.day + 14.hours,
-    end_time: base_date + 1.day + 16.hours,
-    status: 'confirmed'
-  },
-  {
-    phone_number: '+91-9000000009',
-    user: user_records[8], # Charlie Designer (StartupXYZ)
-    room: room_records[10], # Conference One (Ground Floor - StartupXYZ workspace)
-    start_time: base_date + 2.days + 10.hours,
-    end_time: base_date + 2.days + 12.hours,
-    status: 'confirmed'
-  },
-  {
-    phone_number: '+91-9000000010',
-    user: user_records[9], # Diana Manager (TechSolutions)
-    room: room_records[13], # Executive Suite (Floor 2 - TechSolutions workspace)
-    start_time: base_date + 2.days + 15.hours,
-    end_time: base_date + 2.days + 17.hours,
-    status: 'cancelled'
-  },
-  {
-    phone_number: '+91-9000000007',
-    user: user_records[6], # Alice Employee (SR Next)
-    room: room_records[3], # Alto (Floor 5 - SR Next workspace)
-    start_time: base_date + 3.days + 9.hours,
-    end_time: base_date + 3.days + 10.hours,
-    status: 'confirmed'
-  }
+  { phone_number: '+91-9000000007', company: company_records[0], room: room_records[0], start_time: base_date + 1.day + 9.hours, end_time: base_date + 1.day + 11.hours, status: 'confirmed' },
+  { phone_number: '+91-9000000008', company: company_records[1], room: room_records[6], start_time: base_date + 1.day + 14.hours, end_time: base_date + 1.day + 16.hours, status: 'confirmed' }
 ]
 
 bookings_data.each do |booking_data|
   Booking.find_or_create_by!(
-    user: booking_data[:user],
+    company: booking_data[:company],
     room: booking_data[:room],
     start_time: booking_data[:start_time]
   ) do |booking|
-    booking.assign_attributes(booking_data.except(:user, :room))
+    booking.assign_attributes(booking_data.except(:company, :room))
   end
 end
 
@@ -425,28 +352,32 @@ office_enquiries_data = [
     enquirer_name: 'Rohit Agarwal',
     phone_number: '+91-9234567890',
     email: 'rohit@newstartup.com',
-    company_name: 'New Startup Pvt Ltd'
+    company_name: 'New Startup Pvt Ltd',
+    no_of_seats: 5
   },
   {
     workspace: workspace_records[1],
     enquirer_name: 'Kavita Singh',
     phone_number: '+91-9234567891',
     email: 'kavita@expandingbiz.com',
-    company_name: 'Expanding Business Co'
+    company_name: 'Expanding Business Co',
+    no_of_seats: 8
   },
   {
     workspace: workspace_records[2],
     enquirer_name: 'Vikram Rao',
     phone_number: '+91-9234567892',
     email: 'vikram@freelancer.in',
-    company_name: 'Freelancer'
+    company_name: 'Freelancer',
+    no_of_seats: 2
   },
   {
     workspace: workspace_records[0],
     enquirer_name: 'Anita Joshi',
     phone_number: '+91-9234567893',
     email: 'anita@consultancy.com',
-    company_name: 'Consultancy Services Ltd'
+    company_name: 'Consultancy Services Ltd',
+    no_of_seats: 10
   }
 ]
 

@@ -30,29 +30,42 @@ class Admin::UsersController < Admin::BaseController
 
   def new
     @user = User.new
+    @workspaces = Workspace.all
   end
 
   def create
     @user = User.new(user_params)
     @user.password = params[:user][:password] if params[:user][:password].present?
-    
     if @user.save
+      # Assign workspace if selected
+      if params[:user][:workspace_id].present?
+        @user.user_workspaces.create(workspace_id: params[:user][:workspace_id])
+      end
       redirect_to admin_users_path, notice: 'User was successfully created.'
     else
+      @workspaces = Workspace.all
       render :new
     end
   end
 
   def edit
+    @workspaces = Workspace.all
   end
 
   def update
     user_update_params = user_params
     user_update_params[:password] = params[:user][:password] if params[:user][:password].present?
-    
     if @user.update(user_update_params)
+      # Update workspace assignment
+      if params[:user][:workspace_id].present?
+        @user.user_workspaces.destroy_all
+        @user.user_workspaces.create(workspace_id: params[:user][:workspace_id])
+      else
+        @user.user_workspaces.destroy_all
+      end
       redirect_to admin_user_path(@user), notice: 'User was successfully updated.'
     else
+      @workspaces = Workspace.all
       render :edit
     end
   end

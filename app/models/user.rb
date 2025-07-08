@@ -10,7 +10,6 @@ class User < ApplicationRecord
   has_many :companies, through: :company_users
   has_many :user_workspaces
   has_many :workspaces, through: :user_workspaces
-  has_many :bookings
 
   # Enum declaration with a default value
   enum :role, { super_admin: 'super_admin', admin: 'admin', floor_user: 'floor_user', user: 'user' }, default: :user
