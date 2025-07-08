@@ -159,9 +159,9 @@ class Admin::CompaniesController < Admin::BaseController
   def calculate_usage_analytics(company)
     {
       total_users: company.users.count,
-      total_bookings: company.users.joins(:bookings).count,
-      this_month_bookings: company.users.joins(:bookings).where(bookings: { created_at: Date.current.beginning_of_month..Date.current.end_of_month }).count,
-      active_users: company.users.joins(:bookings).where(bookings: { created_at: 30.days.ago..Date.current }).distinct.count
+      total_bookings: company.bookings.count,
+      this_month_bookings: company.bookings.where(created_at: Date.current.beginning_of_month..Date.current.end_of_month).count,
+      active_users: company.users.joins(:company_users).where(company_users: { company_id: company.id }).count
     }
   end
 

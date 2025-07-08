@@ -29,7 +29,7 @@ class Admin::BookingsController < Admin::BaseController
     end
     
     # Order by start time descending
-    @bookings = @bookings.order(start_time: :desc)
+    @bookings = @bookings.order(start_time: :asc)
     
     # Pagination
     @bookings = @bookings.page(params[:page]).per(15)
@@ -41,7 +41,7 @@ class Admin::BookingsController < Admin::BaseController
   def new
     @booking = Booking.new
     @companies = Company.all
-    @rooms = Room.all
+    @rooms = [] # Start with empty rooms, will be populated via JavaScript
   end
 
   def create
@@ -68,11 +68,21 @@ class Admin::BookingsController < Admin::BaseController
   end
 
   def edit
+    unless @booking.editable?
+      redirect_to admin_booking_path(@booking), alert: 'Cannot edit completed bookings.'
+      return
+    end
+    
     @companies = Company.all
-    @rooms = Room.all
+    @rooms = @booking.company.rooms.includes(:workspace) # Load rooms for the current company
   end
 
   def update
+    unless @booking.editable?
+      redirect_to admin_booking_path(@booking), alert: 'Cannot update completed bookings.'
+      return
+    end
+    
     @booking.acting_user = current_user
     if @booking.update(booking_params)
       redirect_to admin_booking_path(@booking), notice: 'Booking was successfully updated.'
@@ -86,6 +96,17 @@ class Admin::BookingsController < Admin::BaseController
   def destroy
     @booking.destroy
     redirect_to admin_bookings_path, notice: 'Booking was successfully cancelled.'
+  end
+
+  def company_rooms
+    company = Company.find(params[:company_id])
+    rooms = company.rooms.includes(:workspace).map do |room|
+      {
+        id: room.id,
+        name: "#{room.name} - #{room.workspace.name}"
+      }
+    end
+    render json: rooms
   end
 
   private

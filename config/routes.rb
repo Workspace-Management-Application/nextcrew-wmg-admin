@@ -47,7 +47,11 @@ Rails.application.routes.draw do
     end
     
     resources :rooms, only: [:index, :show]
-    resources :bookings
+    resources :bookings do
+      collection do
+        get :company_rooms
+      end
+    end
     resources :companies do
       member do
         post :add_room

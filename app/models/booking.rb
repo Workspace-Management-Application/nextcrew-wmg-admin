@@ -96,6 +96,14 @@ class Booking < ApplicationRecord
     acting_user&.admin? || acting_user&.super_admin?
   end
 
+  def completed?
+    end_time.present? && end_time < Time.current
+  end
+
+  def editable?
+    !completed?
+  end
+
   # Method to get all validation errors as an array
   def all_validation_errors
     # Run validations if not already run

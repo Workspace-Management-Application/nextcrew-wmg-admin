@@ -21,19 +21,19 @@
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :user_id, "User", class: "form-label" %>
-          <%= form.select :user_id, 
-                          options_from_collection_for_select(@users, :id, ->(user) { "#{user.name} (#{user.email})" }), 
-                          { prompt: 'Select User' }, 
-                          { class: "form-select", required: true } %>
+          <%= form.label :company_id, "Company", class: "form-label" %>
+          <%= form.select :company_id, 
+                          options_from_collection_for_select(@companies, :id, ->(company) { "#{company.name} (#{company.email})" }), 
+                          { prompt: 'Select Company' }, 
+                          { class: "form-select", required: true, id: "company_select" } %>
         </div>
         
         <div class="col-md-6 mb-3">
           <%= form.label :room_id, "Room", class: "form-label" %>
           <%= form.select :room_id, 
-                          options_from_collection_for_select(@rooms, :id, ->(room) { "#{room.name} - #{room.workspace.name}" }), 
-                          { prompt: 'Select Room' }, 
-                          { class: "form-select", required: true } %>
+                          options_for_select([]), 
+                          { prompt: 'Select Company First' }, 
+                          { class: "form-select", required: true, id: "room_select", disabled: true } %>
         </div>
       </div>
 
@@ -61,3 +61,48 @@
     <% end %>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const companySelect = document.getElementById('company_select');
+  const roomSelect = document.getElementById('room_select');
+
+  companySelect.addEventListener('change', function() {
+    const companyId = this.value;
+    
+    if (companyId) {
+      // Enable room dropdown and show loading
+      roomSelect.disabled = false;
+      roomSelect.innerHTML = '<option value="">Loading rooms...</option>';
+      
+      // Fetch rooms for the selected company
+      fetch(`<%= company_rooms_admin_bookings_path %>?company_id=${companyId}`)
+        .then(response => response.json())
+        .then(rooms => {
+          // Clear existing options
+          roomSelect.innerHTML = '<option value="">Select Room</option>';
+          
+          // Add room options
+          rooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room.id;
+            option.textContent = room.name;
+            roomSelect.appendChild(option);
+          });
+          
+          if (rooms.length === 0) {
+            roomSelect.innerHTML = '<option value="">No rooms available for this company</option>';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching rooms:', error);
+          roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+        });
+    } else {
+      // Reset room dropdown
+      roomSelect.disabled = true;
+      roomSelect.innerHTML = '<option value="">Select Company First</option>';
+    }
+  });
+});
+</script>

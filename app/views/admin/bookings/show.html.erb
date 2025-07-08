@@ -3,7 +3,9 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h2>Booking Details</h2>
   <div>
-    <%= link_to "Edit", edit_admin_booking_path(@booking), class: "btn btn-primary me-2" %>
+    <% if @booking.editable? %>
+      <%= link_to "Edit", edit_admin_booking_path(@booking), class: "btn btn-primary me-2" %>
+    <% end %>
     <%= link_to "← Back to Bookings", admin_bookings_path, class: "btn btn-outline-primary" %>
   </div>
 </div>
@@ -14,8 +16,8 @@
       <h4 class="mb-3">Booking Information</h4>
       <div class="row">
         <div class="col-md-6">
-          <p><strong>User:</strong> <%= @booking.user.name %></p>
-          <p><strong>Email:</strong> <%= @booking.user.email %></p>
+          <p><strong>Company:</strong> <%= @booking.company.name %></p>
+          <p><strong>Company Email:</strong> <%= @booking.company.email %></p>
           <p><strong>Phone Number:</strong> <%= @booking.phone_number %></p>
           <p><strong>Room:</strong> <%= @booking.room.name %></p>
           <p><strong>Workspace:</strong> <%= @booking.room.workspace.name %></p>

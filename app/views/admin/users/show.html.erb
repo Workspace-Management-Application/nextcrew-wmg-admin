@@ -67,8 +67,8 @@
 
     <!-- User's Bookings -->
     <h4 class="mb-3">Recent Bookings</h4>
-    <% recent_bookings = @user.bookings.includes(:room).order(created_at: :desc).limit(5) %>
-    <% if recent_bookings.any? %>
+    <% recent_bookings = Booking.where(company_id: @user.companies.ids).includes(:room).order(created_at: :desc).limit(5) if @user.companies.any? %>
+    <% if recent_bookings&.any? %>
       <div class="table-responsive">
         <table class="table table-hover table-dark">
           <thead>
@@ -100,7 +100,7 @@
         </table>
       </div>
     <% else %>
-      <p class="text-muted">No bookings found for this user.</p>
+      <p class="text-muted">No bookings found for this user's company.</p>
     <% end %>
   </div>
 
@@ -115,18 +115,21 @@
     <div class="bg-dark p-4 rounded">
       <h5 class="mb-3">User Statistics</h5>
       
+      <% total_bookings = Booking.where(company_id: @user.companies.ids).count %>
       <div class="metric-card mb-3">
-        <div class="metric-value"><%= @user.bookings.count %></div>
+        <div class="metric-value"><%= total_bookings %></div>
         <div class="metric-label">Total Bookings</div>
       </div>
       
+      <% this_month_bookings = Booking.where(company_id: @user.companies.ids, created_at: Date.current.beginning_of_month..Date.current.end_of_month).count %>
       <div class="metric-card mb-3">
-        <div class="metric-value"><%= @user.bookings.where(created_at: Date.current.beginning_of_month..Date.current.end_of_month).count %></div>
+        <div class="metric-value"><%= this_month_bookings %></div>
         <div class="metric-label">This Month Bookings</div>
       </div>
       
+      <% last_30_days_bookings = Booking.where(company_id: @user.companies.ids, created_at: 30.days.ago..Date.current).count %>
       <div class="metric-card">
-        <div class="metric-value"><%= @user.bookings.where(created_at: 30.days.ago..Date.current).count %></div>
+        <div class="metric-value"><%= last_30_days_bookings %></div>
         <div class="metric-label">Last 30 Days</div>
       </div>
     </div>

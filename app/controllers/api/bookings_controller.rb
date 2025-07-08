@@ -19,25 +19,28 @@ class Api::BookingsController < Api::BaseController
 
   # POST /api/bookings
   def create
-    booking = current_user.bookings.new(booking_params)
-    unless @workspace.rooms.exists?(id: booking.room_id)
+    company = Company.find_by(id: booking_params[:company_id])
+    unless company
+      return render_error('Company not found', :unprocessable_entity)
+    end
+
+    @booking = Booking.new(booking_params)
+    @booking.company = company
+    @booking.acting_user = current_user
+
+    unless @workspace.rooms.exists?(id: @booking.room_id)
       return render_error('Room does not belong to this workspace', :unprocessable_entity)
     end
-    if booking.save
-      # Send booking confirmation email
+
+    if @booking.save
       begin
-        BookingMailer.booking_confirmation(booking).deliver_now
+        BookingMailer.booking_confirmation(@booking).deliver_now
       rescue => e
         Rails.logger.error "Failed to send booking confirmation email: #{e.message}"
-        # Don't fail the booking creation if email fails
       end
-      
-      # Note: Monthly limit exceeded notification is automatically sent by the model validation
-      # if the company exceeds their monthly limit
-      
-      render_success(booking, 'Booking created successfully', :created)
+      render_success(@booking, 'Booking created successfully', :created)
     else
-      render_error(booking.all_validation_errors)
+      render_error(@booking.all_validation_errors)
     end
   end
 
@@ -47,6 +50,7 @@ class Api::BookingsController < Api::BaseController
       if booking_params[:room_id] && !@workspace.rooms.exists?(id: booking_params[:room_id])
         return render_error('Room does not belong to this workspace', :unprocessable_entity)
       end
+      @booking.acting_user = current_user
       if @booking.update(booking_params)
         render_success(@booking, 'Booking updated successfully')
       else
@@ -79,6 +83,6 @@ class Api::BookingsController < Api::BaseController
   end
 
   def booking_params
-    params.require(:booking).permit(:booker_name, :phone_number, :room_id, :start_time, :end_time, :status)
+    params.require(:booking).permit(:company_id, :booker_name, :phone_number, :room_id, :start_time, :end_time, :status)
   end
 end
