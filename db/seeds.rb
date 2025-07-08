@@ -51,7 +51,7 @@ companies = [
     email: 'team@startupxyz.in',
     phone_number: '9876543212',
     address: 'Coworking Space, AB Road',
-    status: 'pending',
+    status: 'active',
     cabin_number: '1C',
     no_of_employee: 15,
     meeting_time_limit_per_month: 600,
@@ -65,7 +65,7 @@ companies = [
     email: 'info@techsolutions.co.in',
     phone_number: '9876543213',
     address: 'Office Complex, Ring Road',
-    status: 'approved',
+    status: 'inactive',
     cabin_number: '2D',
     no_of_employee: 40,
     meeting_time_limit_per_month: 1000,
@@ -178,23 +178,10 @@ company_workspace_associations.each do |assoc|
   CompanyWorkspace.find_or_create_by!(company: assoc[:company], workspace: assoc[:workspace])
 end
 
-# 5. Create Company-User associations
+# 5. Create Company-User associations (Only for users with role 'user')
 puts "👤 Creating company-user associations..."
-company_user_associations = [
-  { company: company_records[0], user: user_records[1] }, # admin@srnext
-  { company: company_records[0], user: user_records[3] }, # floor_user@gmail
-  { company: company_records[0], user: user_records[6] }, # user1@srnext
-  { company: company_records[1], user: user_records[2] }, # admin2@innovatecorp
-  { company: company_records[1], user: user_records[4] }, # floor_user2
-  { company: company_records[1], user: user_records[7] }, # user2@innovatecorp
-  { company: company_records[2], user: user_records[5] }, # floor_user3
-  { company: company_records[2], user: user_records[8] }, # user3@startupxyz
-  { company: company_records[3], user: user_records[9] }  # user4@techsolutions
-]
-
-company_user_associations.each do |assoc|
-  CompanyUser.find_or_create_by!(company: assoc[:company], user: assoc[:user])
-end
+# The associations are already created above in the user creation section
+# This section is redundant and has been removed to avoid duplicate associations
 
 # 6. Create User-Workspace associations (Regular users belong to their company's workspace)
 # Note: Super admin users are already associated with ALL workspaces via the after_create callback

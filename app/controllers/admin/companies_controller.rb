@@ -51,8 +51,8 @@ class Admin::CompaniesController < Admin::BaseController
 
   def create
     @company = Company.new(company_params)
-    # Ensure new companies have pending status by default
-    @company.status = 'pending' unless current_user.super_admin?
+    # All new companies default to active status
+    @company.status = 'active'
     
     if @company.save
       redirect_to admin_companies_path, notice: 'Company was successfully created.'
@@ -65,12 +65,10 @@ class Admin::CompaniesController < Admin::BaseController
   end
 
   def update
-    # Handle status authorization
-    if company_params[:status].present?
-      unless can_change_company_status?(@company, company_params[:status])
-        redirect_to edit_admin_company_path(@company), alert: 'You are not authorized to make this status change.'
-        return
-      end
+    # Only super_admin can change status
+    if company_params[:status].present? && !current_user.super_admin?
+      redirect_to edit_admin_company_path(@company), alert: 'Only Super Admin can change company status.'
+      return
     end
     
     if @company.update(company_params)
@@ -121,16 +119,14 @@ class Admin::CompaniesController < Admin::BaseController
   def quick_status_change
     @company = Company.find(params[:id])
     
-    if current_user.super_admin? && @company.status != 'active'
-      # Super admin can activate any non-active company
-      @company.update(status: 'active')
-      redirect_to admin_companies_path, notice: "Company '#{@company.name}' has been activated successfully."
-    elsif current_user.admin? && @company.status == 'active'
-      # Admin can only deactivate active companies
-      @company.update(status: 'inactive')
-      redirect_to admin_companies_path, notice: "Company '#{@company.name}' has been deactivated successfully."
+    if current_user.super_admin?
+      # Super admin can toggle between active and inactive
+      new_status = @company.status == 'active' ? 'inactive' : 'active'
+      @company.update(status: new_status)
+      status_text = new_status == 'active' ? 'activated' : 'deactivated'
+      redirect_to admin_companies_path, notice: "Company '#{@company.name}' has been #{status_text} successfully."
     else
-      redirect_to admin_companies_path, alert: "You are not authorized to make this status change."
+      redirect_to admin_companies_path, alert: "Only Super Admin can change company status."
     end
   end
 
@@ -143,14 +139,9 @@ class Admin::CompaniesController < Admin::BaseController
   def company_params
     permitted_params = [:name, :email, :phone_number, :address, :cabin_number, :no_of_employee, :meeting_time_limit_per_month, :no_of_meeting_per_day, :meeting_time_limit_per_day, :minimum_minutes_meeting_limit, :max_minutes_meeting_limit]
     
-    # Only allow status parameter for super_admin or admin with restrictions
+    # Only super_admin can change status
     if current_user.super_admin?
       permitted_params << :status
-    elsif current_user.admin?
-      # Admin can only change status if it's from active to inactive
-      if params[:company][:status].present? && @company&.status == 'active' && params[:company][:status] == 'inactive'
-        permitted_params << :status
-      end
     end
     
     params.require(:company).permit(permitted_params)
@@ -165,14 +156,5 @@ class Admin::CompaniesController < Admin::BaseController
     }
   end
 
-  def can_change_company_status?(company, new_status)
-    return true if current_user.super_admin?
-    
-    if current_user.admin?
-      # Admin can only change from active to inactive
-      return company.status == 'active' && new_status == 'inactive'
-    end
-    
-    false
-  end
+  # This method is no longer needed as only super_admin can change status
 end

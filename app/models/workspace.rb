@@ -15,6 +15,9 @@ class Workspace < ApplicationRecord
 
   validates :name, :building_name, :address, :city, :pincode, presence: true
   validates :is_active, inclusion: { in: [true, false] }
+  
+  # Set default value for is_active
+  attribute :is_active, :boolean, default: true
 
   # Callbacks
   after_create :associate_super_admins

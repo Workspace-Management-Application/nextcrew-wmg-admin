@@ -8,7 +8,7 @@ class Company < ApplicationRecord
   has_many :rooms, through: :company_rooms
   has_many :bookings
 
-  enum :status, { active: 'active', inactive: 'inactive', pending: 'pending', approved: 'approved' }, default: :pending
+  enum :status, { active: 'active', inactive: 'inactive' }, default: :active
 
   validates :name, :email, :phone_number, :address, :cabin_number, :no_of_employee, :meeting_time_limit_per_month, :no_of_meeting_per_day, :meeting_time_limit_per_day, :minimum_minutes_meeting_limit, :max_minutes_meeting_limit, presence: true
   validates :phone_number, uniqueness: true

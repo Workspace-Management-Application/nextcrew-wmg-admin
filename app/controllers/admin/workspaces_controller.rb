@@ -36,6 +36,7 @@ class Admin::WorkspacesController < Admin::BaseController
 
   def create
     @workspace = Workspace.new(workspace_params.except(:photo))
+    @workspace.is_active = true # Set to active by default
     
     if @workspace.save
       # Handle photo upload using Active Storage with auto folder organization
