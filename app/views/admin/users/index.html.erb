@@ -3,12 +3,13 @@
 <div class="content-area bg-dark text-white p-4 rounded">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Users</h2>
-    <%= link_to "Add User", new_admin_user_path, class: "btn btn-primary" %>
+    <%= link_to "Add User", new_admin_user_path, data: { turbo: false }, class: "btn btn-primary" %>
   </div>
 
   <!-- Search and Filter Form -->
   <div class="row mb-4">
     <div class="col-md-8">
+      <label class="form-label">Search Users</label>
       <%= form_with url: admin_users_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
         <%= form.text_field :search, value: @search, placeholder: "Search by name, email, or role...", 
                            class: "form-control", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;" %>
@@ -19,6 +20,7 @@
       <% end %>
     </div>
     <div class="col-md-4">
+      <label class="form-label">Filter by Role</label>
       <%= form_with url: admin_users_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
         <%= form.hidden_field :search, value: @search %>
         <%= form.select :role, 
@@ -43,6 +45,7 @@
           <th>Name</th>
           <th>Email</th>
           <th>Role</th>
+          <th>Company</th>
           <th>Workspace</th>
           <th>Actions</th>
         </tr>
@@ -57,9 +60,10 @@
                 <%= user.role.humanize %>
               </span>
             </td>
+            <td><%= user.companies.any? ? user.companies.pluck(:name).join(', ') : 'Not assigned' %></td>
             <td><%= user.workspaces.any? ? user.workspaces.pluck(:name).join(', ') : 'Not assigned' %></td>
             <td class="action-column">
-              <%= link_to "Edit", edit_admin_user_path(user), class: "btn btn-secondary btn-sm me-2" %>
+              <%= link_to "Edit", edit_admin_user_path(user), class: "btn btn-secondary btn-sm me-2", data: { turbo: false } %>
               <% if current_user.super_admin? && user.admin? %>
                 <%= link_to "Assign Workspace", assign_workspace_admin_user_path(user), class: "btn btn-outline-primary btn-sm me-2" %>
               <% end %>

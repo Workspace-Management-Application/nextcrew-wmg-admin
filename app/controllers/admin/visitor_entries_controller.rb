@@ -19,12 +19,8 @@ class Admin::VisitorEntriesController < Admin::BaseController
     end
     
     # Filter by date range if specified
-    if params[:date_from].present?
-      @visitor_entries = @visitor_entries.where("created_at >= ?", Date.parse(params[:date_from]).beginning_of_day)
-    end
-    
-    if params[:date_to].present?
-      @visitor_entries = @visitor_entries.where("created_at <= ?", Date.parse(params[:date_to]).end_of_day)
+    if params[:date].present?
+      @visitor_entries = @visitor_entries.where("created_at >= ?", Date.parse(params[:date]).beginning_of_day)
     end
     
     # Order by created_at (newest first)

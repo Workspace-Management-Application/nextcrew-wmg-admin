@@ -9,6 +9,7 @@
   <!-- Search Form -->
   <div class="row mb-4">
     <div class="col-md-8">
+      <label class="form-label">Search Workspaces</label>
       <%= form_with url: admin_workspaces_path, method: :get, local: true, class: "d-flex" do |form| %>
         <%= form.text_field :search, placeholder: "Search by name, building, city, address, pincode...", 
                            value: params[:search], 
@@ -20,6 +21,7 @@
       <% end %>
     </div>
     <div class="col-md-4">
+      <label class="form-label">Filter by Status</label>
       <%= form_with url: admin_workspaces_path, method: :get, local: true, class: "d-flex" do |form| %>
         <%= form.hidden_field :search, value: params[:search] %>
         <%= form.select :filter, 

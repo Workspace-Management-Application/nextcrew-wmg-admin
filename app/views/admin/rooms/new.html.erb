@@ -1,13 +1,13 @@
-<% content_for :page_title, "Add Room to #{@workspace.name}" %>
+<% content_for :page_title, "Add New Room" %>
 
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>Add New Room</h2>
-      <%= link_to "← Back to Rooms", admin_rooms_path, class: "btn btn-outline-primary" %>
+      <%= link_to "← Back to Rooms", request.referer || admin_rooms_path, class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @workspace, @room], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @room], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
       <% if @room.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@room.errors.count, "error") %> prohibited this room from being saved:</h6>
@@ -19,14 +19,28 @@
         </div>
       <% end %>
 
+      <div class="mb-3">
+        <%= form.label :workspace_id, class: "form-label" do %>
+          Workspace <span class="text-danger">*</span>
+        <% end %>
+        <%= form.select :workspace_id,
+                        options_from_collection_for_select(@workspaces, :id, :name),
+                        { prompt: 'Select Workspace' },
+                        { class: "form-select", required: true } %>
+      </div>
+
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :name, class: "form-label" %>
+          <%= form.label :name, class: "form-label" do %>
+            Name <span class="text-danger">*</span>
+          <% end %>
           <%= form.text_field :name, class: "form-control", required: true, placeholder: "e.g., Conference Room A" %>
         </div>
         
         <div class="col-md-6 mb-3">
-          <%= form.label :category, class: "form-label" %>
+          <%= form.label :category, class: "form-label" do %>
+            Category <span class="text-danger">*</span>
+          <% end %>
           <%= form.select :category, 
                           options_for_select([
                             ['Meeting Room', 'meeting_room'],
@@ -42,7 +56,9 @@
       </div>
 
       <div class="mb-3">
-        <%= form.label :capacity, class: "form-label" %>
+        <%= form.label :capacity, class: "form-label" do %>
+          Capacity <span class="text-danger">*</span>
+        <% end %>
         <%= form.number_field :capacity, class: "form-control", required: true, min: 1, placeholder: "Maximum number of people" %>
       </div>
 
@@ -73,6 +89,7 @@
       </div>
 
       <div class="mb-3">
+        <%= form.label :is_available, "Status", class: "form-label" %><span class="text-danger">*</span>
         <div class="form-check">
           <%= form.check_box :is_available, { class: "form-check-input" }, true, false %>
           <%= form.label :is_available, "Active", class: "form-check-label" %>
@@ -81,7 +98,7 @@
 
       <div class="d-flex gap-2">
         <%= form.submit "Create Room", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_rooms_path, class: "btn btn-secondary" %>
+        <%= link_to "Cancel", request.referer || admin_rooms_path, class: "btn btn-secondary" %>
       </div>
     <% end %>
   </div>

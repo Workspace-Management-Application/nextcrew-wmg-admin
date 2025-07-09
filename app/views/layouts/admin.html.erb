@@ -130,7 +130,7 @@
     <!-- Sidebar -->
     <div class="sidebar show" id="sidebar">
       <div class="sidebar-header d-flex align-items-center justify-content-between">
-        <h4 class="sidebar-title mb-0">Admin Panel</h4>
+        <h4 class="sidebar-title mb-0"><%= format_role_display(current_user.role) %> Panel</h4>
         <button class="sidebar-toggle btn btn-outline-light ms-2" onclick="toggleSidebar()" style="font-size: 1.5rem;">
           ☰
         </button>
@@ -144,7 +144,7 @@
         
         <%= link_to admin_workspaces_path, class: "nav-item #{'active' if controller_name == 'workspaces'}" do %>
           <span class="nav-icon">🏢</span>
-          <span class="nav-text">Workspace</span>
+          <span class="nav-text">Workspaces</span>
         <% end %>
         
         <%= link_to admin_rooms_path, class: "nav-item #{'active' if controller_name == 'rooms'}" do %>
@@ -204,7 +204,7 @@
       <!-- Top Header -->
       <header class="top-header d-flex align-items-center" style="min-height: 120px; background: #000 !important; color: #fff !important; position: relative;">
         <div class="flex-grow-1 text-center">
-          <h2 class="brand-heading fw-bold mb-1">NEXTCOWORKS</h2>
+          <h2 class="brand-heading fw-bold mb-1">NextCoworks</h2>
           <hr style="width: 60px; margin: 0.5rem auto; border-top: 2px solid #fff; opacity: 1;">
           <div style="font-family: 'Catamaran', sans-serif; font-size: 1.1rem;">Coworking Spaces</div>
           <div style="font-family: 'Catamaran', sans-serif; font-size: 1rem;">Private Cabin | Private Office | Private Desk | Shared Desk</div>
@@ -426,7 +426,6 @@
     </script>
 
     <%= yield :scripts %>
-    <%= javascript_include_tag 'application', 'data-turbo-track': 'reload', defer: true %>
     <!-- jQuery (required for Bootstrap and selectpicker) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS (required for selectpicker) -->

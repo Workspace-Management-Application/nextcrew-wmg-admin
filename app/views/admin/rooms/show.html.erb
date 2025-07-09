@@ -55,22 +55,11 @@
           <h5 class="card-title text-white">Room Photo</h5>
           
           <% if @room.photo.attached? %>
-            <%= image_tag @room.photo, class: "img-fluid rounded mb-3", alt: @room.name %>
+            <%= image_tag @room.photo, class: "img-fluid rounded", alt: @room.name %>
           <% else %>
-            <div class="text-center mb-3 p-4" style="border: 2px dashed #555; border-radius: 8px;">
+            <div class="text-center p-4" style="border: 2px dashed #555; border-radius: 8px;">
               <i class="fas fa-image fa-3x text-muted mb-2"></i>
               <p class="text-muted mb-0">No photo uploaded</p>
-            </div>
-          <% end %>
-          
-          <!-- Inline Photo Upload Form -->
-          <%= form_with model: [:admin, @workspace, @room], local: true, multipart: true, class: "photo-upload-form" do |form| %>
-            <div class="mb-3">
-              <%= form.file_field :photo, class: "form-control form-control-sm", accept: "image/*", id: "room_photo_upload" %>
-              <div class="form-text text-muted">JPG, PNG, GIF, WebP. Max 5MB.</div>
-            </div>
-            <div class="d-grid">
-              <%= form.submit "Upload Photo", class: "btn btn-outline-primary btn-sm" %>
             </div>
           <% end %>
         </div>

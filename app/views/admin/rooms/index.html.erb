@@ -2,12 +2,14 @@
 
 <div class="content-area bg-dark text-white p-4 rounded">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>All Rooms</h2>
+    <h2>Rooms</h2>
+    <%= link_to "Add Room", new_admin_room_path, class: "btn btn-primary" %>
   </div>
 
   <!-- Search Form -->
   <div class="row mb-4">
     <div class="col-md-4">
+      <label class="form-label">Search Rooms</label>
       <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
         <%= form.hidden_field :filter, value: params[:filter] if params[:filter].present? %>
         <%= form.hidden_field :availability, value: params[:availability] if params[:availability].present? %>
@@ -22,6 +24,7 @@
       <% end %>
     </div>
     <div class="col-md-3">
+      <label class="form-label">Filter by Category</label>
       <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
         <%= form.hidden_field :search, value: params[:search] if params[:search].present? %>
         <%= form.hidden_field :availability, value: params[:availability] if params[:availability].present? %>
@@ -39,6 +42,7 @@
       <% end %>
     </div>
     <div class="col-md-2">
+      <label class="form-label">Filter by Status</label>
       <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
         <%= form.hidden_field :search, value: params[:search] if params[:search].present? %>
         <%= form.hidden_field :filter, value: params[:filter] if params[:filter].present? %>
@@ -54,6 +58,7 @@
       <% end %>
     </div>
     <div class="col-md-3">
+      <label class="form-label">Filter by Workspace</label>
       <%= form_with url: admin_rooms_path, method: :get, local: true, class: "d-flex" do |form| %>
         <%= form.hidden_field :search, value: params[:search] if params[:search].present? %>
         <%= form.hidden_field :filter, value: params[:filter] if params[:filter].present? %>

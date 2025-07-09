@@ -8,6 +8,10 @@ module AdminHelper
     controller_names.include?(controller_name)
   end
 
+  def format_role_display(role)
+    role.to_s.humanize
+  end
+
   def pagination_info(collection, resource_name = nil)
     # Auto-detect resource name if not provided
     if resource_name.nil?

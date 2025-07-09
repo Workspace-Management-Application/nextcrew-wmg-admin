@@ -46,7 +46,7 @@ Rails.application.routes.draw do
       end
     end
     
-    resources :rooms, only: [:index, :show]
+    resources :rooms, only: [:index, :show, :new, :create]
     resources :bookings do
       collection do
         get :company_rooms
@@ -60,12 +60,18 @@ Rails.application.routes.draw do
         delete :remove_user
         patch :quick_status_change
       end
+      collection do
+        get :rooms_for_workspace
+      end
     end
     
     resources :users do
       member do
         get :assign_workspace
         patch :assign_workspace
+      end
+      collection do
+        get :companies_for_workspace
       end
     end
     

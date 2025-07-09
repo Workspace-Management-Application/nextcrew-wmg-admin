@@ -21,12 +21,16 @@
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :name, "Company Name", class: "form-label" %>
+          <%= form.label :name, class: "form-label" do %>
+            Company Name <span class="text-danger">*</span>
+          <% end %>
           <%= form.text_field :name, class: "form-control", required: true %>
         </div>
         
         <div class="col-md-6 mb-3">
-          <%= form.label :email, class: "form-label" %>
+          <%= form.label :email, class: "form-label" do %>
+            Email <span class="text-danger">*</span>
+          <% end %>
           <%= form.email_field :email, class: "form-control", required: true %>
         </div>
       </div>
@@ -63,54 +67,129 @@
         
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :phone_number, "Phone Number", class: "form-label" %>
+          <%= form.label :phone_number, class: "form-label" do %>
+            Phone Number <span class="text-danger">*</span>
+          <% end %>
           <%= form.telephone_field :phone_number, class: "form-control", required: true %>
         </div>
         <div class="col-md-6 mb-3">
-          <%= form.label :cabin_number, "Cabin Number", class: "form-label" %>
+          <%= form.label :cabin_number, class: "form-label" do %>
+            Cabin Number <span class="text-danger">*</span>
+          <% end %>
           <%= form.text_field :cabin_number, class: "form-control", required: true %>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :no_of_employee, "Number of Employees", class: "form-label" %>
+          <%= form.label :workspace_id, "Workspace", class: "form-label" %><span class="text-danger">*</span>
+          <%= form.select :workspace_id,
+            options_from_collection_for_select(@workspaces, :id, :name, @company.workspaces.first&.id),
+            { prompt: 'Select Workspace' },
+            { class: "form-select", id: "company_workspace_id" } %>
+        </div>
+        <div class="col-md-6 mb-3">
+          <%= form.label :room_ids, "Rooms", class: "form-label" %>
+          <%= form.collection_select :room_ids, @rooms, :id, :name, { selected: @company.rooms.pluck(:id), multiple: true }, { class: "selectpicker", multiple: true, required: true, 'data-live-search': true, title: "Select Rooms", 'data-style': 'btn-dark', id: "company_room_ids" } %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :no_of_employee, class: "form-label" do %>
+            Number of Employees <span class="text-danger">*</span>
+          <% end %>
           <%= form.number_field :no_of_employee, class: "form-control", required: true, min: 1 %>
         </div>
         <div class="col-md-6 mb-3">
-          <%= form.label :meeting_time_limit_per_month, "Meeting Time Limit per Month (minutes)", class: "form-label" %>
+          <%= form.label :meeting_time_limit_per_month, class: "form-label" do %>
+            Meeting Time Limit per Month (minutes) <span class="text-danger">*</span>
+          <% end %>
           <%= form.number_field :meeting_time_limit_per_month, class: "form-control", required: true, min: 1 %>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-3 mb-3">
-          <%= form.label :no_of_meeting_per_day, "Number of Meetings per Day", class: "form-label" %>
+          <%= form.label :no_of_meeting_per_day, class: "form-label" do %>
+            Number of Meetings per Day <span class="text-danger">*</span>
+          <% end %>
           <%= form.number_field :no_of_meeting_per_day, class: "form-control", required: true, min: 1 %>
         </div>
         <div class="col-md-3 mb-3">
-          <%= form.label :meeting_time_limit_per_day, "Daily Meeting Time Limit (minutes)", class: "form-label" %>
+          <%= form.label :meeting_time_limit_per_day, class: "form-label" do %>
+            Daily Meeting Time Limit (minutes) <span class="text-danger">*</span>
+          <% end %>
           <%= form.number_field :meeting_time_limit_per_day, class: "form-control", required: true, min: 1 %>
         </div>
         <div class="col-md-3 mb-3">
-          <%= form.label :minimum_minutes_meeting_limit, "Minimum Meeting Duration (minutes)", class: "form-label" %>
+          <%= form.label :minimum_minutes_meeting_limit, class: "form-label" do %>
+            Minimum Meeting Duration (minutes) <span class="text-danger">*</span>
+          <% end %>
           <%= form.number_field :minimum_minutes_meeting_limit, class: "form-control", required: true, min: 1 %>
         </div>
         <div class="col-md-3 mb-3">
-          <%= form.label :max_minutes_meeting_limit, "Maximum Meeting Duration (minutes)", class: "form-label" %>
+          <%= form.label :max_minutes_meeting_limit, class: "form-label" do %>
+            Maximum Meeting Duration (minutes) <span class="text-danger">*</span>
+          <% end %>
           <%= form.number_field :max_minutes_meeting_limit, class: "form-control", required: true, min: 1 %>
         </div>
       </div>
 
       <div class="mb-3">
-        <%= form.label :address, class: "form-label" %>
+        <%= form.label :address, class: "form-label" do %>
+          Address <span class="text-danger">*</span>
+        <% end %>
         <%= form.text_area :address, class: "form-control", rows: 3, required: true %>
       </div>
 
       <div class="d-flex gap-2">
         <%= form.submit "Update Company", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_company_path(@company), class: "btn btn-secondary" %>
+        <%= link_to "Cancel", request.referer || admin_company_path(@company), class: "btn btn-secondary" %>
       </div>
     <% end %>
   </div>
-</div> 
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const workspaceSelect = document.getElementById('company_workspace_id');
+  const roomSelect = document.getElementById('company_room_ids');
+
+  function loadRoomsForWorkspace(workspaceId) {
+    if (!workspaceId) {
+      roomSelect.innerHTML = '';
+      $(roomSelect).selectpicker();
+      return;
+    }
+
+    fetch(`/admin/companies/rooms_for_workspace?workspace_id=${workspaceId}`)
+      .then(response => response.json())
+      .then(data => {
+        roomSelect.innerHTML = '';
+        data.rooms.forEach(room => {
+          const option = document.createElement('option');
+          option.value = room.id;
+          option.textContent = room.name;
+          roomSelect.appendChild(option);
+          $(roomSelect).selectpicker();
+        });
+      })
+      .catch(error => {
+        console.error('Error loading rooms:', error);
+        roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+        $(roomSelect).selectpicker();
+      });
+  }
+
+  // Event listener for workspace change
+  workspaceSelect.addEventListener('change', function() {
+    loadRoomsForWorkspace(this.value);
+  });
+
+  // Load rooms if workspace is already set
+  if (workspaceSelect.value) {
+    loadRoomsForWorkspace(workspaceSelect.value);
+  }
+});
+</script> 

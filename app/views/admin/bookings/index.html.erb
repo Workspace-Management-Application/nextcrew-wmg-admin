@@ -3,7 +3,7 @@
 <div class="content-area bg-dark text-white p-4 rounded">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Bookings</h2>
-    <%= link_to "Create Booking", new_admin_booking_path, class: "btn btn-primary" %>
+    <%= link_to "Create Booking", new_admin_booking_path, data: { turbo: false }, class: "btn btn-primary" %>
   </div>
 
   <!-- Search and Filters -->
@@ -11,23 +11,25 @@
     <%= form_with url: admin_bookings_path, method: :get, local: true, class: "row g-3" do |form| %>
       <div class="col-md-4">
         <%= form.label :search, "Search", class: "form-label" %>
-        <%= form.text_field :search, placeholder: "Search by company, room, phone...", 
-                           value: params[:search], 
-                           class: "form-control form-control-dark" %>
+        <div class="d-flex">
+          <%= form.text_field :search, placeholder: "Search by company, room, phone...", 
+                             value: params[:search], 
+                             class: "form-control form-control-dark me-2" %>
+          <%= form.submit "Search/Filter", class: "btn btn-outline-primary" %>
+        </div>
       </div>
       <div class="col-md-2">
         <%= form.label :date, "Filter by Date", class: "form-label" %>
-        <%= form.date_field :date, value: params[:date], class: "form-control form-control-dark" %>
+        <%= form.date_field :date, value: params[:date], class: "form-control form-control-dark", onchange: "this.form.submit();" %>
       </div>
       <div class="col-md-3">
         <%= form.label :workspace_id, "Filter by Workspace", class: "form-label" %>
         <%= form.select :workspace_id, 
                         options_from_collection_for_select(Workspace.all, :id, :name, params[:workspace_id]), 
                         { prompt: 'All Workspaces' }, 
-                        { class: "form-select" } %>
+                        { class: "form-select", onchange: "this.form.submit();" } %>
       </div>
       <div class="col-md-3 d-flex align-items-end">
-        <%= form.submit "Search/Filter", class: "btn btn-outline-primary me-2" %>
         <%= link_to "Clear", admin_bookings_path, class: "btn btn-secondary" %>
       </div>
     <% end %>
@@ -79,12 +81,14 @@
               <% if booking.editable? %>
                 <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-secondary btn-sm me-2" %>
               <% end %>
-              <%= link_to "Cancel", admin_booking_path(booking), 
-                          data: { 
-                            turbo_method: :delete, 
-                            turbo_confirm: "Are you sure you want to cancel this booking?" 
-                          },
-                          class: "btn btn-danger btn-sm" %>
+              <% unless booking.end_time && booking.end_time < Time.current %>
+                <%= link_to "Cancel", admin_booking_path(booking), 
+                            data: { 
+                              turbo_method: :delete, 
+                              turbo_confirm: "Are you sure you want to cancel this booking?" 
+                            },
+                            class: "btn btn-danger btn-sm" %>
+              <% end %>
             </td>
           </tr>
         <% end %>

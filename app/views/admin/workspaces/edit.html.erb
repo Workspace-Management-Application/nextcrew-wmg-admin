@@ -21,35 +21,45 @@
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :name, class: "form-label" %>
+          <%= form.label :name, class: "form-label" do %>
+            Name <span class="text-danger">*</span>
+          <% end %>
           <%= form.text_field :name, class: "form-control", required: true %>
         </div>
         
         <div class="col-md-6 mb-3">
-          <%= form.label :building_name, class: "form-label" %>
+          <%= form.label :building_name, class: "form-label" do %>
+            Building Name <span class="text-danger">*</span>
+          <% end %>
           <%= form.text_field :building_name, class: "form-control", required: true %>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :city, class: "form-label" %>
+          <%= form.label :city, class: "form-label" do %>
+            City <span class="text-danger">*</span>
+          <% end %>
           <%= form.text_field :city, class: "form-control", required: true %>
         </div>
         
         <div class="col-md-6 mb-3">
-          <%= form.label :pincode, class: "form-label" %>
+          <%= form.label :pincode, class: "form-label" do %>
+            Pincode <span class="text-danger">*</span>
+          <% end %>
           <%= form.text_field :pincode, class: "form-control", required: true %>
         </div>
       </div>
 
       <div class="mb-3">
-        <%= form.label :address, class: "form-label" %>
+        <%= form.label :address, class: "form-label" do %>
+          Address <span class="text-danger">*</span>
+        <% end %>
         <%= form.text_area :address, class: "form-control", rows: 3, required: true %>
       </div>
 
       <div class="mb-3">
-        <%= form.label :workspace_type_ids, "Workspace Types", class: "form-label" %>
+        <%= form.label :workspace_type_ids, "Workspace Types", class: "form-label" %><span class="text-danger">*</span>
         <div class="form-text mb-2">Select one or more workspace types for this workspace</div>
         <div class="row">
           <% WorkspaceType.order(:name).each do |workspace_type| %>
@@ -77,7 +87,7 @@
 
       <div class="d-flex gap-2">
         <%= form.submit "Update Workspace", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_workspaces_path, class: "btn btn-secondary" %>
+        <%= link_to "Cancel", admin_workspace_path(@workspace), class: "btn btn-secondary" %>
       </div>
     <% end %>
   </div>

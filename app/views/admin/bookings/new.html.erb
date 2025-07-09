@@ -21,7 +21,9 @@
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :company_id, "Company", class: "form-label" %>
+          <%= form.label :company_id, class: "form-label" do %>
+            Company <span class="text-danger">*</span>
+          <% end %>
           <%= form.select :company_id, 
                           options_from_collection_for_select(@companies, :id, ->(company) { "#{company.name} (#{company.email})" }), 
                           { prompt: 'Select Company' }, 
@@ -29,7 +31,9 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <%= form.label :room_id, "Room", class: "form-label" %>
+          <%= form.label :room_id, class: "form-label" do %>
+            Room <span class="text-danger">*</span>
+          <% end %>
           <%= form.select :room_id, 
                           options_for_select([]), 
                           { prompt: 'Select Company First' }, 
@@ -38,25 +42,31 @@
       </div>
 
       <div class="mb-3">
-        <%= form.label :phone_number, class: "form-label" %>
+        <%= form.label :phone_number, class: "form-label" do %>
+          Phone Number <span class="text-danger">*</span>
+        <% end %>
         <%= form.telephone_field :phone_number, class: "form-control", required: true, placeholder: "Enter phone number" %>
       </div>
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :start_time, class: "form-label" %>
+          <%= form.label :start_time, class: "form-label" do %>
+            Start Time <span class="text-danger">*</span>
+          <% end %>
           <%= form.datetime_local_field :start_time, class: "form-control", required: true %>
         </div>
         
         <div class="col-md-6 mb-3">
-          <%= form.label :end_time, class: "form-label" %>
+          <%= form.label :end_time, class: "form-label" do %>
+            End Time <span class="text-danger">*</span>
+          <% end %>
           <%= form.datetime_local_field :end_time, class: "form-control", required: true %>
         </div>
       </div>
 
       <div class="d-flex gap-2">
         <%= form.submit "Create Booking", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_bookings_path, class: "btn btn-secondary" %>
+        <%= link_to "Cancel", request.referer || admin_bookings_path, class: "btn btn-secondary" %>
       </div>
     <% end %>
   </div>

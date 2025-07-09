@@ -41,6 +41,12 @@ class Admin::UsersController < Admin::BaseController
       if params[:user][:workspace_id].present?
         @user.user_workspaces.create(workspace_id: params[:user][:workspace_id])
       end
+      
+      # Assign company if selected (for user role)
+      if params[:user][:company_id].present? && @user.user?
+        @user.company_users.create(company_id: params[:user][:company_id])
+      end
+      
       redirect_to admin_users_path, notice: 'User was successfully created.'
     else
       @workspaces = Workspace.all
@@ -63,6 +69,17 @@ class Admin::UsersController < Admin::BaseController
       else
         @user.user_workspaces.destroy_all
       end
+      
+      # Update company assignment (for user role)
+      if @user.user?
+        if params[:user][:company_id].present?
+          @user.company_users.destroy_all
+          @user.company_users.create(company_id: params[:user][:company_id])
+        else
+          @user.company_users.destroy_all
+        end
+      end
+      
       redirect_to admin_user_path(@user), notice: 'User was successfully updated.'
     else
       @workspaces = Workspace.all
@@ -73,6 +90,16 @@ class Admin::UsersController < Admin::BaseController
   def destroy
     @user.destroy
     redirect_to admin_users_path, notice: 'User was successfully deleted.'
+  end
+
+  # API endpoint to get companies for a specific workspace
+  def companies_for_workspace
+    workspace_id = params[:workspace_id]
+    companies = Company.joins(:company_workspaces)
+                      .where(company_workspaces: { workspace_id: workspace_id })
+                      .order(:name)
+    
+    render json: { companies: companies.map { |c| { id: c.id, name: c.name } } }
   end
 
   # Super Admin only - assign workspace to admin users

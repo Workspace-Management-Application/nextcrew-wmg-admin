@@ -38,7 +38,7 @@ class Admin::CompaniesController < Admin::BaseController
     end
     
     # Get available users (role 'user' and not assigned to any company)
-    @available_users = User.where(role: ['user', 'floor_user'])
+    @available_users = User.where(role: ['user'])
                           .left_joins(:company_users)
                           .where(company_users: { id: nil })
 
@@ -47,6 +47,7 @@ class Admin::CompaniesController < Admin::BaseController
 
   def new
     @company = Company.new
+    @workspaces = Workspace.order(:name)
   end
 
   def create
@@ -55,13 +56,28 @@ class Admin::CompaniesController < Admin::BaseController
     @company.status = 'active'
     
     if @company.save
+      # Assign workspace if selected
+      if params[:company][:workspace_id].present?
+        @company.company_workspaces.create(workspace_id: params[:company][:workspace_id])
+      end
+      
+      # Assign rooms if selected
+      if params[:company][:room_ids].present?
+        params[:company][:room_ids].each do |room_id|
+          @company.company_rooms.create(room_id: room_id) if room_id.present?
+        end
+      end
+      
       redirect_to admin_companies_path, notice: 'Company was successfully created.'
     else
+      @workspaces = Workspace.order(:name)
       render :new
     end
   end
 
   def edit
+    @workspaces = Workspace.order(:name)
+    @rooms = Room.joins(:workspace).where(workspaces: { id: @company.workspaces.pluck(:id) }).order(:name)
   end
 
   def update
@@ -72,8 +88,26 @@ class Admin::CompaniesController < Admin::BaseController
     end
     
     if @company.update(company_params)
+      # Update workspace assignment
+      if params[:company][:workspace_id].present?
+        @company.company_workspaces.destroy_all
+        @company.company_workspaces.create(workspace_id: params[:company][:workspace_id])
+      else
+        @company.company_workspaces.destroy_all
+      end
+      
+      # Update room assignments
+      @company.company_rooms.destroy_all
+      if params[:company][:room_ids].present?
+        params[:company][:room_ids].each do |room_id|
+          @company.company_rooms.create(room_id: room_id) if room_id.present?
+        end
+      end
+      
       redirect_to admin_company_path(@company), notice: 'Company was successfully updated.'
     else
+      @workspaces = Workspace.order(:name)
+      @rooms = Room.joins(:workspace).where(workspaces: { id: @company.workspaces.pluck(:id) }).order(:name)
       render :edit
     end
   end
@@ -81,6 +115,14 @@ class Admin::CompaniesController < Admin::BaseController
   def destroy
     @company.destroy
     redirect_to admin_companies_path, notice: 'Company was successfully deleted.'
+  end
+
+  # API endpoint to get rooms for a specific workspace
+  def rooms_for_workspace
+    workspace_id = params[:workspace_id]
+    rooms = Room.where(workspace_id: workspace_id).order(:name)
+    
+    render json: { rooms: rooms.map { |r| { id: r.id, name: r.name } } }
   end
 
   def add_room

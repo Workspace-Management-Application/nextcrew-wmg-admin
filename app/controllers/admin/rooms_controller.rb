@@ -1,5 +1,5 @@
 class Admin::RoomsController < Admin::BaseController
-  before_action :set_workspace, only: [:new, :create, :edit, :update, :destroy]
+  before_action :set_workspace, only: [:edit, :update, :destroy]
   before_action :set_room, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -48,12 +48,15 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def new
-    @room = @workspace.rooms.build
+    @room = Room.new
+    @workspaces = current_user.workspaces.order(:name)
     @amenities = Amenity.order(:name)
   end
 
   def create
-    @room = @workspace.rooms.build(room_params.except(:photo, :amenity_ids))
+    workspace_id = params[:room][:workspace_id]
+    @workspace = current_user.workspaces.find(workspace_id)
+    @room = @workspace.rooms.build(room_params.except(:photo, :amenity_ids, :workspace_id))
     
     if @room.save
       # Handle amenity associations
@@ -64,6 +67,8 @@ class Admin::RoomsController < Admin::BaseController
         photo_result = PhotoUploadService.attach_photo_auto(@room, params[:room][:photo])
         unless photo_result[:success]
           flash[:alert] = photo_result[:error]
+          @workspaces = current_user.workspaces.order(:name)
+          @amenities = Amenity.order(:name)
           render :new
           return
         end
@@ -71,6 +76,7 @@ class Admin::RoomsController < Admin::BaseController
       
       redirect_to admin_rooms_path, notice: 'Room was successfully created.'
     else
+      @workspaces = current_user.workspaces.order(:name)
       @amenities = Amenity.order(:name)
       render :new
     end
@@ -126,7 +132,7 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def room_params
-    params.require(:room).permit(:name, :category, :capacity, :is_available, :photo, amenity_ids: [])
+    params.require(:room).permit(:name, :category, :capacity, :is_available, :photo, :workspace_id, amenity_ids: [])
   end
 
   def handle_amenity_associations(room, amenity_ids)

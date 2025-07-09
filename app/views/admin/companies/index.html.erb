@@ -3,12 +3,13 @@
 <div class="content-area bg-dark text-white p-4 rounded">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Companies</h2>
-    <%= link_to "Add Company", new_admin_company_path, class: "btn btn-primary" %>
+    <%= link_to "Add Company", new_admin_company_path, class: "btn btn-primary", data: { turbo: false }%>
   </div>
 
   <!-- Search and Filter Form -->
   <div class="row mb-4">
     <div class="col-md-8">
+      <label class="form-label">Search Companies</label>
       <%= form_with url: admin_companies_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
         <%= form.text_field :search, value: @search, placeholder: "Search by name, email, phone, address, or cabin number...", 
                            class: "form-control", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;" %>
@@ -19,6 +20,7 @@
       <% end %>
     </div>
     <div class="col-md-4">
+      <label class="form-label">Filter by Status</label>
       <%= form_with url: admin_companies_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
         <%= form.hidden_field :search, value: @search %>
         <%= form.select :status, 
@@ -59,7 +61,7 @@
             </td>
             <td><%= company.users.count %></td>
             <td class="action-column">
-              <%= link_to "Edit", edit_admin_company_path(company), class: "btn btn-secondary btn-sm me-2" %>
+              <%= link_to "Edit", edit_admin_company_path(company), class: "btn btn-secondary btn-sm me-2", data: { turbo: false } %>
               
               <% if current_user.super_admin? %>
                 <% if company.status == 'active' %>

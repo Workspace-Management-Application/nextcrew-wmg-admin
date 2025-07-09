@@ -1,4 +1,4 @@
-<% content_for :page_title, "Add Office Enquiry" %>
+<span class="text-danger">*</span><% content_for :page_title, "Add Office Enquiry" %>
 
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
@@ -21,39 +21,39 @@
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :enquirer_name, class: "form-label" %>
+          <%= form.label :enquirer_name, class: "form-label" %><span class="text-danger">*</span>
           <%= form.text_field :enquirer_name, class: "form-control", required: true %>
         </div>
         <div class="col-md-6 mb-3">
-          <%= form.label :company_name, class: "form-label" %>
+          <%= form.label :company_name, class: "form-label" %><span class="text-danger">*</span>
           <%= form.text_field :company_name, class: "form-control", required: true %>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :email, class: "form-label" %>
+          <%= form.label :email, class: "form-label" %><span class="text-danger">*</span>
           <%= form.email_field :email, class: "form-control", required: true %>
         </div>
         <div class="col-md-6 mb-3">
-          <%= form.label :phone_number, class: "form-label" %>
+          <%= form.label :phone_number, class: "form-label" %><span class="text-danger">*</span>
           <%= form.telephone_field :phone_number, class: "form-control", required: true %>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-6 mb-3">
-          <%= form.label :no_of_seats, "Number of Seats", class: "form-label" %>
+          <%= form.label :no_of_seats, "Number of Seats", class: "form-label" %><span class="text-danger">*</span>
           <%= form.number_field :no_of_seats, class: "form-control", required: true, min: 1 %>
         </div>
         <div class="col-md-6 mb-3">
-          <%= form.label :workspace_type_ids, "Workspace Types", class: "form-label" %>
+          <%= form.label :workspace_type_ids, "Workspace Types", class: "form-label" %><span class="text-danger">*</span>
           <%= form.collection_select :workspace_type_ids, WorkspaceType.order(:name), :id, :name, { multiple: true }, { class: "selectpicker", multiple: true, required: true, 'data-live-search': true, title: "Select Workspace Types", 'data-style': 'btn-dark' } %>
         </div>
       </div>
 
       <div class="mb-3">
-        <%= form.label :workspace_id, "Workspace", class: "form-label" %>
+        <%= form.label :workspace_id, "Workspace", class: "form-label" %><span class="text-danger">*</span>
         <%= form.collection_select :workspace_id, Workspace.order(:name), :id, :name, { prompt: "Select Workspace" }, { class: "selectpicker", required: true, 'data-live-search': true, title: "Select Workspace", 'data-style': 'btn-dark' } %>
       </div>
 
