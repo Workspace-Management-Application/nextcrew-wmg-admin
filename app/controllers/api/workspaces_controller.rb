@@ -36,15 +36,15 @@ class Api::WorkspacesController < Api::BaseController
     
     if company
       today_bookings = Booking.joins(:room, :company)
-                             .where(company_id: company.id)
                              .where(rooms: { workspace_id: @workspace.id })
                              .where('DATE(bookings.start_time) = ?', Date.current)
                              .includes(:room, :company).order(:start_time)
       
       bookings_with_room_name = today_bookings.map do |booking|
-        booking.as_json(except: [:phone_number, :company_id, :room_id, :created_at, :updated_at]).merge(
+        booking.as_json(except: [ :company_id, :room_id, :created_at, :updated_at]).merge(
           room_name: booking.room.name,
-          company_name: booking.company.name
+          company_name: booking.company.name,
+          phone_number: booking.company.phone_number
         )
       end
       
