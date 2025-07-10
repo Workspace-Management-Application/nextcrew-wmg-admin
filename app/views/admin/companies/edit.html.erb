@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function loadRoomsForWorkspace(workspaceId) {
     if (!workspaceId) {
       roomSelect.innerHTML = '';
+      $(roomSelect).selectpicker('destroy');
       $(roomSelect).selectpicker();
       return;
     }
@@ -172,12 +173,15 @@ document.addEventListener('DOMContentLoaded', function() {
           option.value = room.id;
           option.textContent = room.name;
           roomSelect.appendChild(option);
-          $(roomSelect).selectpicker();
         });
+        // Reinitialize the selectpicker after all options are added
+        $(roomSelect).selectpicker('destroy');
+        $(roomSelect).selectpicker();
       })
       .catch(error => {
         console.error('Error loading rooms:', error);
         roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+        $(roomSelect).selectpicker('destroy');
         $(roomSelect).selectpicker();
       });
   }
@@ -186,10 +190,5 @@ document.addEventListener('DOMContentLoaded', function() {
   workspaceSelect.addEventListener('change', function() {
     loadRoomsForWorkspace(this.value);
   });
-
-  // Load rooms if workspace is already set
-  if (workspaceSelect.value) {
-    loadRoomsForWorkspace(workspaceSelect.value);
-  }
 });
 </script> 

@@ -243,8 +243,14 @@
       </main>
     </div>
 
-    <!-- Scripts -->
+    <%= yield :scripts %>
+    
+    <!-- jQuery (required for Bootstrap Select) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
     
     <script>
       function toggleSidebar() {
@@ -309,41 +315,53 @@
       }
 
       // Handle clickable table rows
-        function initializeClickableRows() {
-          const clickableRows = document.querySelectorAll('.clickable-row');
+      function initializeClickableRows() {
+        const clickableRows = document.querySelectorAll('.clickable-row');
+        
+        clickableRows.forEach(function(row) {
+          // Remove any existing listeners to avoid duplicates
+          row.removeEventListener('click', handleRowClick);
           
-          clickableRows.forEach(function(row) {
-            // Remove any existing listeners to avoid duplicates
-            row.removeEventListener('click', handleRowClick);
-            
-            // Add the click listener
-            row.addEventListener('click', handleRowClick);
-          });
+          // Add the click listener
+          row.addEventListener('click', handleRowClick);
+        });
+      }
+      
+      function handleRowClick(e) {
+        // Don't navigate if clicking on action buttons, links, or form elements
+        if (e.target.closest('.action-column') || 
+            e.target.closest('.btn') || 
+            e.target.closest('a') ||
+            e.target.closest('button') ||
+            e.target.closest('form') ||
+            e.target.closest('input') ||
+            e.target.closest('select')) {
+          return;
         }
         
-        function handleRowClick(e) {
-          // Don't navigate if clicking on action buttons, links, or form elements
-          if (e.target.closest('.action-column') || 
-              e.target.closest('.btn') || 
-              e.target.closest('a') ||
-              e.target.closest('button') ||
-              e.target.closest('form') ||
-              e.target.closest('input') ||
-              e.target.closest('select')) {
-            return;
-          }
-          
-          const href = this.getAttribute('data-href');
-          if (href) {
-            window.location.href = href;
-          }
+        const href = this.getAttribute('data-href');
+        if (href) {
+          window.location.href = href;
         }
+      }
+
+      // Initialize Bootstrap Select
+      function initializeBootstrapSelect() {
+        if (typeof $ !== 'undefined' && $.fn.selectpicker) {
+          $('.selectpicker').selectpicker();
+          console.log('Bootstrap Select initialized');
+        } else {
+          console.warn('Bootstrap Select not available, retrying in 100ms...');
+          setTimeout(initializeBootstrapSelect, 100);
+        }
+      }
         
       // Initialize everything on page load
       document.addEventListener('DOMContentLoaded', function() {
         console.log('DOMContentLoaded - Initializing components...');
         initializeBootstrapComponents();
         initializeClickableRows();
+        initializeBootstrapSelect();
       });
         
       // Re-initialize after Turbo navigation
@@ -351,6 +369,7 @@
         console.log('turbo:load - Re-initializing components...');
         initializeBootstrapComponents();
         initializeClickableRows();
+        initializeBootstrapSelect();
       });
 
       // Also initialize immediately if DOM is already loaded
@@ -359,17 +378,20 @@
           console.log('DOMContentLoaded (delayed) - Initializing components...');
           initializeBootstrapComponents();
           initializeClickableRows();
+          initializeBootstrapSelect();
         });
       } else {
         console.log('DOM already loaded - Initializing components immediately...');
         initializeBootstrapComponents();
         initializeClickableRows();
+        initializeBootstrapSelect();
       }
 
       // Additional initialization after a short delay to ensure everything is loaded
       setTimeout(function() {
         console.log('Delayed initialization - Ensuring components are ready...');
         initializeBootstrapComponents();
+        initializeBootstrapSelect();
       }, 500);
 
       // Manual fallback for profile dropdown
@@ -413,19 +435,6 @@
           }
         }
       }
-    </script>
-
-    <%= yield :scripts %>
-    <!-- jQuery (required for Bootstrap and selectpicker) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS (required for selectpicker) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Bootstrap Select JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
-    <script>
-      document.addEventListener("turbo:load", function() {
-        $('.selectpicker').selectpicker();
-      });
     </script>
   </body>
 </html>

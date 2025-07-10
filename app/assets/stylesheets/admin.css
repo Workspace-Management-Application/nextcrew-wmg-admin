@@ -580,10 +580,29 @@
 .bootstrap-select .dropdown-menu {
   background-color: #222 !important;
   color: #fff !important;
+  border: 1px solid #333333 !important;
+  z-index: 9999 !important;
+  position: absolute !important;
+  display: block !important;
 }
+
+.bootstrap-select .dropdown-menu.show {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 .bootstrap-select .dropdown-menu .dropdown-item {
   color: #fff !important;
+  background-color: transparent !important;
 }
+
+.bootstrap-select .dropdown-menu .dropdown-item:hover,
+.bootstrap-select .dropdown-menu .dropdown-item:focus {
+  background-color: #444 !important;
+  color: #fff !important;
+}
+
 .bootstrap-select .dropdown-menu .dropdown-item.active,
 .bootstrap-select .dropdown-menu .dropdown-item:active {
   background-color: #444 !important;
@@ -605,14 +624,17 @@
   min-height: 38px;
   box-shadow: none !important;
   padding: 0.375rem 0.75rem;
+  cursor: pointer !important;
 }
 
 .bootstrap-select .dropdown-toggle:focus,
-.bootstrap-select .dropdown-toggle:active {
+.bootstrap-select .dropdown-toggle:active,
+.bootstrap-select .dropdown-toggle:hover {
   border-color: #ffffff !important;
   box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.1) !important;
   color: #ffffff !important;
   outline: none !important;
+  background-color: #1a1a1a !important;
 }
 
 .bootstrap-select .dropdown-toggle .filter-option {
@@ -622,4 +644,36 @@
 /* Remove default caret and use Bootstrap's */
 .bootstrap-select .dropdown-toggle::after {
   border-top: 0.3em solid #fff !important;
+}
+
+/* Ensure dropdown is clickable */
+.bootstrap-select .dropdown-toggle[aria-expanded="true"] {
+  border-color: #ffffff !important;
+}
+
+/* Fix for search box in dropdown */
+.bootstrap-select .bs-searchbox input {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333333 !important;
+  color: #ffffff !important;
+}
+
+.bootstrap-select .bs-searchbox input:focus {
+  background-color: #1a1a1a !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.1) !important;
+}
+
+/* Fix for inner dropdown items */
+.bootstrap-select .dropdown-menu .inner {
+  background-color: #222 !important;
+}
+
+.bootstrap-select .dropdown-menu .inner .dropdown-item {
+  color: #fff !important;
+}
+
+.bootstrap-select .dropdown-menu .inner .dropdown-item:hover {
+  background-color: #444 !important;
 }
