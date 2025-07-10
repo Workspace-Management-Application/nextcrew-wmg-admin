@@ -56,6 +56,7 @@ class Admin::VisitorEntriesController < Admin::BaseController
   end
 
   def update
+    @workspaces = Workspace.order(:name)
     if @visitor_entry.update(visitor_entry_params)
       redirect_to admin_visitor_entries_path, notice: 'Visitor entry was successfully updated.'
     else

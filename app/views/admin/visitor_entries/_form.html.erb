@@ -1,3 +1,16 @@
+<% if @visitor_entry.errors.any? %>
+  <div class="alert alert-danger">
+    <h5>
+      <%= pluralize(@visitor_entry.errors.count, "error") %> prohibited this visitor entry from being saved:
+    </h5>
+    <ul>
+      <% @visitor_entry.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
 <%= form_with(model: [:admin, @visitor_entry], local: true, data: { turbo: false }, html: { class: "row g-3" }) do |form| %>
   <div class="col-md-6">
     <%= form.label :name, class: "form-label" %><span class="text-danger">*</span>
@@ -12,7 +25,7 @@
     <%= form.text_field :phone_number, class: "form-control form-control-dark" %>
   </div>
   <div class="col-md-6">
-    <%= form.label :person_to_visit_name, "Person to Visit", class: "form-label" %><span class="text-danger">*</span>
+    <%= form.label :person_to_visit_name, "Person to Visit", class: "form-label" %>
     <%= form.text_field :person_to_visit_name, class: "form-control form-control-dark" %>
   </div>
   <div class="col-md-12">
