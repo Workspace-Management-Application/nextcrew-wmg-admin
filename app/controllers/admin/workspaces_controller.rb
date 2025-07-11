@@ -201,21 +201,24 @@ class Admin::WorkspacesController < Admin::BaseController
       @workspace.rooms.build
     end
     @rooms = @workspace.rooms
+    @amenities = Amenity.order(:name)
     respond_to do |format|
       format.html
-      format.js { render partial: 'admin/workspaces/step3_rooms', locals: { workspace: @workspace, rooms: @rooms } }
+      format.js { render partial: 'admin/workspaces/step3_rooms', locals: { workspace: @workspace, rooms: @rooms, amenities: @amenities } }
     end
   end
 
   def update_step3
     if @workspace.update(workspace_params)
+      
       @workspace.update(wizard_step: 4)
       respond_to do |format|
         format.html { redirect_to step4_admin_workspace_path(@workspace), notice: 'Rooms created successfully!' }
         format.json { render json: { next_step: 4, workspace_id: @workspace.id } }
       end
     else
-      @rooms = @workspace.rooms
+      @rooms = @workspace.rooms.includes(:amenities)
+      @amenities = Amenity.order(:name)
       respond_to do |format|
         format.html { render :step3 }
         format.json { render partial: 'admin/workspaces/step3_rooms', status: :unprocessable_entity }
@@ -305,13 +308,25 @@ class Admin::WorkspacesController < Admin::BaseController
   end
 
   def workspace_params
-    params.require(:workspace).permit(
-      :name, :building_name, :city, :address, :pincode, :is_active, :photo, workspace_type_ids: [],
-      rooms_attributes: [
-        :id, :name, :category, :capacity, :is_available, :photo, :_destroy,
-        amenity_ids: []
-      ]
+    # First permit the basic workspace attributes
+    base_params = params.require(:workspace).permit(
+      :name, :building_name, :city, :address, :pincode, :is_active, :photo, 
+      workspace_type_ids: []
     )
+    
+    # Handle rooms_attributes manually to support Cocoon's dynamic keys
+    if params[:workspace][:rooms_attributes].present?
+      rooms_attrs = {}
+      params[:workspace][:rooms_attributes].each do |key, room_params|
+        rooms_attrs[key] = room_params.permit(
+          :id, :name, :category, :capacity, :is_available, :photo, :_destroy, 
+          amenity_ids: []
+        )
+      end
+      base_params[:rooms_attributes] = rooms_attrs
+    end
+    
+    base_params
   end
 
   def user_params

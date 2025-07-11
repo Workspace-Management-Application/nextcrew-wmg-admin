@@ -26,7 +26,7 @@ class Workspace < ApplicationRecord
 
   enum :status, { pending: 'pending', confirmed: 'confirmed' }
 
-  accepts_nested_attributes_for :rooms, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :rooms, allow_destroy: true, reject_if: proc { |attributes| attributes['name'].blank? && attributes['category'].blank? && attributes['capacity'].blank? }
 
   private
 

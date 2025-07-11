@@ -7,7 +7,7 @@
         <h2 class="fw-bold mb-0">Step 3: Create Rooms</h2>
         <%= link_to "← Back", step2_admin_workspace_path(@workspace), class: "btn btn-outline-light border-white" %>
       </div>
-      <%= render 'step3_rooms', workspace: @workspace, rooms: @rooms %>
+      <%= render 'step3_rooms', workspace: @workspace, rooms: @rooms, amenities: @amenities %>
     </div>
   </div>
 </div>

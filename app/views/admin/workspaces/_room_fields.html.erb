@@ -1,9 +1,9 @@
-<div class="nested-fields card bg-dark text-white mb-3 p-3" style="border-radius: 0.5rem;">
+<%= content_tag :div, class: 'nested-fields card bg-dark text-white mb-3 p-3', style: 'border-radius: 0.5rem;' do %>
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h6 class="card-title mb-0">Room Details</h6>
     <%= link_to_remove_association 'Remove Room', f, class: 'btn btn-sm btn-outline-danger' %>
   </div>
-  
+
   <div class="row">
     <div class="col-md-6 mb-2">
       <%= f.label :name, 'Room Name', class: 'form-label' %>
@@ -15,17 +15,16 @@
           options_for_select([
             ['Meeting Room', 'meeting_room'],
             ['Conference Room', 'conference_room'],
-            ['Private Office', 'private_office'],
-            ['Hot Desk', 'hot_desk'],
-            ['Dedicated Desk', 'dedicated_desk'],
             ['Phone Booth', 'phone_booth'],
-            ['Training Room', 'training_room'],
+            ['Open Desk', 'open_desk'],
+            ['Private Office', 'private_office'],
             ['Event Space', 'event_space']
-          ]), 
+          ], f.object.category), 
           { prompt: 'Select Category' }, 
           { class: "form-select bg-black text-white border-secondary", required: true } %>
     </div>
   </div>
+
   <div class="row">
     <div class="col-md-6 mb-2">
       <%= f.label :capacity, class: 'form-label' %>
@@ -34,10 +33,35 @@
     <div class="col-md-6 mb-2">
       <%= f.label :photo, class: 'form-label' %>
       <%= f.file_field :photo, class: 'form-control bg-black text-white border-secondary', accept: "image/*" %>
+      <% if f.object.photo.attached? %>
+        <div class="mt-2">
+          <%= image_tag f.object.photo, class: "img-thumbnail", style: "max-width: 100px; max-height: 100px;" %>
+        </div>
+      <% end %>
     </div>
   </div>
 
-  <!-- Hidden field for is_available (always true) -->
-  <%= f.hidden_field :is_available, value: true %>
-</div>
+  <!-- Amenities -->
+  <div class="mb-3">
+    <%= f.label :amenity_ids, "Room Amenities", class: 'form-label' %>
+    <%= hidden_field_tag "#{f.object_name}[amenity_ids][]", nil %>
+    <div class="form-text mb-2 text-light">Select the amenities available in this room</div>
+    <div class="row">
+      <% amenities.each do |amenity| %>
+        <div class="col-md-6 mb-2">
+          <div class="form-check">
+            <%= f.check_box :amenity_ids, 
+                { multiple: true, class: "form-check-input" }, 
+                amenity.id, 
+                nil %>
+            <%= f.label "amenity_ids_#{amenity.id}", 
+                amenity.name, 
+                class: "form-check-label" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
 
+  <%= f.hidden_field :is_available, value: true %>
+<% end %>
