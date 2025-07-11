@@ -7,7 +7,7 @@
   
   <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
     <%= link_to_add_association 'Add Room', f, :rooms, 
-        class: "btn btn-success", 
+        class: "btn btn-primary", 
         render_options: { partial: 'room_fields', locals: { amenities: amenities } },
         data: { 
           association_insertion_node: '#rooms', 
@@ -19,7 +19,7 @@
   <div class="d-flex justify-content-between gap-2 mt-4">
     <%= link_to "← Back", step2_admin_workspace_path(@workspace), class: "btn btn-outline-light px-4" %>
     <div class="d-flex gap-2">
-      <%= f.submit "Save and Next", class: "btn btn-success px-4 fw-bold" %>
+      <%= f.submit "Save and Next", class: "btn btn-primary px-4 fw-bold" %>
       <%= link_to "Cancel", admin_workspaces_path, class: "btn btn-secondary px-4" %>
     </div>
   </div>

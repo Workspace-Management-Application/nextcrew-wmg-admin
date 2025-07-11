@@ -50,8 +50,6 @@ Rails.application.routes.draw do
         patch :update_step2
         get :step3
         patch :update_step3
-        get :step4
-        patch :update_step4
         get :step1
         patch :update_step1
       end

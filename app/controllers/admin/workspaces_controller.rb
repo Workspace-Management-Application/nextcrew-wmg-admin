@@ -1,6 +1,6 @@
 class Admin::WorkspacesController < Admin::BaseController
-  before_action :set_workspace, only: [:show, :edit, :update, :destroy, :step2, :step3, :step4, :update_step2, :update_step3, :update_step4, :step1, :update_step1]
-  before_action :check_workspace_status, only: [:step2, :step3, :step4, :update_step2, :update_step3, :update_step4]
+  before_action :set_workspace, only: [:show, :edit, :update, :destroy, :step2, :step3, :update_step2, :update_step3, :step1, :update_step1]
+  before_action :check_workspace_status, only: [:step2, :step3, :update_step2, :update_step3]
 
   def index
     @search = params[:search]
@@ -213,8 +213,8 @@ class Admin::WorkspacesController < Admin::BaseController
       
       @workspace.update(wizard_step: 4)
       respond_to do |format|
-        format.html { redirect_to step4_admin_workspace_path(@workspace), notice: 'Rooms created successfully!' }
-        format.json { render json: { next_step: 4, workspace_id: @workspace.id } }
+        format.html { redirect_to admin_workspaces_path, notice: 'Rooms created successfully!' }
+        format.json { render json: { redirect_url: admin_workspaces_path } }
       end
     else
       @rooms = @workspace.rooms.includes(:amenities)
@@ -222,44 +222,6 @@ class Admin::WorkspacesController < Admin::BaseController
       respond_to do |format|
         format.html { render :step3 }
         format.json { render partial: 'admin/workspaces/step3_rooms', status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def step4
-    @workspace.update(wizard_step: 4) unless @workspace.wizard_step >= 4
-    @available_users = User.where(role: ['floor_user', 'user'])
-                          .left_joins(:company_users)
-                          .where(company_users: { id: nil })
-                          .order(:name)
-    @company = Company.new
-    respond_to do |format|
-      format.html
-      format.js { render partial: 'admin/workspaces/step4_company', locals: { workspace: @workspace, company: @company, available_users: @available_users } }
-    end
-  end
-
-  def update_step4
-    @company = Company.new(company_params)
-    if @company.save
-      if params[:user_id].present?
-        user = User.find(params[:user_id])
-        CompanyUser.create!(company: @company, user: user)
-      end
-      CompanyWorkspace.create!(company: @company, workspace: @workspace)
-      @workspace.update!(status: 'confirmed')
-      respond_to do |format|
-        format.html { redirect_to admin_workspaces_path, notice: 'Workspace setup completed successfully!' }
-        format.json { render json: { redirect_url: admin_workspaces_path } }
-      end
-    else
-      @available_users = User.where(role: ['floor_user', 'user'])
-                            .left_joins(:company_users)
-                            .where(company_users: { id: nil })
-                            .order(:name)
-      respond_to do |format|
-        format.html { render :step4 }
-        format.json { render partial: 'admin/workspaces/step4_company', status: :unprocessable_entity }
       end
     end
   end
@@ -300,8 +262,6 @@ class Admin::WorkspacesController < Admin::BaseController
       step2_admin_workspace_path(workspace)
     elsif workspace.rooms.empty?
       step3_admin_workspace_path(workspace)
-    elsif workspace.companies.empty?
-      step4_admin_workspace_path(workspace)
     else
       admin_workspaces_path
     end
