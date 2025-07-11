@@ -38,11 +38,26 @@ Rails.application.routes.draw do
     get '/', to: 'dashboard#index', as: :root
     get 'dashboard', to: 'dashboard#index'
     
+
+    
     resources :workspaces do
       resources :rooms
       member do
         post :add_company
         delete :remove_company
+        # Multi-step wizard routes
+        get :step2
+        patch :update_step2
+        get :step3
+        patch :update_step3
+        get :step4
+        patch :update_step4
+        get :step1
+        patch :update_step1
+      end
+      collection do
+        get :resume
+        get :start_over
       end
     end
     

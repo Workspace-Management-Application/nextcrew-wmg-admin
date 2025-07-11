@@ -77,3 +77,4 @@ gem 'dotenv-rails'
 
 # Pagination
 gem 'kaminari'
+gem 'cocoon'

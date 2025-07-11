@@ -1,0 +1,20 @@
+<% content_for :page_title, "Create Rooms for Workspace" %>
+<%= render 'wizard_stepper', step: 3 %>
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="card bg-dark text-white shadow-sm p-4 mb-4" style="border-radius: 1rem;">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Step 3: Create Rooms</h2>
+        <%= link_to "← Back", step2_admin_workspace_path(@workspace), class: "btn btn-outline-light border-white" %>
+      </div>
+      <%= render 'step3_rooms', workspace: @workspace, rooms: @rooms %>
+    </div>
+  </div>
+</div>
+<style>
+#wizard-step3-form input {
+  background: #111;
+  color: #fff;
+  border: 1px solid #444;
+}
+</style>

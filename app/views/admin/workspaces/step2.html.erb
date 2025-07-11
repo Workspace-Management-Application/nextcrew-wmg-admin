@@ -1,0 +1,25 @@
+<% content_for :page_title, "Assign User to Workspace" %>
+<%= render 'wizard_stepper', step: 2, css_class: 'wizard-stepper-center' %>
+<div class="row">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="card bg-dark text-white shadow-sm p-4 mb-4" style="border-radius: 1rem;">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Step 2: Assign Floor User</h2>
+        <%= link_to "← Back", step1_admin_workspace_path(@workspace), class: "btn btn-outline-light border-white" %>
+      </div>
+      <%= render 'step2_user', workspace: @workspace, available_users: @available_users %>
+    </div>
+  </div>
+</div>
+<style>
+#new-user-fields input, #existing-user-fields select {
+  background: #111;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.wizard-stepper-center {
+  display: flex;
+  justify-content: center;
+}
+</style>

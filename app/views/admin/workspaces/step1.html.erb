@@ -1,16 +1,13 @@
-<% content_for :page_title, "Add Workspace" %>
-
+<% content_for :page_title, "Workspace Details" %>
+<%= render 'wizard_stepper', step: 1 %>
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold">Add New Workspace</h2>
+      <h2 class="fw-bold">Step 1: Details</h2>
       <%= link_to "← Back to Workspaces", admin_workspaces_path, class: "btn btn-outline-light border-white" %>
     </div>
-
-    <%= render 'wizard_stepper', step: 1 %>
-
     <div class="card bg-dark text-white shadow-sm p-4 mb-4" style="border-radius: 1rem;">
-      <%= form_with model: [:admin, @workspace], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
+      <%= form_with model: [:admin, @workspace], url: update_step1_admin_workspace_path(@workspace), method: :patch, local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
         <% if @workspace.errors.any? %>
           <div class="alert alert-danger">
             <h6><%= pluralize(@workspace.errors.count, "error") %> prohibited this workspace from being saved:</h6>
@@ -21,7 +18,6 @@
             </ul>
           </div>
         <% end %>
-
         <div class="row">
           <div class="col-md-6 mb-3">
             <%= form.label :name, class: "form-label fw-semibold" do %>
@@ -36,7 +32,6 @@
             <%= form.text_field :building_name, class: "form-control bg-black text-white border-secondary", required: true %>
           </div>
         </div>
-
         <div class="row">
           <div class="col-md-6 mb-3">
             <%= form.label :city, class: "form-label fw-semibold" do %>
@@ -51,14 +46,12 @@
             <%= form.text_field :pincode, class: "form-control bg-black text-white border-secondary", required: true %>
           </div>
         </div>
-
         <div class="mb-3">
           <%= form.label :address, class: "form-label fw-semibold" do %>
             Address <span class="text-danger">*</span>
           <% end %>
           <%= form.text_area :address, class: "form-control bg-black text-white border-secondary", rows: 2, required: true %>
         </div>
-
         <div class="mb-3">
           <%= form.label :workspace_type_ids, "Workspace Types", class: "form-label fw-semibold" %> <span class="text-danger">*</span>
           <div class="row">
@@ -74,10 +67,15 @@
             <% end %>
           </div>
         </div>
-
         <!-- Hidden field for is_active (always true) -->
         <%= form.hidden_field :is_active, value: true %>
-
+        
+        <div class="mb-3">
+          <%= form.label :photo, "Workspace Photo", class: "form-label fw-semibold" %>
+          <%= form.file_field :photo, class: "form-control bg-black text-white border-secondary", accept: "image/*" %>
+          <div class="form-text text-muted">Upload a photo of the workspace (optional). Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB.</div>
+        </div>
+        
         <div class="d-flex justify-content-end gap-2">
           <%= form.submit "Save and Next", class: "btn btn-primary px-4 fw-bold" %>
           <%= link_to "Cancel", admin_workspaces_path, class: "btn btn-outline-light" %>

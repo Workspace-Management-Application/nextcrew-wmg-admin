@@ -1,0 +1,43 @@
+<div class="nested-fields card bg-dark text-white mb-3 p-3" style="border-radius: 0.5rem;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="card-title mb-0">Room Details</h6>
+    <%= link_to_remove_association 'Remove Room', f, class: 'btn btn-sm btn-outline-danger' %>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-6 mb-2">
+      <%= f.label :name, 'Room Name', class: 'form-label' %>
+      <%= f.text_field :name, class: 'form-control bg-black text-white border-secondary', required: true %>
+    </div>
+    <div class="col-md-6 mb-2">
+      <%= f.label :category, class: 'form-label' %>
+      <%= f.select :category, 
+          options_for_select([
+            ['Meeting Room', 'meeting_room'],
+            ['Conference Room', 'conference_room'],
+            ['Private Office', 'private_office'],
+            ['Hot Desk', 'hot_desk'],
+            ['Dedicated Desk', 'dedicated_desk'],
+            ['Phone Booth', 'phone_booth'],
+            ['Training Room', 'training_room'],
+            ['Event Space', 'event_space']
+          ]), 
+          { prompt: 'Select Category' }, 
+          { class: "form-select bg-black text-white border-secondary", required: true } %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-2">
+      <%= f.label :capacity, class: 'form-label' %>
+      <%= f.number_field :capacity, class: 'form-control bg-black text-white border-secondary', min: 1, required: true %>
+    </div>
+    <div class="col-md-6 mb-2">
+      <%= f.label :photo, class: 'form-label' %>
+      <%= f.file_field :photo, class: 'form-control bg-black text-white border-secondary', accept: "image/*" %>
+    </div>
+  </div>
+
+  <!-- Hidden field for is_available (always true) -->
+  <%= f.hidden_field :is_available, value: true %>
+</div>
+

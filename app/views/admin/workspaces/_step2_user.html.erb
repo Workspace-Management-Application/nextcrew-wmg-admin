@@ -1,0 +1,82 @@
+<%= form_with url: update_step2_admin_workspace_path(@workspace), method: :patch, local: true, html: { id: 'wizard-step2-form' } do |f| %>
+  <% assigned_floor_users = @workspace.users.where(role: 'floor_user') %>
+  <% if assigned_floor_users.any? %>
+    <div class="alert alert-info mb-3">
+      A floor user is already assigned to this workspace. You cannot add or assign another user.
+    </div>
+  <% else %>
+    <div class="mb-3">
+      <label>Assign Floor User</label>
+      <div>
+        <label><input type="radio" name="user_action" value="create_new" checked> Create New User</label>
+        <label class="ms-3"><input type="radio" name="user_action" value="assign_existing"> Assign Existing User</label>
+      </div>
+    </div>
+    <div id="new-user-fields">
+      <%= fields_for :user, User.new do |uf| %>
+        <div class="mb-2">
+          <%= uf.label :name %>
+          <%= uf.text_field :name, class: 'form-control' %>
+        </div>
+        <div class="mb-2">
+          <%= uf.label :email %>
+          <%= uf.email_field :email, class: 'form-control' %>
+        </div>
+        <div class="mb-2">
+          <%= uf.label :phone_number %>
+          <%= uf.text_field :phone_number, class: 'form-control' %>
+        </div>
+        <div class="mb-2">
+          <%= uf.label :password %>
+          <%= uf.password_field :password, class: 'form-control', autocomplete: 'new-password' %>
+        </div>
+        <%= uf.hidden_field :role, value: 'floor_user' %>
+      <% end %>
+    </div>
+    <div id="existing-user-fields" style="display:none;">
+      <%= f.collection_select :user_id, @available_users, :id, :name, { prompt: 'Select Floor User' }, { class: 'form-select' } %>
+    </div>
+    <div class="d-flex justify-content-end">
+      <%= f.submit 'Save and Next', class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+
+  <% if assigned_floor_users.any? %>
+    <div class="mt-4">
+      <h5>Assigned Floor Users</h5>
+      <table class="table table-dark table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% assigned_floor_users.each do |user| %>
+            <tr>
+              <td><%= user.name %></td>
+              <td><%= user.email %></td>
+              <td><%= user.phone_number %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+      <%= link_to 'Next', step3_admin_workspace_path(@workspace), class: 'btn btn-primary px-4 fw-bold' %>
+    </div>
+  <% end %>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const radios = document.querySelectorAll('input[name="user_action"]');
+    radios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        document.getElementById('new-user-fields').style.display = this.value === 'create_new' ? '' : 'none';
+        document.getElementById('existing-user-fields').style.display = this.value === 'assign_existing' ? '' : 'none';
+      });
+    });
+  });
+  </script>
+<% end %>

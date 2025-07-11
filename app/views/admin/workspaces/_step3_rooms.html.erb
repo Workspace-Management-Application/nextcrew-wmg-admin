@@ -1,0 +1,24 @@
+<%= form_with model: @workspace, url: update_step3_admin_workspace_path(@workspace), method: :patch, local: true, html: { id: 'wizard-step3-form', multipart: true }, data: { turbo: false } do |f| %>
+  <div id="rooms">
+    <%= f.fields_for :rooms do |room_form| %>
+      <%= render 'room_fields', f: room_form %>
+    <% end %>
+  </div>
+  
+  <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+    <%= link_to_add_association 'Add Room', f, :rooms, 
+        class: "btn btn-success", 
+        data: { 
+          association_insertion_node: '#rooms', 
+          association_insertion_method: :append 
+        } %>
+  </div>
+  
+  <div class="d-flex justify-content-between gap-2 mt-4">
+    <%= link_to "← Back", step2_admin_workspace_path(@workspace), class: "btn btn-outline-light px-4" %>
+    <div class="d-flex gap-2">
+      <%= f.submit "Save and Next", class: "btn btn-success px-4 fw-bold" %>
+      <%= link_to "Cancel", admin_workspaces_path, class: "btn btn-secondary px-4" %>
+    </div>
+  </div>
+<% end %>

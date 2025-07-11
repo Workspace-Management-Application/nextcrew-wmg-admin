@@ -6,6 +6,22 @@
     <%= link_to "Add Workspace", new_admin_workspace_path, class: "btn btn-primary" %>
   </div>
 
+  <!-- Pending Workspace Recovery -->
+  <% if @pending_workspaces %>
+    <% @pending_workspaces.each do |pending_workspace| %>
+      <div class="alert alert-warning mb-4">
+        <h5><i class="fas fa-exclamation-triangle"></i> Workspace Creation in Progress</h5>
+        <p class="mb-2">You have an incomplete workspace setup for "<strong><%= pending_workspace.name %></strong>".</p>
+        <div class="d-flex gap-2">
+          <%= link_to "Resume Setup", resume_admin_workspaces_path(id: pending_workspace.id), class: "btn btn-warning btn-sm" %>
+          <%= link_to "Start Over", start_over_admin_workspaces_path(id: pending_workspace.id),
+                      data: { turbo_method: :get, turbo_confirm: "Are you sure? This will delete the current workspace and start fresh." },
+                      class: "btn btn-outline-warning btn-sm" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
   <!-- Search Form -->
   <div class="row mb-4">
     <div class="col-md-8">
@@ -28,7 +44,8 @@
                        options_for_select([
                          ['All Status', ''],
                          ['Active', 'active'],
-                         ['Inactive', 'inactive']
+                         ['Inactive', 'inactive'],
+                         ['Pending', 'pending']
                        ], params[:filter]), 
                        {}, 
                        { class: "form-select form-control-dark me-2", onchange: "this.form.submit();" } %>

@@ -15,12 +15,18 @@ class Workspace < ApplicationRecord
 
   validates :name, :building_name, :address, :city, :pincode, presence: true
   validates :is_active, inclusion: { in: [true, false] }
-  
+  validates :status, presence: true
+  validates :wizard_step, presence: true, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 4 }
+
   # Set default value for is_active
   attribute :is_active, :boolean, default: true
 
   # Callbacks
   after_create :associate_super_admins
+
+  enum :status, { pending: 'pending', confirmed: 'confirmed' }
+
+  accepts_nested_attributes_for :rooms, allow_destroy: true, reject_if: :all_blank
 
   private
 
