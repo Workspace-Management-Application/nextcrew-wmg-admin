@@ -4,7 +4,7 @@ class Admin::WorkspacesController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @workspaces = Workspace.includes(:companies, :users, :rooms, :workspace_types)
+    @workspaces = current_user.workspaces.includes(:companies, :users, :rooms, :workspace_types)
     
     # Search functionality
     if @search.present?
@@ -18,15 +18,15 @@ class Admin::WorkspacesController < Admin::BaseController
     if params[:filter].present?
       case params[:filter]
       when 'active'
-        @workspaces = @workspaces.where(is_active: true, status: 'confirmed')
+        @workspaces = @workspaces.where(is_active: true, status: 'completed')
       when 'inactive'
-        @workspaces = @workspaces.where(is_active: false, status: 'confirmed')
+        @workspaces = @workspaces.where(is_active: false, status: 'completed')
       when 'pending'
         @workspaces = @workspaces.where(status: 'pending')
       end
     else
-      # Show confirmed workspaces by default
-      @workspaces = @workspaces.where(status: 'confirmed')
+      # Show completed workspaces by default
+      @workspaces = @workspaces.where(status: 'completed')
     end
     
     # Order by name
@@ -36,11 +36,12 @@ class Admin::WorkspacesController < Admin::BaseController
     @workspaces = @workspaces.page(params[:page]).per(10)
 
     # Find a pending workspace for resume/start over UI
-    @pending_workspaces = Workspace.where(status: 'pending')
+    @pending_workspaces = current_user.workspaces.where(status: 'pending') unless current_user.super_admin?
   end
 
   def show
     @rooms = @workspace.rooms
+    @available_companies = @workspace.companies.where(status: ['active']).left_joins(:company_workspaces).where(company_workspaces: { id: nil })
   end
 
   def new
@@ -58,6 +59,8 @@ class Admin::WorkspacesController < Admin::BaseController
     @workspace.is_active = true
     
     if @workspace.save
+      # Assign the creator as a user of this workspace
+      UserWorkspace.create!(user: current_user, workspace: @workspace)
       # Handle photo upload using Active Storage with auto folder organization
       if params[:workspace][:photo].present?
         photo_result = PhotoUploadService.attach_photo_auto(@workspace, params[:workspace][:photo])
@@ -209,21 +212,26 @@ class Admin::WorkspacesController < Admin::BaseController
   end
 
   def update_step3
-    if @workspace.update(workspace_params)
-      
-      @workspace.update(wizard_step: 4)
-      respond_to do |format|
-        format.html { redirect_to admin_workspaces_path, notice: 'Rooms created successfully!' }
-        format.json { render json: { redirect_url: admin_workspaces_path } }
+    unless params[:workspace].nil?
+      if @workspace.update(workspace_params)
+        
+        respond_to do |format|
+          format.html { redirect_to admin_workspaces_path, notice: 'Rooms created successfully!' }
+          format.json { render json: { redirect_url: admin_workspaces_path } }
+        end
+      else
+        @rooms = @workspace.rooms.includes(:amenities)
+        @amenities = Amenity.order(:name)
+        respond_to do |format|
+          format.html { render :step3 }
+          format.json { render partial: 'admin/workspaces/step3_rooms', status: :unprocessable_entity }
+        end
       end
     else
-      @rooms = @workspace.rooms.includes(:amenities)
-      @amenities = Amenity.order(:name)
-      respond_to do |format|
-        format.html { render :step3 }
-        format.json { render partial: 'admin/workspaces/step3_rooms', status: :unprocessable_entity }
-      end
+      @workspace.update(wizard_step: 3, status:"completed")
+      redirect_to admin_workspaces_path, notice: 'Workspace created successfully!'
     end
+
   end
 
   def resume

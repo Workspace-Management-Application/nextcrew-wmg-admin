@@ -3,7 +3,9 @@ class Admin::OfficeEnquiriesController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @office_enquiries = OfficeEnquiry.includes(:workspace)
+    workspace_ids = current_user.workspaces.pluck(:id)
+    @office_enquiries = OfficeEnquiry.includes(:workspace).where(workspace_id: workspace_ids)
+  
     
     # Search functionality
     if @search.present?
@@ -34,7 +36,7 @@ class Admin::OfficeEnquiriesController < Admin::BaseController
     @office_enquiries = @office_enquiries.page(params[:page]).per(25)
     
     # For workspace filter dropdown
-    @workspaces = Workspace.order(:name)
+    @workspaces = current_user.workspaces
   end
 
   def show
@@ -42,6 +44,9 @@ class Admin::OfficeEnquiriesController < Admin::BaseController
 
   def new
     @office_enquiry = OfficeEnquiry.new
+    @workspaces = current_user.workspaces.order(:name)
+    workspace_ids = @workspaces.pluck(:id)
+    @workspace_types = WorkspaceType.joins(:workspaces).where(workspaces: { id: workspace_ids }).distinct.order(:name)
   end
 
   def create
@@ -55,6 +60,9 @@ class Admin::OfficeEnquiriesController < Admin::BaseController
   end
 
   def edit
+    @workspaces = current_user.workspaces.order(:name)
+    workspace_ids = @workspaces.pluck(:id)
+    @workspace_types = WorkspaceType.joins(:workspaces).where(workspaces: { id: workspace_ids }).distinct.order(:name)
   end
 
   def update

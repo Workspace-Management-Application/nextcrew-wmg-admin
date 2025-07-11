@@ -59,7 +59,7 @@ Rails.application.routes.draw do
       end
     end
     
-    resources :rooms, only: [:index, :show, :new, :create]
+    resources :rooms, only: [:index, :show, :new, :create, :destroy]
     resources :bookings do
       collection do
         get :company_rooms

@@ -3,7 +3,11 @@ class Admin::CompaniesController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @companies = Company.includes(:users, :workspaces)
+    workspace_ids = current_user.workspaces.pluck(:id)
+    @companies = Company.joins(:workspaces)
+                        .where(workspaces: { id: workspace_ids })
+                        .distinct
+                        .includes(:users, :workspaces)
     
     # Search functionality
     if @search.present?

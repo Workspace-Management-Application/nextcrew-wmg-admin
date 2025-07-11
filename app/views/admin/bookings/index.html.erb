@@ -25,7 +25,7 @@
       <div class="col-md-3">
         <%= form.label :workspace_id, "Filter by Workspace", class: "form-label" %>
         <%= form.select :workspace_id, 
-                        options_from_collection_for_select(Workspace.all, :id, :name, params[:workspace_id]), 
+                        options_from_collection_for_select(current_user.workspaces, :id, :name, params[:workspace_id]), 
                         { prompt: 'All Workspaces' }, 
                         { class: "form-select", onchange: "this.form.submit();" } %>
       </div>

@@ -1,0 +1,117 @@
+<%= form_with model: @room.persisted? ? [:admin, @workspace, @room] : [:admin, @room], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
+  <% if @room.errors.any? %>
+    <div class="alert alert-danger">
+      <h6><%= pluralize(@room.errors.count, "error") %> prohibited this room from being saved:</h6>
+      <ul class="mb-0">
+        <% @room.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% unless @room.persisted? %>
+    <div class="mb-3">
+      <%= form.label :workspace_id, class: "form-label" do %>
+        Workspace <span class="text-danger">*</span>
+      <% end %>
+      <% if @room.workspace_id.present? %>
+        <!-- Pre-selected workspace (from nested route) -->
+        <%= form.select :workspace_id,
+                        options_from_collection_for_select(@workspaces, :id, :name, @room.workspace_id),
+                        {},
+                        { class: "form-select", required: true, disabled: true } %>
+        <%= form.hidden_field :workspace_id %>
+        <div class="form-text">This room will be created in the selected workspace.</div>
+      <% else %>
+        <!-- Regular workspace selection -->
+        <%= form.select :workspace_id,
+                        options_from_collection_for_select(@workspaces, :id, :name),
+                        { prompt: 'Select Workspace' },
+                        { class: "form-select", required: true } %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :name, class: "form-label" do %>
+        Name <span class="text-danger">*</span>
+      <% end %>
+      <%= form.text_field :name, class: "form-control", required: true, placeholder: "e.g., Conference Room A" %>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+      <%= form.label :category, class: "form-label" do %>
+        Category <span class="text-danger">*</span>
+      <% end %>
+      <%= form.select :category, 
+                      options_for_select([
+                        ['Meeting Room', 'meeting_room'],
+                        ['Conference Room', 'conference_room'],
+                        ['Phone Booth', 'phone_booth'],
+                        ['Open Desk', 'open_desk'],
+                        ['Private Office', 'private_office'],
+                        ['Event Space', 'event_space']
+                      ], @room.category), 
+                      { prompt: 'Select Category' }, 
+                      { class: "form-select", required: true } %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :capacity, class: "form-label" do %>
+      Capacity <span class="text-danger">*</span>
+    <% end %>
+    <%= form.number_field :capacity, class: "form-control", required: true, min: 1, placeholder: "Maximum number of people" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :photo, "Room Photo", class: "form-label" %><%= @room.persisted? ? raw('<span class="text-danger">*</span>') : '' %>
+    <% if @room.persisted? && @room.photo.attached? %>
+      <div class="current-photo mb-2">
+        <small class="text-muted">Current photo:</small><br>
+        <%= image_tag @room.photo, class: "img-thumbnail", style: "max-width: 200px; height: auto;" %>
+      </div>
+    <% end %>
+    <%= form.file_field :photo, class: "form-control", accept: "image/*" %>
+    <div class="form-text">
+      <%= @room.persisted? ? 
+          "Upload a new photo to replace the current one (optional). Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB." :
+          "Upload a photo of the room (optional). Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB." %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :amenity_ids, "Room Amenities", class: "form-label" %><%= @room.persisted? ? raw('<span class="text-danger">*</span>') : '' %>
+    <div class="form-text mb-2">Select the amenities available in this room</div>
+    <div class="row">
+      <% @amenities.each do |amenity| %>
+        <div class="col-md-6 mb-2">
+          <div class="form-check">
+            <%= form.check_box :amenity_ids, 
+                { multiple: true, class: "form-check-input" }, 
+                amenity.id, 
+                nil %>
+            <%= form.label "amenity_ids_#{amenity.id}", 
+                amenity.name, 
+                class: "form-check-label" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :is_available, "Status", class: "form-label" %><span class="text-danger">*</span>
+    <div class="form-check">
+      <%= form.check_box :is_available, { class: "form-check-input" }, true, false %>
+      <%= form.label :is_available, "Active", class: "form-check-label" %>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= form.submit @room.persisted? ? "Update Room" : "Create Room", class: "btn btn-primary" %>
+    <%= link_to "Cancel", request.referer || admin_rooms_path, class: "btn btn-secondary" %>
+  </div>
+<% end %> 

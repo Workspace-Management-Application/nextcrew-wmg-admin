@@ -1,5 +1,5 @@
 class Admin::RoomsController < Admin::BaseController
-  before_action :set_workspace, only: [:edit, :update, :destroy]
+  before_action :set_workspace, only: [:new, :create, :show, :edit, :update, :destroy]
   before_action :set_room, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -49,14 +49,27 @@ class Admin::RoomsController < Admin::BaseController
 
   def new
     @room = Room.new
+    
+    # If accessed via nested route, set the workspace
+    if params[:workspace_id].present?
+      @room.workspace = @workspace
+    end
+    
     @workspaces = current_user.workspaces.order(:name)
     @amenities = Amenity.order(:name)
   end
 
   def create
-    workspace_id = params[:room][:workspace_id]
-    @workspace = current_user.workspaces.find(workspace_id)
-    @room = @workspace.rooms.build(room_params.except(:photo, :amenity_ids, :workspace_id))
+    # If accessed via nested route, use the workspace from the URL
+    if params[:workspace_id].present?
+      target_workspace = @workspace
+    else
+      # If accessed via standalone route, use the workspace from the form
+      workspace_id = params[:room][:workspace_id]
+      target_workspace = current_user.workspaces.find(workspace_id)
+    end
+    
+    @room = target_workspace.rooms.build(room_params.except(:photo, :amenity_ids, :workspace_id))
     
     if @room.save
       # Handle amenity associations
@@ -74,7 +87,12 @@ class Admin::RoomsController < Admin::BaseController
         end
       end
       
-      redirect_to admin_rooms_path, notice: 'Room was successfully created.'
+              # Redirect based on the route context
+        if params[:workspace_id].present?
+          redirect_to admin_workspace_path(target_workspace), notice: 'Room was successfully created.'
+        else
+        redirect_to admin_rooms_path, notice: 'Room was successfully created.'
+      end
     else
       @workspaces = current_user.workspaces.order(:name)
       @amenities = Amenity.order(:name)
@@ -109,14 +127,21 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def destroy
+    workspace = @room.workspace
     @room.destroy
-    redirect_to admin_rooms_path, notice: 'Room was successfully deleted.'
+    
+    # Redirect based on the route context
+    if params[:workspace_id].present?
+      redirect_to admin_workspace_path(workspace), notice: 'Room was successfully deleted.'
+    else
+      redirect_to admin_rooms_path, notice: 'Room was successfully deleted.'
+    end
   end
 
   private
 
   def set_workspace
-    @workspace = Workspace.find(params[:workspace_id])
+    @workspace = Workspace.find(params[:workspace_id]) if params[:workspace_id].present?
   end
 
   def set_room

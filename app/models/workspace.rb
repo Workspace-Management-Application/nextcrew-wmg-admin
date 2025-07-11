@@ -24,7 +24,7 @@ class Workspace < ApplicationRecord
   # Callbacks
   after_create :associate_super_admins
 
-  enum :status, { pending: 'pending', confirmed: 'confirmed' }
+  enum :status, { pending: 'pending', completed: 'completed' }
 
   accepts_nested_attributes_for :rooms, allow_destroy: true, reject_if: proc { |attributes| attributes['name'].blank? && attributes['category'].blank? && attributes['capacity'].blank? }
 

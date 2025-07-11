@@ -3,7 +3,8 @@ class Admin::VisitorEntriesController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @visitor_entries = VisitorEntry.includes(:workspace)
+    workspace_ids = current_user.workspaces.pluck(:id)
+    @visitor_entries = VisitorEntry.includes(:workspace).where(workspace_id: workspace_ids)
     
     # Search functionality
     if @search.present?

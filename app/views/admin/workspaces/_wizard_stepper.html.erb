@@ -1,4 +1,4 @@
-<nav aria-label="wizard-steps" class="mb-4 wizard-stepper-center">
+<nav aria-label="wizard-steps" class="mb-4">
   <ol class="breadcrumb bg-dark text-white p-2" style="border-radius: 0.5rem;">
     <li class="breadcrumb-item <%= step == 1 ? 'active text-white fw-bold' : 'text-white' %>" style="<%= step == 1 ? 'background: #222;' : '' %>">
       Step 1: Details
@@ -18,9 +18,5 @@
 @keyframes fadeIn {
   from { opacity: 0.3; }
   to { opacity: 1; }
-}
-.wizard-stepper-center {
-  display: flex;
-  justify-content: center;
 }
 </style>

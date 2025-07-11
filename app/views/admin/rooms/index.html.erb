@@ -121,12 +121,13 @@
             </td>
             <td class="action-column">
               <%= link_to "Edit", edit_admin_workspace_room_path(room.workspace, room), class: "btn btn-secondary btn-sm me-2" %>
-              <%= link_to "Delete", admin_workspace_room_path(room.workspace, room), 
+              <%= button_to "Delete", admin_room_path(room), 
+                          method: :delete,
                           data: { 
-                            turbo_method: :delete, 
-                            turbo_confirm: "Are you sure you want to delete this room?" 
+                            confirm: "Are you sure you want to delete this room?" 
                           },
-                          class: "btn btn-danger btn-sm" %>
+                          class: "btn btn-danger btn-sm",
+                          form: { style: "display: inline;" } %>
             </td>
           </tr>
         <% end %>
@@ -156,8 +157,4 @@
     </div>
   <% end %>
 </div>
-
-<script>
-    intializeDataTableSort();
-</script>
 

@@ -3,7 +3,15 @@ class Admin::UsersController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @users = User.includes(:workspaces)
+    workspace_ids = current_user.workspaces.pluck(:id)
+    @users = User.joins(:user_workspaces)
+                 .where(user_workspaces: { workspace_id: workspace_ids })
+                 .distinct
+                 .includes(:workspaces)
+
+    unless current_user.super_admin?
+      @users = @users.where.not(role: 'super_admin')
+    end
     
     # Search functionality
     if @search.present?
