@@ -12,3 +12,6 @@ pin "@popperjs/core", to: "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/li
 pin "jquery" # @3.7.1
 pin "cocoon", to: "cocoon.js"
 
+# Select2
+pin "select2", to: "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
+
