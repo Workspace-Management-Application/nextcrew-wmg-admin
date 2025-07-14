@@ -38,7 +38,7 @@
                 ['Inactive', 'inactive']
               ], @company.status), 
               {}, 
-              { class: "form-select" } %>
+              { class: "select2-select", 'data-placeholder': 'Select Status' } %>
         </div>
       </div>
     <% else %>
@@ -79,14 +79,14 @@
       <%= form.select :workspace_id,
         options_from_collection_for_select(@workspaces, :id, :name, @company.workspaces.first&.id),
         { prompt: 'Select Workspace' },
-        { class: "form-select", id: "company_workspace_id" } %>
+        { class: "select2-select", id: "company_workspace_id", 'data-placeholder': 'Select Workspace' } %>
     </div>
     <div class="col-md-6 mb-3">
       <%= form.label :room_ids, "Rooms", class: "form-label" %>
       <% if @company.persisted? %>
-        <%= form.collection_select :room_ids, @rooms, :id, :name, { selected: @company.rooms.pluck(:id), multiple: true }, { class: "selectpicker", multiple: true, required: true, 'data-live-search': true, title: "Select Rooms", 'data-style': 'btn-dark', id: "company_room_ids" } %>
+        <%= form.collection_select :room_ids, @rooms, :id, :name, { selected: @company.rooms.pluck(:id), multiple: true }, { class: "select2-select", multiple: true, required: true, 'data-placeholder': "Select Rooms", id: "company_room_ids" } %>
       <% else %>
-        <%= form.collection_select :room_ids, [], :id, :name, { multiple: true }, { class: "selectpicker", multiple: true, required: true, 'data-live-search': true, title: "Select Rooms", 'data-style': 'btn-dark', id: "company_room_ids" } %>
+        <%= form.collection_select :room_ids, [], :id, :name, { multiple: true }, { class: "select2-select", multiple: true, required: true, 'data-placeholder': "Select Rooms", id: "company_room_ids" } %>
       <% end %>
     </div>
   </div>
@@ -161,16 +161,37 @@ function initializeCompanyForm() {
   
   if (!workspaceSelect || !roomSelect) return;
 
-  // Initialize selectpicker for room select
-  if (typeof $ !== 'undefined' && $.fn.selectpicker) {
-    $(roomSelect).selectpicker('refresh');
+  // Initialize Select2 for workspace select
+  if (typeof $ !== 'undefined' && $.fn.select2) {
+    $(workspaceSelect).select2({
+      theme: 'default',
+      width: '100%',
+      placeholder: 'Select Workspace',
+      allowClear: true
+    });
+  }
+
+  // Initialize Select2 for room select
+  if (typeof $ !== 'undefined' && $.fn.select2) {
+    $(roomSelect).select2({
+      theme: 'default',
+      width: '100%',
+      placeholder: 'Select Rooms',
+      allowClear: true
+    });
   }
 
   function loadRoomsForWorkspace(workspaceId) {
     if (!workspaceId) {
       roomSelect.innerHTML = '';
-      if (typeof $ !== 'undefined' && $.fn.selectpicker) {
-        $(roomSelect).selectpicker('refresh');
+      if (typeof $ !== 'undefined' && $.fn.select2) {
+        $(roomSelect).select2('destroy');
+        $(roomSelect).select2({
+          theme: 'default',
+          width: '100%',
+          placeholder: 'Select Rooms',
+          allowClear: true
+        });
       }
       return;
     }
@@ -185,23 +206,42 @@ function initializeCompanyForm() {
           option.textContent = room.name;
           roomSelect.appendChild(option);
         });
-        // Reinitialize the selectpicker after all options are added
-        if (typeof $ !== 'undefined' && $.fn.selectpicker) {
-          $(roomSelect).selectpicker('refresh');
+        // Reinitialize the Select2 after all options are added
+        if (typeof $ !== 'undefined' && $.fn.select2) {
+          $(roomSelect).select2('destroy');
+          $(roomSelect).select2({
+            theme: 'default',
+            width: '100%',
+            placeholder: 'Select Rooms',
+            allowClear: true
+          });
         }
       })
       .catch(error => {
         console.error('Error loading rooms:', error);
         roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
-        if (typeof $ !== 'undefined' && $.fn.selectpicker) {
-          $(roomSelect).selectpicker('refresh');
+        if (typeof $ !== 'undefined' && $.fn.select2) {
+          $(roomSelect).select2('destroy');
+          $(roomSelect).select2({
+            theme: 'default',
+            width: '100%',
+            placeholder: 'Select Rooms',
+            allowClear: true
+          });
         }
       });
   }
 
-  // Event listener for workspace change
-  workspaceSelect.addEventListener('change', function() {
-    loadRoomsForWorkspace(this.value);
-  });
+  // Event listener for workspace change using jQuery for Select2
+  if (typeof $ !== 'undefined' && $.fn.select2) {
+    $(workspaceSelect).on('change', function() {
+      loadRoomsForWorkspace(this.value);
+    });
+  } else {
+    // Fallback to native event listener
+    workspaceSelect.addEventListener('change', function() {
+      loadRoomsForWorkspace(this.value);
+    });
+  }
 }
 </script>

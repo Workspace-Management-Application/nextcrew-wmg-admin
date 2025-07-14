@@ -27,7 +27,7 @@
           <%= form.select :company_id, 
                           options_from_collection_for_select(@companies, :id, ->(company) { "#{company.name} (#{company.email})" }), 
                           { prompt: 'Select Company' }, 
-                          { class: "form-select", required: true, id: "company_select" } %>
+                          { class: "select2-select", required: true, id: "company_select", 'data-placeholder': 'Select Company' } %>
         </div>
         
         <div class="col-md-6 mb-3">
@@ -37,7 +37,7 @@
           <%= form.select :room_id, 
                           options_for_select([]), 
                           { prompt: 'Select Company First' }, 
-                          { class: "form-select", required: true, id: "room_select", disabled: true } %>
+                          { class: "select2-select", required: true, id: "room_select", disabled: true, 'data-placeholder': 'Select Room' } %>
         </div>
       </div>
 
@@ -74,16 +74,35 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  initializeBookingForm();
+});
+
+document.addEventListener('turbo:load', function() {
+  initializeBookingForm();
+});
+
+function initializeBookingForm() {
   const companySelect = document.getElementById('company_select');
   const roomSelect = document.getElementById('room_select');
 
-  companySelect.addEventListener('change', function() {
-    const companyId = this.value;
-    
+  if (!companySelect || !roomSelect) return;
+
+  function loadRoomsForCompany(companyId) {
     if (companyId) {
       // Enable room dropdown and show loading
       roomSelect.disabled = false;
       roomSelect.innerHTML = '<option value="">Loading rooms...</option>';
+      
+      // Reinitialize Select2 for room select
+      if (typeof $ !== 'undefined' && $.fn.select2) {
+        $(roomSelect).select2('destroy');
+        $(roomSelect).select2({
+          theme: 'default',
+          width: '100%',
+          placeholder: 'Loading rooms...',
+          allowClear: true
+        });
+      }
       
       // Fetch rooms for the selected company
       fetch(`<%= company_rooms_admin_bookings_path %>?company_id=${companyId}`)
@@ -103,16 +122,57 @@ document.addEventListener('DOMContentLoaded', function() {
           if (rooms.length === 0) {
             roomSelect.innerHTML = '<option value="">No rooms available for this company</option>';
           }
+          
+          // Reinitialize Select2 after options are added
+          if (typeof $ !== 'undefined' && $.fn.select2) {
+            $(roomSelect).select2('destroy');
+            $(roomSelect).select2({
+              theme: 'default',
+              width: '100%',
+              placeholder: 'Select Room',
+              allowClear: true
+            });
+          }
         })
         .catch(error => {
           console.error('Error fetching rooms:', error);
           roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+          if (typeof $ !== 'undefined' && $.fn.select2) {
+            $(roomSelect).select2('destroy');
+            $(roomSelect).select2({
+              theme: 'default',
+              width: '100%',
+              placeholder: 'Error loading rooms',
+              allowClear: true
+            });
+          }
         });
     } else {
       // Reset room dropdown
       roomSelect.disabled = true;
       roomSelect.innerHTML = '<option value="">Select Company First</option>';
+      if (typeof $ !== 'undefined' && $.fn.select2) {
+        $(roomSelect).select2('destroy');
+        $(roomSelect).select2({
+          theme: 'default',
+          width: '100%',
+          placeholder: 'Select Company First',
+          allowClear: true
+        });
+      }
     }
-  });
-});
+  }
+
+  // Event listener using jQuery for Select2 compatibility
+  if (typeof $ !== 'undefined' && $.fn.select2) {
+    $(companySelect).on('change', function() {
+      loadRoomsForCompany(this.value);
+    });
+  } else {
+    // Fallback to native event listener
+    companySelect.addEventListener('change', function() {
+      loadRoomsForCompany(this.value);
+    });
+  }
+}
 </script>

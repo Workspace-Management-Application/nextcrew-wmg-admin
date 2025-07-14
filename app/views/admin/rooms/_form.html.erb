@@ -28,7 +28,7 @@
         <%= form.select :workspace_id,
                         options_from_collection_for_select(@workspaces, :id, :name),
                         { prompt: 'Select Workspace' },
-                        { class: "form-select", required: true } %>
+                        { class: "select2-select", required: true, 'data-placeholder': 'Select Workspace' } %>
       <% end %>
     </div>
   <% end %>
@@ -55,7 +55,7 @@
                         ['Event Space', 'event_space']
                       ], @room.category), 
                       { prompt: 'Select Category' }, 
-                      { class: "form-select", required: true } %>
+                      { class: "select2-select", required: true, 'data-placeholder': 'Select Category' } %>
     </div>
   </div>
 

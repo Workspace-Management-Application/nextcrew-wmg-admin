@@ -34,7 +34,7 @@
   </div>
   <div class="col-md-6">
     <%= form.label :workspace_id, "Workspace", class: "form-label" %><span class="text-danger">*</span>
-    <%= form.collection_select :workspace_id, @workspaces, :id, :name, { prompt: "Select Workspace" }, { class: "form-select form-control-dark" } %>
+    <%= form.collection_select :workspace_id, @workspaces, :id, :name, { prompt: "Select Workspace" }, { class: "select2-select", 'data-placeholder': "Select Workspace" } %>
   </div>
   <div class="col-md-6">
     <%= form.label :photo, class: "form-label" %><span class="text-danger">*</span>

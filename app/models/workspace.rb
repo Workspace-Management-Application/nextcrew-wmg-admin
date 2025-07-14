@@ -1,4 +1,8 @@
 class Workspace < ApplicationRecord
+  # Scope to return only workspaces with status 'completed'
+  scope :completed, -> { where(status: 'completed') }
+  scope :pending, -> { where(status: 'pending') }
+  
   has_many :company_workspaces,  dependent: :destroy
   has_many :companies, through: :company_workspaces,  dependent: :destroy
   has_many :user_workspaces,  dependent: :destroy

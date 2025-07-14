@@ -575,39 +575,10 @@
   color: #000000 !important;
 }
 
-.bootstrap-select,
-.bootstrap-select .dropdown-toggle,
-.selectpicker {
-  width: 100% !important;
-}
+/* Select2 styles are now handled in the admin layout */
 
-.bootstrap-select .dropdown-toggle {
-  background-color: #1a1a1a !important;
-  border: 1px solid #333333 !important;
-  color: #ffffff !important;
-  border-radius: 6px !important;
-  text-align: left;
-  min-height: 38px;
-  box-shadow: none !important;
-  padding: 0.375rem 0.75rem;
-  cursor: pointer !important;
-}
-
-.bootstrap-select .dropdown-toggle:focus,
-.bootstrap-select .dropdown-toggle:active,
-.bootstrap-select .dropdown-toggle:hover {
-  border-color: #ffffff !important;
-  box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.1) !important;
-  color: #ffffff !important;
-  outline: none !important;
-  background-color: #1a1a1a !important;
-}
-
-.bootstrap-select .dropdown-toggle .filter-option {
-  color: #ffffff !important;
-}
-
-/* Remove default caret and use Bootstrap's */
-.bootstrap-select .dropdown-toggle::after {
-  border-top: 0.3em solid #fff !important;
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    cursor: default;
+    padding-left: 10px !important;
+    padding-right: 5px;
 }

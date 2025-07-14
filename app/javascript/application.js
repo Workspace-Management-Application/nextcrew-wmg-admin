@@ -2,16 +2,48 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "bootstrap"
-import "bootstrap-select"
-import "jquery"
 import "cocoon"
+import "select2"
 
+// Initialize Select2 after every Turbo page load
+document.addEventListener("turbo:load", function() {
+  if (window.$ && typeof $().select2 === 'function') {
+    $('.select2-select').each(function() {
+      const placeholder = $(this).data('placeholder') || 'Select an option';
+      $(this).select2({
+        theme: 'default',
+        width: '100%',
+        placeholder: placeholder,
+        allowClear: true
+      });
+    });
+  }
+});
 
-// Initialize selectpicker after every Turbo page load
-// Note: bootstrap-select is loaded via CDN in admin layout
-document.addEventListener("turbo:load", () => {
-  if (window.$ && typeof $('.selectpicker').selectpicker === 'function') {
-    $('.selectpicker').selectpicker('render');
-    $('.selectpicker').selectpicker('refresh');
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.$ && typeof $().select2 === 'function') {
+    $('.select2-select').each(function() {
+      const placeholder = $(this).data('placeholder') || 'Select an option';
+      $(this).select2({
+        theme: 'default',
+        width: '100%',
+        placeholder: placeholder,
+        allowClear: true
+      });
+    });
+  }
+});
+
+$(document).on('cocoon:after-insert', function(e, insertedItem) {
+  if (window.$ && typeof $().select2 === 'function') {
+    insertedItem.find('.select2-select').each(function() {
+      const placeholder = $(this).data('placeholder') || 'Select an option';
+      $(this).select2({
+        theme: 'default',
+        width: '100%',
+        placeholder: placeholder,
+        allowClear: true
+      });
+    });
   }
 });

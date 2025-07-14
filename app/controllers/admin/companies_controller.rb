@@ -51,7 +51,7 @@ class Admin::CompaniesController < Admin::BaseController
 
   def new
     @company = Company.new
-    @workspaces = Workspace.order(:name)
+    @workspaces = current_user.workspaces.completed.order(:name)
   end
 
   def create
@@ -80,7 +80,7 @@ class Admin::CompaniesController < Admin::BaseController
   end
 
   def edit
-    @workspaces = Workspace.order(:name)
+    @workspaces = current_user.workspaces.completed.order(:name)
     @rooms = Room.joins(:workspace).where(workspaces: { id: @company.workspaces.pluck(:id) }).order(:name)
   end
 

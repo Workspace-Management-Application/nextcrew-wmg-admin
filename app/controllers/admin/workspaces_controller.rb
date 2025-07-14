@@ -36,7 +36,7 @@ class Admin::WorkspacesController < Admin::BaseController
     @workspaces = @workspaces.page(params[:page]).per(10)
 
     # Find a pending workspace for resume/start over UI
-    @pending_workspaces = current_user.workspaces.where(status: 'pending') unless current_user.super_admin?
+    @pending_workspaces = current_user.workspaces.pending
   end
 
   def show
@@ -60,7 +60,7 @@ class Admin::WorkspacesController < Admin::BaseController
     
     if @workspace.save
       # Assign the creator as a user of this workspace
-      UserWorkspace.create!(user: current_user, workspace: @workspace)
+      UserWorkspace.create!(user: current_user, workspace: @workspace) unless current_user.super_admin?
       # Handle photo upload using Active Storage with auto folder organization
       if params[:workspace][:photo].present?
         photo_result = PhotoUploadService.attach_photo_auto(@workspace, params[:workspace][:photo])
@@ -149,9 +149,10 @@ class Admin::WorkspacesController < Admin::BaseController
                           .left_joins(:user_workspaces)
                           .where(user_workspaces: { id: nil })
                           .order(:name)
+    @assigned_floor_users = @workspace.users.where(role: 'floor_user')
     respond_to do |format|
       format.html
-      format.js { render partial: 'admin/workspaces/step2_user', locals: { workspace: @workspace, available_users: @available_users } }
+      format.js { render partial: 'admin/workspaces/step2_user', locals: { workspace: @workspace, available_users: @available_users, assigned_floor_users: @assigned_floor_users } }
     end
   end
 
@@ -214,6 +215,7 @@ class Admin::WorkspacesController < Admin::BaseController
   def update_step3
     unless params[:workspace].nil?
       if @workspace.update(workspace_params)
+        @workspace.update(wizard_step: 3, status:"completed")
         
         respond_to do |format|
           format.html { redirect_to admin_workspaces_path, notice: 'Rooms created successfully!' }
