@@ -46,6 +46,7 @@
           <th>Phone</th>
           <th>Status</th>
           <th>Total Users</th>
+          <th>Rooms</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -62,6 +63,7 @@
               </span>
             </td>
             <td><%= company.users.count %></td>
+            <td><%= company.rooms.pluck(:name).join(', ') %></td>
             <td class="action-column">
               <%= link_to "Edit", edit_admin_company_path(company), class: "btn btn-secondary btn-sm me-2", data: { turbo: false } %>
               

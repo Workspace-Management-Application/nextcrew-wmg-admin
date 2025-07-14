@@ -145,7 +145,7 @@ class Admin::WorkspacesController < Admin::BaseController
 
   def step2
     @workspace.update(wizard_step: 2) unless @workspace.wizard_step >= 2
-    @available_users = User.where(role: ['floor_user', 'user'])
+    @available_users = User.where(role: ['floor_user'])
                           .left_joins(:user_workspaces)
                           .where(user_workspaces: { id: nil })
                           .order(:name)
@@ -172,7 +172,7 @@ class Admin::WorkspacesController < Admin::BaseController
         end
       else
         @user = user
-        @available_users = User.where(role: ['floor_user', 'user'])
+        @available_users = User.where(role: ['floor_user'])
                               .left_joins(:user_workspaces)
                               .where(user_workspaces: { id: nil })
                               .order(:name)

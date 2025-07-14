@@ -183,7 +183,7 @@ class Admin::CompaniesController < Admin::BaseController
   end
 
   def company_params
-    permitted_params = [:name, :email, :phone_number, :address, :cabin_number, :no_of_employee, :meeting_time_limit_per_month, :no_of_meeting_per_day, :meeting_time_limit_per_day, :minimum_minutes_meeting_limit, :max_minutes_meeting_limit]
+    permitted_params = [:name, :email, :phone_number, :address, :cabin_number, :no_of_employee, :meeting_time_limit_per_month, :no_of_meeting_per_day, :meeting_time_limit_per_day, :minimum_minutes_meeting_limit, :max_minutes_meeting_limit, :parallel_booking]
     
     # Only super_admin can change status
     if current_user.super_admin?

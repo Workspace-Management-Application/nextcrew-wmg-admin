@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_10_110533) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_11_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -76,6 +76,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_10_110533) do
     t.integer "minimum_minutes_meeting_limit"
     t.integer "max_minutes_meeting_limit"
     t.integer "meeting_time_limit_per_day", null: false
+    t.boolean "parallel_booking", default: false, null: false
   end
 
   create_table "company_rooms", force: :cascade do |t|

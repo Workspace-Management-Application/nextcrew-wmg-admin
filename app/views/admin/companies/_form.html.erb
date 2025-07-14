@@ -1,4 +1,4 @@
-<%= form_with model: [:admin, @company], local: true, class: "needs-validation", novalidate: true do |form| %>
+<%= form_with model: [:admin, @company], local: true, class: "needs-validation", novalidate: true, data: { turbo: false } do |form| %>
   <% if @company.errors.any? %>
     <div class="alert alert-danger">
       <h6><%= pluralize(@company.errors.count, "error") %> prohibited this company from being saved:</h6>
@@ -130,6 +130,13 @@
         Maximum Meeting Duration (minutes) <span class="text-danger">*</span>
       <% end %>
       <%= form.number_field :max_minutes_meeting_limit, class: "form-control", required: true, min: 1 %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="form-check">
+      <%= form.check_box :parallel_booking, class: "form-check-input" %>
+      <%= form.label :parallel_booking, "Allow Parallel Booking", class: "form-check-label" %>
     </div>
   </div>
 

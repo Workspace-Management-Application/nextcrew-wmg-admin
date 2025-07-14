@@ -6,6 +6,7 @@ class Booking < ApplicationRecord
   enum :status, { confirmed: 'confirmed', cancelled: 'cancelled' }, default: :confirmed
 
   validates :phone_number, :company_id, :room_id, :start_time, :end_time, :status, presence: true
+  validates :phone_number, format: { with: /\A[1-9][0-9]{9}\z/, message: "must be 10 digits and not start with zero" }
   validate :start_and_end_time_validity
   validate :no_time_overlap_for_room
   validate :check_meeting_duration_limits
@@ -13,6 +14,7 @@ class Booking < ApplicationRecord
   validate :company_room_association_exists
   validate :check_user_booking_time_restrictions
   validate :check_user_forward_booking_restrictions
+  validate :start_time_cannot_be_in_past_for_user_roles
 
   after_commit :check_monthly_meeting_time_limit, on: :create
   after_commit :check_daily_meeting_time_limit, on: :create
@@ -143,6 +145,14 @@ class Booking < ApplicationRecord
 
   private
 
+  def start_time_cannot_be_in_past_for_user_roles
+    return if can_override_company_restrictions?
+    return if start_time.blank?
+    if (acting_user&.user? || acting_user&.floor_user?) && start_time < Time.current
+      errors.add(:start_time, "Start time cannot be past from the current Time")
+    end
+  end
+
   def no_time_overlap_for_room
     return if start_time.blank? || end_time.blank? || room_id.blank?
 
@@ -172,6 +182,7 @@ class Booking < ApplicationRecord
   def check_company_time_slot_overlap
     return if company.blank? || start_time.blank? || end_time.blank?
     return if can_override_company_restrictions?
+    return if company.parallel_booking?
     
     # Check if the company has any other bookings in the same time slot
     if company_has_time_slot_conflicts?
@@ -237,7 +248,7 @@ class Booking < ApplicationRecord
     existing_bookings.each do |existing_booking|
       # Rule 1: Can't book before an existing booking's start time in the same room
       if start_time < existing_booking.start_time
-        errors.add(:start_time, "cannot be before the existing booking at #{existing_booking.start_time.strftime('%I:%M %p')} in #{existing_booking.room.name}")
+        errors.add(:start_time, "You have already booking from before #{existing_booking.start_time.strftime('%I:%M %p')} to #{existing_booking.end_time.strftime('%I:%M %p')} in #{existing_booking.room.name}. You are only allow to make booking after #{existing_booking.end_time.strftime('%I:%M %p')}")
       end
     end
   end

@@ -7,5 +7,5 @@ class DayPass < ApplicationRecord
 
   validates :name, :email, :phone_number, :pass_date, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, message: "invalid email format" }
-  validates :phone_number, format: { with: /\A(\+?\d{1,3}[- ]?)?\(?\d{1,4}?\)?[- ]?\d{1,4}[- ]?\d{1,4}\z/, message: "invalid phone number format" }
+  validates :phone_number, format: { with: /\A[1-9][0-9]{9}\z/, message: "must be 10 digits and not start with zero" }
 end
