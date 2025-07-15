@@ -11,7 +11,7 @@
     <div class="col-md-8">
       <label class="form-label">Search Companies</label>
       <%= form_with url: admin_companies_path, method: :get, local: true, class: "d-flex gap-2" do |form| %>
-        <%= form.text_field :search, value: @search, placeholder: "Search by name, email, phone, address, or cabin number...", 
+        <%= form.text_field :search, value: @search, placeholder: "Search by name, email, phone, address, cabin number, centre address, POC contact, or company email...", 
                            class: "form-control", style: "background: #2d2d2d; border: 1px solid #555; color: #fff;" %>
         <%= form.submit "Search", class: "btn btn-outline-light" %>
         <% if @search.present? || params[:status].present? %>
@@ -44,6 +44,7 @@
           <th>Name</th>
           <th>Email</th>
           <th>Phone</th>
+          <th>POC Contact</th>
           <th>Status</th>
           <th>Total Users</th>
           <th>Rooms</th>
@@ -57,6 +58,7 @@
             <td><%= company.name %></td>
             <td><%= company.email %></td>
             <td><%= company.phone_number %></td>
+            <td><%= company.company_poc_contact %></td>
             <td>
               <span class="badge <%= company.status == 'active' ? 'bg-success' : 'bg-secondary' %>">
                 <%= company.status.humanize %>

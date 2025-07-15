@@ -221,10 +221,28 @@
   margin: 0;
 }
 
+.profile-dropdown {
+  position: relative;
+}
+
 .profile-dropdown .profile-btn {
   background: none;
   border: none;
   padding: 0;
+}
+
+.profile-dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+  min-width: 200px;
+  z-index: 1050;
+  margin-top: 0.125rem;
+  background-color: #1a1a1a !important;
+  border: 1px solid #333333 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 .profile-avatar {
@@ -522,6 +540,20 @@
 
   .sidebar-toggle {
     display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-dropdown .dropdown-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 300px;
+    margin: 0;
   }
 }
 

@@ -15,17 +15,17 @@
           <div class="col-md-6 mb-3">
             <%= form.label :workspace_id, "Workspace", class: "form-label" %>
             <%= form.select :workspace_id, 
-                options_for_select([['All Workspaces', 'all']] + @workspaces.map { |w| [w.name, w.id] }), 
-                { selected: 'all' }, 
-                { class: "form-select", id: "workspace-select" } %>
+                options_for_select(@workspaces.map { |w| [w.name, w.id] }), 
+                { prompt: 'Select Workspace' }, 
+                { class: "form-select", id: "workspace-select", required: true } %>
           </div>
           
           <div class="col-md-6 mb-3">
             <%= form.label :company_id, "Company", class: "form-label" %>
             <%= form.select :company_id, 
-                options_for_select([['All Companies', 'all']] + @companies.map { |c| [c.name, c.id] }), 
-                { selected: 'all' }, 
-                { class: "form-select", id: "company-select" } %>
+                options_for_select(@companies.map { |c| [c.name, c.id] }), 
+                { prompt: 'Select Company' }, 
+                { class: "form-select", id: "company-select", required: true } %>
           </div>
         </div>
 
@@ -73,20 +73,10 @@ document.addEventListener('DOMContentLoaded', function() {
   workspaceSelect.addEventListener('change', function() {
     const selectedWorkspaceId = this.value;
     
-    // Clear current options
-    companySelect.innerHTML = '<option value="all">All Companies</option>';
+    // Clear current options and add prompt
+    companySelect.innerHTML = '<option value="">Select Company</option>';
     
-    if (selectedWorkspaceId === 'all') {
-      // Load all companies via AJAX
-      fetch('/admin/exports/companies_by_workspace?workspace_id=all')
-        .then(response => response.json())
-        .then(companies => {
-          companies.forEach(company => {
-            const option = new Option(company.name, company.id);
-            companySelect.add(option);
-          });
-        });
-    } else {
+    if (selectedWorkspaceId) {
       // Load companies for specific workspace via AJAX
       fetch(`/admin/exports/companies_by_workspace?workspace_id=${selectedWorkspaceId}`)
         .then(response => response.json())
@@ -95,6 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const option = new Option(company.name, company.id);
             companySelect.add(option);
           });
+        })
+        .catch(error => {
+          console.error('Error loading companies:', error);
+          companySelect.innerHTML = '<option value="">Error loading companies</option>';
         });
     }
   });

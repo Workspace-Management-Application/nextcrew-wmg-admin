@@ -31,6 +31,33 @@
       </div>
     </div>
 
+    <!-- Additional Company Details -->
+    <div class="bg-dark p-4 rounded mb-4">
+      <h4 class="mb-3">Additional Company Details</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Company Centre Address:</strong> <%= @company.centre_address %></p>
+          <p><strong>Company POC Contact:</strong> <%= @company.company_poc_contact %></p>
+          <p><strong>Company Email Address:</strong> <%= @company.company_email_address %></p>
+          <p><strong>Floor No:</strong> <%= @company.floor_no %></p>
+          <p><strong>No of Seats:</strong> <%= @company.no_of_seats %></p>
+          <p><strong>Lock-in Period:</strong> <%= @company.lock_in_period %> months</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Cost per Seat / Monthly Rental:</strong> ₹<%= @company.cost_per_seat %></p>
+          <p><strong>Commencement Date:</strong> <%= @company.commencement_date&.strftime("%B %d, %Y") %></p>
+          <p><strong>Agreement Date:</strong> <%= @company.agreement_date&.strftime("%B %d, %Y") %></p>
+          <p><strong>Lease Expiry Date:</strong> <%= @company.lease_expiry_date&.strftime("%B %d, %Y") %></p>
+          <p><strong>Shift Type:</strong> <%= @company.shift_type %></p>
+          <p><strong>Name Board Charges:</strong> 
+            <span class="badge <%= @company.name_board_charges? ? 'bg-success' : 'bg-secondary' %>">
+              <%= @company.name_board_charges? ? 'YES' : 'NO' %>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Workspace Information -->
     <% if @company.workspaces.any? %>
       <div class="bg-dark p-4 rounded mb-4">

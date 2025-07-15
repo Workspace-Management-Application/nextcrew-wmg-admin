@@ -580,52 +580,22 @@
       }
       
       function positionDropdown(dropdownMenu, dropdownBtn) {
-        const btnRect = dropdownBtn.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Reset any previous positioning
+        // Simple positioning - align dropdown to the right edge of the button
         dropdownMenu.style.position = 'absolute';
         dropdownMenu.style.top = '100%';
+        dropdownMenu.style.right = '0';
         dropdownMenu.style.left = 'auto';
-        dropdownMenu.style.right = 'auto';
         dropdownMenu.style.transform = 'none';
         dropdownMenu.style.marginTop = '0.125rem';
         dropdownMenu.style.marginBottom = '0';
-        
-        // Temporarily show the menu to measure it
-        dropdownMenu.style.visibility = 'hidden';
-        dropdownMenu.style.display = 'block';
-        
-        const menuWidth = dropdownMenu.offsetWidth;
-        const menuHeight = dropdownMenu.offsetHeight;
-        
-        // Calculate available space on both sides
-        const spaceOnLeft = btnRect.left;
-        const spaceOnRight = viewportWidth - btnRect.right;
-        
-        // Determine which side has more space
-        if (spaceOnLeft >= menuWidth && spaceOnLeft >= spaceOnRight) {
-          // Position on the left
-          dropdownMenu.style.left = '0';
-          dropdownMenu.style.right = 'auto';
-        } else if (spaceOnRight >= menuWidth) {
-          // Position on the right
-          dropdownMenu.style.left = 'auto';
-          dropdownMenu.style.right = '0';
-        } else {
-          // If neither side has enough space, choose the side with more space
-          if (spaceOnLeft > spaceOnRight) {
-            dropdownMenu.style.left = '0';
-            dropdownMenu.style.right = 'auto';
-          } else {
-            dropdownMenu.style.left = 'auto';
-            dropdownMenu.style.right = '0';
-          }
-        }
+        dropdownMenu.style.minWidth = '200px';
+        dropdownMenu.style.zIndex = '1050';
         
         // Check if menu would go off the bottom edge
-        if (btnRect.bottom + menuHeight > viewportHeight) {
+        const btnRect = dropdownBtn.getBoundingClientRect();
+        const menuHeight = dropdownMenu.offsetHeight || 100; // Estimate if not yet rendered
+        
+        if (btnRect.bottom + menuHeight > window.innerHeight) {
           dropdownMenu.style.top = 'auto';
           dropdownMenu.style.bottom = '100%';
           dropdownMenu.style.marginTop = '0';
@@ -633,7 +603,7 @@
         }
         
         // For very small screens, center the menu
-        if (viewportWidth <= 576) {
+        if (window.innerWidth <= 576) {
           dropdownMenu.style.position = 'fixed';
           dropdownMenu.style.top = '50%';
           dropdownMenu.style.left = '50%';
@@ -643,10 +613,6 @@
           dropdownMenu.style.width = '90%';
           dropdownMenu.style.maxWidth = '300px';
         }
-        
-        // Hide the menu again
-        dropdownMenu.style.visibility = 'visible';
-        dropdownMenu.style.display = '';
       }
       
       function closeProfileDropdown() {
