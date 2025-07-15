@@ -12,6 +12,10 @@ class Api::SessionsController < Devise::SessionsController
       return render json: { error: 'User not found' }, status: :not_found
     end
 
+    if user.can_access_web?
+      return render json: { error: "You can't login through Mobile application" }, status: :unauthorized
+    end
+
     # Validate user password
     if user.valid_password?(params[:user][:password])
       # Skip the warden.authenticate! since we already validated the password

@@ -38,7 +38,7 @@ class Admin::UsersController < Admin::BaseController
 
   def new
     @user = User.new
-    @workspaces = Workspace.all
+    @workspaces = current_user.workspaces
   end
 
   def create
@@ -63,7 +63,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def edit
-    @workspaces = Workspace.all
+    @workspaces = current_user.workspaces
   end
 
   def update

@@ -1,4 +1,4 @@
-<%= form_with url: update_step2_admin_workspace_path(@workspace), method: :patch, local: true, html: { id: 'wizard-step2-form' } do |f| %>
+<%= form_with url: update_step2_admin_workspace_path(@workspace), method: :patch, local: true, data: { turbo: false }, html: { id: 'wizard-step2-form' } do |f| %>
   <% assigned_floor_users = defined?(@assigned_floor_users) ? @assigned_floor_users : @workspace.users.where(role: 'floor_user') %>
   <% if assigned_floor_users.any? %>
     <div class="alert alert-info mb-3">
@@ -13,22 +13,53 @@
       </div>
     </div>
     <div id="new-user-fields">
-      <%= fields_for :user, User.new do |uf| %>
+      <% if defined?(@user) && @user&.errors&.any? %>
+        <div class="alert alert-danger mb-3">
+          <h6>Please fix the following errors:</h6>
+          <ul class="mb-0">
+            <% @user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      
+      <%= fields_for :user, defined?(@user) ? @user : User.new do |uf| %>
         <div class="mb-2">
           <%= uf.label :name %>
-          <%= uf.text_field :name, class: 'form-control' %>
+          <%= uf.text_field :name, class: "form-control #{'is-invalid' if defined?(@user) && @user.errors[:name].any?}" %>
+          <% if defined?(@user) && @user.errors[:name].any? %>
+            <div class="invalid-feedback">
+              <%= @user.errors[:name].join(', ') %>
+            </div>
+          <% end %>
         </div>
         <div class="mb-2">
           <%= uf.label :email %>
-          <%= uf.email_field :email, class: 'form-control' %>
+          <%= uf.email_field :email, class: "form-control #{'is-invalid' if defined?(@user) && @user.errors[:email].any?}" %>
+          <% if defined?(@user) && @user.errors[:email].any? %>
+            <div class="invalid-feedback">
+              <%= @user.errors[:email].join(', ') %>
+            </div>
+          <% end %>
         </div>
         <div class="mb-2">
           <%= uf.label :phone_number %>
-          <%= uf.text_field :phone_number, class: 'form-control' %>
+          <%= uf.text_field :phone_number, class: "form-control #{'is-invalid' if defined?(@user) && @user.errors[:phone_number].any?}" %>
+          <% if defined?(@user) && @user.errors[:phone_number].any? %>
+            <div class="invalid-feedback">
+              <%= @user.errors[:phone_number].join(', ') %>
+            </div>
+          <% end %>
         </div>
         <div class="mb-2">
           <%= uf.label :password %>
-          <%= uf.password_field :password, class: 'form-control', autocomplete: 'new-password' %>
+          <%= uf.password_field :password, class: "form-control #{'is-invalid' if defined?(@user) && @user.errors[:password].any?}" %>
+          <% if defined?(@user) && @user.errors[:password].any? %>
+            <div class="invalid-feedback">
+              <%= @user.errors[:password].join(', ') %>
+            </div>
+          <% end %>
         </div>
         <%= uf.hidden_field :role, value: 'floor_user' %>
       <% end %>
