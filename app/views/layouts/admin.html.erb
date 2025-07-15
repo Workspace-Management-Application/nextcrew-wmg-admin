@@ -114,6 +114,36 @@
         line-height: 1 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
       }
+      
+      /* Profile dropdown responsive positioning */
+      .profile-dropdown {
+        position: relative;
+      }
+      
+      .profile-dropdown .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        min-width: 200px;
+        z-index: 1050;
+        margin-top: 0.125rem;
+        /* Remove default positioning - let JavaScript handle it dynamically */
+      }
+      
+      @media (max-width: 576px) {
+        .profile-dropdown {
+          position: static;
+        }
+        
+        .profile-dropdown .dropdown-menu {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 90%;
+          max-width: 300px;
+          z-index: 1060;
+        }
+      }
     </style>
     
     <!-- Chart.js -->
@@ -332,12 +362,12 @@
         </div>
         <!-- Profile Dropdown -->
         <div class="profile-dropdown position-absolute end-0 me-4">
-          <button class="profile-btn" data-bs-toggle="dropdown" aria-expanded="false" id="profileDropdownBtn" data-turbo="true">
+          <button class="profile-btn" id="profileDropdownBtn" type="button">
             <div class="profile-avatar">
               <%= current_user.name&.first&.upcase || "A" %>
             </div>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end" id="profileDropdownMenu">
+          <ul class="dropdown-menu" id="profileDropdownMenu">
             <li><%= link_to "Edit Profile", admin_profile_path, class: "dropdown-item" %></li>
             <li><hr class="dropdown-divider"></li>
             <li><%= button_to "Logout", destroy_user_session_path, method: :delete, class: "dropdown-item border-0 bg-transparent w-100 text-start", form: { style: "display: inline;" } %></li>
@@ -387,9 +417,14 @@
           return;
         }
 
-        // Initialize all dropdowns
+        // Initialize all dropdowns except the profile dropdown
         const dropdownElementList = document.querySelectorAll('[data-bs-toggle="dropdown"]');
         dropdownElementList.forEach(function(dropdownToggleEl) {
+          // Skip the profile dropdown as it's handled separately
+          if (dropdownToggleEl.id === 'profileDropdownBtn') {
+            return;
+          }
+          
           try {
             // Remove any existing dropdown instance
             const existingDropdown = bootstrap.Dropdown.getInstance(dropdownToggleEl);
@@ -466,45 +501,191 @@
       }
 
 
-      // Manual fallback for profile dropdown
+      // Custom profile dropdown implementation
       function initializeProfileDropdown() {
         const profileBtn = document.getElementById('profileDropdownBtn');
         const profileMenu = document.getElementById('profileDropdownMenu');
         
         if (profileBtn && profileMenu) {
-          // Remove existing listeners
-          profileBtn.removeEventListener('click', toggleProfileDropdown);
+          // Remove any existing Bootstrap dropdown instance to prevent conflicts
+          if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+            const existingDropdown = bootstrap.Dropdown.getInstance(profileBtn);
+            if (existingDropdown) {
+              existingDropdown.dispose();
+            }
+          }
           
-          // Add manual click handler as fallback
+          // Remove existing listeners to prevent duplicates
+          profileBtn.removeEventListener('click', toggleProfileDropdown);
+          document.removeEventListener('click', handleOutsideClick);
+          
+          // Add click handler for the profile button
           profileBtn.addEventListener('click', toggleProfileDropdown);
           
-          // Close dropdown when clicking outside
-          document.addEventListener('click', function(event) {
-            if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
-              profileMenu.classList.remove('show');
-              profileBtn.setAttribute('aria-expanded', 'false');
-            }
-          });
+          // Add click handler for outside clicks
+          document.addEventListener('click', handleOutsideClick);
+          
+          // Add escape key handler
+          document.removeEventListener('keydown', handleEscapeKey);
+          document.addEventListener('keydown', handleEscapeKey);
+          
+          // Add window resize handler
+          window.removeEventListener('resize', handleWindowResize);
+          window.addEventListener('resize', handleWindowResize);
+        }
+      }
+      
+      function handleWindowResize() {
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        
+        // Reposition dropdown if it's currently open
+        if (profileMenu && profileBtn && profileMenu.classList.contains('show')) {
+          positionDropdown(profileMenu, profileBtn);
         }
       }
       
       function toggleProfileDropdown(event) {
         event.preventDefault();
         event.stopPropagation();
-        console.log("hello12")
+        
         const profileMenu = document.getElementById('profileDropdownMenu');
         const profileBtn = document.getElementById('profileDropdownBtn');
         
         if (profileMenu && profileBtn) {
           const isVisible = profileMenu.classList.contains('show');
           
+          // Close all other dropdowns first
+          closeAllDropdowns();
+          
           if (isVisible) {
-            profileMenu.classList.remove('show');
-            profileBtn.setAttribute('aria-expanded', 'false');
+            closeProfileDropdown();
           } else {
-            profileMenu.classList.add('show');
-            profileBtn.setAttribute('aria-expanded', 'true');
+            openProfileDropdown();
           }
+        }
+      }
+      
+      function openProfileDropdown() {
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        
+        if (profileMenu && profileBtn) {
+          // Position the dropdown based on available space
+          positionDropdown(profileMenu, profileBtn);
+          
+          profileMenu.classList.add('show');
+          profileBtn.setAttribute('aria-expanded', 'true');
+        }
+      }
+      
+      function positionDropdown(dropdownMenu, dropdownBtn) {
+        const btnRect = dropdownBtn.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Reset any previous positioning
+        dropdownMenu.style.position = 'absolute';
+        dropdownMenu.style.top = '100%';
+        dropdownMenu.style.left = 'auto';
+        dropdownMenu.style.right = 'auto';
+        dropdownMenu.style.transform = 'none';
+        dropdownMenu.style.marginTop = '0.125rem';
+        dropdownMenu.style.marginBottom = '0';
+        
+        // Temporarily show the menu to measure it
+        dropdownMenu.style.visibility = 'hidden';
+        dropdownMenu.style.display = 'block';
+        
+        const menuWidth = dropdownMenu.offsetWidth;
+        const menuHeight = dropdownMenu.offsetHeight;
+        
+        // Calculate available space on both sides
+        const spaceOnLeft = btnRect.left;
+        const spaceOnRight = viewportWidth - btnRect.right;
+        
+        // Determine which side has more space
+        if (spaceOnLeft >= menuWidth && spaceOnLeft >= spaceOnRight) {
+          // Position on the left
+          dropdownMenu.style.left = '0';
+          dropdownMenu.style.right = 'auto';
+        } else if (spaceOnRight >= menuWidth) {
+          // Position on the right
+          dropdownMenu.style.left = 'auto';
+          dropdownMenu.style.right = '0';
+        } else {
+          // If neither side has enough space, choose the side with more space
+          if (spaceOnLeft > spaceOnRight) {
+            dropdownMenu.style.left = '0';
+            dropdownMenu.style.right = 'auto';
+          } else {
+            dropdownMenu.style.left = 'auto';
+            dropdownMenu.style.right = '0';
+          }
+        }
+        
+        // Check if menu would go off the bottom edge
+        if (btnRect.bottom + menuHeight > viewportHeight) {
+          dropdownMenu.style.top = 'auto';
+          dropdownMenu.style.bottom = '100%';
+          dropdownMenu.style.marginTop = '0';
+          dropdownMenu.style.marginBottom = '0.125rem';
+        }
+        
+        // For very small screens, center the menu
+        if (viewportWidth <= 576) {
+          dropdownMenu.style.position = 'fixed';
+          dropdownMenu.style.top = '50%';
+          dropdownMenu.style.left = '50%';
+          dropdownMenu.style.right = 'auto';
+          dropdownMenu.style.bottom = 'auto';
+          dropdownMenu.style.transform = 'translate(-50%, -50%)';
+          dropdownMenu.style.width = '90%';
+          dropdownMenu.style.maxWidth = '300px';
+        }
+        
+        // Hide the menu again
+        dropdownMenu.style.visibility = 'visible';
+        dropdownMenu.style.display = '';
+      }
+      
+      function closeProfileDropdown() {
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        
+        if (profileMenu && profileBtn) {
+          profileMenu.classList.remove('show');
+          profileBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+      
+      function closeAllDropdowns() {
+        // Close any Bootstrap dropdowns that might be open
+        if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+          const dropdowns = document.querySelectorAll('.dropdown-menu.show');
+          dropdowns.forEach(dropdown => {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown.previousElementSibling);
+            if (dropdownInstance) {
+              dropdownInstance.hide();
+            }
+          });
+        }
+      }
+      
+      function handleOutsideClick(event) {
+        const profileBtn = document.getElementById('profileDropdownBtn');
+        const profileMenu = document.getElementById('profileDropdownMenu');
+        
+        if (profileBtn && profileMenu && 
+            !profileBtn.contains(event.target) && 
+            !profileMenu.contains(event.target)) {
+          closeProfileDropdown();
+        }
+      }
+      
+      function handleEscapeKey(event) {
+        if (event.key === 'Escape') {
+          closeProfileDropdown();
         }
       }
 
