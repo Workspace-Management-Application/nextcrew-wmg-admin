@@ -339,7 +339,7 @@
           <span class="nav-text">Amenities</span>
         <% end %>
         
-        <%= link_to admin_exports_path, class: "nav-item #{'active' if controller_name == 'exports'}" do %>
+        <%= link_to admin_exports_path, class: "nav-item #{'active' if controller_name == 'exports'}", data: { turbo: false } do %>
           <span class="nav-icon">📊</span>
           <span class="nav-text">Export</span>
         <% end %>

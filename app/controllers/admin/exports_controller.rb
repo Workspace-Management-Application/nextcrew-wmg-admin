@@ -98,9 +98,8 @@ class Admin::ExportsController < Admin::BaseController
         'Room Name',
         'Start Date',
         'Start Time',
-        'End Date',
-        'End Time',
         'Duration (minutes)',
+        'Exceed Time (minutes)',
         'Status',
         'Created At'
       ]
@@ -110,8 +109,16 @@ class Admin::ExportsController < Admin::BaseController
                           .where('bookings.start_time >= ? AND bookings.start_time <= ?', start_date, end_date)
                           .order('bookings.start_time ASC')
 
+        total_duration = 0
+        total_exceed_time = 0
+        
         bookings.each do |booking|
           duration_minutes = ((booking.end_time - booking.start_time) / 60).to_i
+          exceed_time = calculate_exceed_time(booking, company.meeting_time_limit_per_day.to_i)
+          
+          total_duration += duration_minutes
+          total_exceed_time += exceed_time
+          
           csv << [
             company.name,
             booking.booker_name,
@@ -119,13 +126,27 @@ class Admin::ExportsController < Admin::BaseController
             booking.room&.name || 'N/A',
             booking.start_time.strftime('%d/%m/%Y'),
             booking.start_time.strftime('%H:%M'),
-            booking.end_time.strftime('%d/%m/%Y'),
-            booking.end_time.strftime('%H:%M'),
             duration_minutes,
-            booking.status,
+            exceed_time,
+            booking.status.to_s,
             booking.created_at.strftime('%d/%m/%Y %H:%M')
           ]
         end
+        
+        # Add summary row
+        csv << []
+        csv << [
+          'TOTAL',
+          '',
+          '',
+          '',
+          '',
+          '',
+          total_duration,
+          total_exceed_time,
+          '',
+          ''
+        ]
       end
     end
     csv_data
@@ -166,5 +187,99 @@ class Admin::ExportsController < Admin::BaseController
       total_exceed += exceed
     end
     [total_exceed, total_bookings, total_minutes]
+  end
+
+  def calculate_exceed_time(booking, daily_limit)
+    return 0 unless booking.start_time.present? && booking.end_time.present?
+
+    minutes = ((booking.end_time - booking.start_time) / 60).to_i
+    
+    company = booking.company
+    date = booking.start_time.to_date
+    month_start = date.beginning_of_month
+    month_end = date.end_of_month
+    
+    # Calculate total minutes used on this day before this booking
+    previous_daily_bookings = company.bookings
+                                    .where('start_time >= ? AND start_time < ?', date.beginning_of_day, booking.start_time)
+                                    .sum("EXTRACT(EPOCH FROM (end_time - start_time)) / 60")
+    
+    # Calculate total minutes used in this month before this booking
+    previous_monthly_bookings = company.bookings
+                                      .where('start_time >= ? AND start_time < ?', month_start, booking.start_time)
+                                      .sum("EXTRACT(EPOCH FROM (end_time - start_time)) / 60")
+    
+    # Get monthly limit
+    monthly_limit = company.meeting_time_limit_per_month.to_i
+    
+    # Calculate total minutes including this booking
+    total_daily_minutes = previous_daily_bookings + minutes
+    total_monthly_minutes = previous_monthly_bookings + minutes
+    
+    # Calculate exceed time for this booking
+    daily_exceed = 0
+    monthly_exceed = 0
+    
+    # Check daily limit exceed
+    if previous_daily_bookings >= daily_limit
+      # Already exceeded daily limit, so this entire booking is excess for daily
+      daily_exceed = minutes
+    else
+      # Check if this booking pushes us over the daily limit
+      daily_exceed = [total_daily_minutes - daily_limit, 0].max
+    end
+    
+    # Check monthly limit exceed
+    if previous_monthly_bookings >= monthly_limit
+      # Already exceeded monthly limit, so this entire booking is excess for monthly
+      monthly_exceed = minutes
+    else
+      # Check if this booking pushes us over the monthly limit
+      monthly_exceed = [total_monthly_minutes - monthly_limit, 0].max
+    end
+    
+    # Return the maximum of daily and monthly exceed (whichever is higher)
+    [daily_exceed, monthly_exceed].max
+  end
+
+  def generate_booking_details_csv(company, start_date, end_date)
+    require 'csv'
+    daily_limit = company.meeting_time_limit_per_day.to_i
+    bookings = company.bookings.where('bookings.start_time >= ? AND bookings.start_time <= ?', start_date, end_date).order('bookings.start_time ASC')
+    daily_totals = Hash.new(0)
+
+    csv_data = CSV.generate do |csv|
+      csv << [
+        'Room Name',
+        'Start Date',
+        'Start Time',
+        'Duration (minutes)',
+        'Exceed Time (minutes)',
+        'Status',
+        'Created At'
+      ]
+      total_exceed = 0
+      bookings.each do |booking|
+        date = booking.start_time.to_date
+        minutes = ((booking.end_time - booking.start_time) / 60).to_i
+        previous_total = daily_totals[date]
+        # Calculate exceed for this booking only
+        exceed = [[previous_total + minutes - daily_limit, 0].max - [previous_total - daily_limit, 0].max, minutes].min
+        daily_totals[date] += minutes
+        total_exceed += exceed
+                 csv << [
+           booking.room.try(:name) || booking.room_id,
+           booking.start_time.strftime('%d/%m/%Y'),
+           booking.start_time.strftime('%H:%M'),
+           minutes,
+           exceed,
+           booking.status.to_s,
+           booking.created_at.strftime('%d/%m/%Y %H:%M')
+         ]
+      end
+      # Optionally, add a summary row for total exceed
+      # csv << ['','','','Total Exceed', total_exceed]
+    end
+    csv_data
   end
 end
