@@ -7,7 +7,7 @@ class Admin::CompaniesController < Admin::BaseController
     @companies = Company.joins(:workspaces)
                         .where(workspaces: { id: workspace_ids })
                         .distinct
-                        .includes(:users, :workspaces)
+                        .includes(:users, :workspaces).order(created_at: :desc)
     
     # Search functionality
     if @search.present?
@@ -155,11 +155,20 @@ class Admin::CompaniesController < Admin::BaseController
     end
   end
 
+
+
   def remove_user
     @company = Company.find(params[:id])
     @user = User.find(params[:user_id])
     @company.users.delete(@user)
     redirect_to admin_company_path(@company), notice: "User removed from company."
+  end
+
+  def new_user_for_company
+    @company = Company.find(params[:id])
+    @user = User.new(role: 'user')
+    @workspaces = @company.workspaces
+    @selected_workspace_id = @workspaces.first&.id
   end
 
   def quick_status_change

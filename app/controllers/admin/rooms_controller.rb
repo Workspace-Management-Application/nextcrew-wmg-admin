@@ -34,7 +34,7 @@ class Admin::RoomsController < Admin::BaseController
     end
     
     # Order by workspace name, then room name
-    @rooms = @rooms.order('workspaces.name, rooms.name')
+    @rooms = @rooms.order(created_at: :desc)
     
     # Pagination
     @rooms = @rooms.page(params[:page]).per(10)

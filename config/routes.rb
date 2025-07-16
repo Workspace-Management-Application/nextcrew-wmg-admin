@@ -72,6 +72,7 @@ Rails.application.routes.draw do
         post :add_user
         delete :remove_user
         patch :quick_status_change
+        get :new_user_for_company
       end
       collection do
         get :rooms_for_workspace

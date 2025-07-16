@@ -6,7 +6,7 @@ class Admin::BookingsController < Admin::BaseController
     workspace_ids = current_user.workspaces.pluck(:id)
     @bookings = Booking.joins(room: :workspace)
                      .where(rooms: { workspace_id: workspace_ids })
-                     .includes(:company, :room, room: :workspace)
+                     .includes(:company, :room, room: :workspace).order(created_at: :desc)
     
     # Search functionality
     if @search.present?

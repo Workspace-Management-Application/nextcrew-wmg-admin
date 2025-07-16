@@ -169,7 +169,7 @@
   <div class="row">
     <div class="col-md-6 mb-3">
       <%= form.label :company_email_address, class: "form-label" do %>
-        Company Email Address <span class="text-danger">*</span>
+        Company POC Email Address <span class="text-danger">*</span>
       <% end %>
       <%= form.email_field :company_email_address, class: "form-control", required: true %>
     </div>
@@ -196,9 +196,9 @@
     </div>
     <div class="col-md-4 mb-3">
       <%= form.label :cost_per_seat, class: "form-label" do %>
-        Cost per Seat / Monthly Rental <span class="text-danger">*</span>
+        Cost per Seat / Monthly Rental
       <% end %>
-      <%= form.number_field :cost_per_seat, class: "form-control", required: true, min: 1 %>
+      <%= form.number_field :cost_per_seat, class: "form-control",  min: 1 %>
     </div>
   </div>
 

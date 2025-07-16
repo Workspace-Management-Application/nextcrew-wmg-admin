@@ -71,7 +71,7 @@
   <div class="mb-3" id="company_field" style="display: none;">
     <%= form.label :company_id, "Company", class: "form-label" %><span class="text-danger">*</span>
     <%= form.select :company_id,
-      @user.persisted? ? options_from_collection_for_select(@user.companies, :id, :name, @user.companies.first&.id) : [],
+      @user.persisted? && defined?(@user_workspace_companies) ? options_from_collection_for_select(@user_workspace_companies, :id, :name, @user.companies.first&.id) : (@user.persisted? ? options_from_collection_for_select(@user.companies, :id, :name, @user.companies.first&.id) : []),
       { prompt: 'Select Company' },
       { class: "select2-select", id: "user_company_id", 'data-placeholder': 'Select Company' } %>
   </div>
@@ -140,6 +140,24 @@ function initializeUserForm() {
       return;
     }
 
+    // For edit form, if the workspace hasn't changed, don't reload companies
+    <% if @user.persisted? %>
+    const currentWorkspaceId = '<%= @user.workspaces.first&.id %>';
+    if (workspaceId === currentWorkspaceId && companySelect.options.length > 1) {
+      // Workspace hasn't changed and companies are already loaded, just ensure Select2 is initialized
+      if (typeof $ !== 'undefined' && $.fn.select2) {
+        $(companySelect).select2('destroy');
+        $(companySelect).select2({
+          theme: 'default',
+          width: '100%',
+          placeholder: 'Select Company',
+          allowClear: true
+        });
+      }
+      return;
+    }
+    <% end %>
+
     fetch(`/admin/users/companies_for_workspace?workspace_id=${workspaceId}`)
       .then(response => response.json())
       .then(data => {
@@ -202,5 +220,24 @@ function initializeUserForm() {
   if (roleSelect.value === 'user' && workspaceSelect.value) {
     loadCompaniesForWorkspace(workspaceSelect.value);
   }
+  
+  // For edit form with user role, ensure company field is visible and company is selected
+  <% if @user.persisted? && @user.user? %>
+  if (roleSelect.value === 'user') {
+    companyField.style.display = 'block';
+  }
+  <% end %>
+  
+  // For edit form, ensure company is properly selected after Select2 initialization
+  <% if @user.persisted? && @user.user? && @user.companies.first %>
+  setTimeout(() => {
+    if (companySelect && '<%= @user.companies.first.id %>') {
+      companySelect.value = '<%= @user.companies.first.id %>';
+      if (typeof $ !== 'undefined' && $.fn.select2) {
+        $(companySelect).val('<%= @user.companies.first.id %>').trigger('change.select2');
+      }
+    }
+  }, 200);
+  <% end %>
 }
 </script> 

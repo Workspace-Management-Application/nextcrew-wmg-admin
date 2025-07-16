@@ -7,7 +7,7 @@ class Admin::UsersController < Admin::BaseController
     @users = User.joins(:user_workspaces)
                  .where(user_workspaces: { workspace_id: workspace_ids })
                  .distinct
-                 .includes(:workspaces)
+                 .includes(:workspaces).order(created_at: :desc)
 
     unless current_user.super_admin?
       @users = @users.where.not(role: 'super_admin')
@@ -64,6 +64,17 @@ class Admin::UsersController < Admin::BaseController
 
   def edit
     @workspaces = current_user.workspaces
+    
+    # Ensure company is loaded for user role in edit form
+    if @user.user? && @user.workspaces.first
+      @selected_workspace_id = @user.workspaces.first.id
+      @selected_company_id = @user.companies.first&.id
+    end
+    
+    # Preload companies for the user's workspace to ensure they're available in the form
+    if @user.user? && @user.workspaces.first
+      @user_workspace_companies = @user.workspaces.first.companies
+    end
   end
 
   def update

@@ -4,7 +4,7 @@ class Admin::WorkspacesController < Admin::BaseController
 
   def index
     @search = params[:search]
-    @workspaces = current_user.workspaces.includes(:companies, :users, :rooms, :workspace_types)
+    @workspaces = current_user.workspaces.includes(:companies, :users, :rooms, :workspace_types).order(created_at: :desc)
     
     # Search functionality
     if @search.present?
