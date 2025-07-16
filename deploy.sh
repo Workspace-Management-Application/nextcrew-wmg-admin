@@ -301,7 +301,7 @@ health_check() {
     
     # Check if application responds
     log "Testing application response..."
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost)
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -L https://nextcrew.in)
     info "HTTP response code: $HTTP_CODE"
     
     if echo "$HTTP_CODE" | grep -q "302\|200"; then
