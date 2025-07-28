@@ -33,7 +33,17 @@ companies = [
     no_of_meeting_per_day: 5,
     meeting_time_limit_per_day: 100,
     minimum_minutes_meeting_limit: 15,
-    max_minutes_meeting_limit: 240
+    max_minutes_meeting_limit: 240,
+    centre_address: 'Tech Park, Vijay Nagar, Indore',
+    commencement_date: Date.new(2024, 1, 1),
+    lock_in_period: 12,
+    no_of_seats: 50,
+    floor_no: 10,
+    shift_type: 'Day Shift',
+    agreement_date: Date.new(2023, 12, 15),
+    company_poc_contact: '9876543210',
+    company_email_address: 'admin@srnext.in',
+    lease_expiry_date: Date.new(2026, 12, 31)
   },
   {
     name: 'InnovateCorp',
@@ -47,7 +57,17 @@ companies = [
     no_of_meeting_per_day: 4,
     meeting_time_limit_per_day: 80,
     minimum_minutes_meeting_limit: 10,
-    max_minutes_meeting_limit: 180
+    max_minutes_meeting_limit: 180,
+    centre_address: 'Innovation Hub, Sapna Sangeeta, Indore',
+    commencement_date: Date.new(2024, 2, 1),
+    lock_in_period: 24,
+    no_of_seats: 30,
+    floor_no: 3,
+    shift_type: '24x7 Shift',
+    agreement_date: Date.new(2024, 1, 15),
+    company_poc_contact: '9876543211',
+    company_email_address: 'admin@innovatecorp.com',
+    lease_expiry_date: Date.new(2027, 1, 31)
   },
   {
     name: 'StartupXYZ',
@@ -61,7 +81,17 @@ companies = [
     no_of_meeting_per_day: 3,
     meeting_time_limit_per_day: 60,
     minimum_minutes_meeting_limit: 10,
-    max_minutes_meeting_limit: 120
+    max_minutes_meeting_limit: 120,
+    centre_address: 'Coworking Space, AB Road, Indore',
+    commencement_date: Date.new(2024, 3, 1),
+    lock_in_period: 6,
+    no_of_seats: 15,
+    floor_no: 1,
+    shift_type: 'Day Shift',
+    agreement_date: Date.new(2024, 2, 15),
+    company_poc_contact: '9876543212',
+    company_email_address: 'admin@startupxyz.in',
+    lease_expiry_date: Date.new(2025, 8, 31)
   },
   {
     name: 'TechSolutions Ltd',
@@ -75,7 +105,17 @@ companies = [
     no_of_meeting_per_day: 4,
     meeting_time_limit_per_day: 90,
     minimum_minutes_meeting_limit: 15,
-    max_minutes_meeting_limit: 200
+    max_minutes_meeting_limit: 200,
+    centre_address: 'Office Complex, Ring Road, Indore',
+    commencement_date: Date.new(2023, 6, 1),
+    lock_in_period: 18,
+    no_of_seats: 40,
+    floor_no: 2,
+    shift_type: 'Night Shift Only',
+    agreement_date: Date.new(2023, 5, 15),
+    company_poc_contact: '9876543213',
+    company_email_address: 'admin@techsolutions.co.in',
+    lease_expiry_date: Date.new(2025, 11, 30)
   }
 ]
 
@@ -88,20 +128,20 @@ end
 # 2. Create Users (SuperAdmin, Admin, FloorUser per workspace, company users as user role)
 users_data = [
   # Global users
-  { email: 'superadmin@workspace.com', password: '123456789', name: 'Super Administrator', phone_number: '+91-9000000001', role: 'super_admin' },
-  { email: 'admin@workspace.com', password: '123456789', name: 'Global Admin', phone_number: '+91-9000000002', role: 'admin' },
+  { email: 'somnathtyagi8100@gmail.com', password: '123456789', name: 'Super Administrator', phone_number: '9000000001', role: 'super_admin' },
+  { email: 'admin@workspace.com', password: '123456789', name: 'Global Admin', phone_number: '9000000002', role: 'admin' },
 
   # Floor users (one per workspace)
-  { email: 'floor_user1@workspace.com', password: '123456789', name: 'Floor User 1', phone_number: '+91-9000000003', role: 'floor_user' },
-  { email: 'floor_user2@workspace.com', password: '123456789', name: 'Floor User 2', phone_number: '+91-9000000004', role: 'floor_user' },
-  { email: 'floor_user3@workspace.com', password: '123456789', name: 'Floor User 3', phone_number: '+91-9000000005', role: 'floor_user' },
-  { email: 'floor_user4@workspace.com', password: '123456789', name: 'Floor User 4', phone_number: '+91-9000000006', role: 'floor_user' },
+  { email: 'floor_user1@workspace.com', password: '123456789', name: 'Floor User 1', phone_number: '9000000003', role: 'floor_user' },
+  { email: 'floor_user2@workspace.com', password: '123456789', name: 'Floor User 2', phone_number: '9000000004', role: 'floor_user' },
+  { email: 'floor_user3@workspace.com', password: '123456789', name: 'Floor User 3', phone_number: '9000000005', role: 'floor_user' },
+  { email: 'floor_user4@workspace.com', password: '123456789', name: 'Floor User 4', phone_number: '9000000006', role: 'floor_user' },
 
   # Company users (one per company, role: 'user')
-  { email: 'user1@srnext.in', password: '123456789', name: 'SR Next User', phone_number: '+91-9000000010', role: 'user' },
-  { email: 'user1@innovatecorp.com', password: '123456789', name: 'InnovateCorp User', phone_number: '+91-9000000011', role: 'user' },
-  { email: 'user1@startupxyz.in', password: '123456789', name: 'StartupXYZ User', phone_number: '+91-9000000012', role: 'user' },
-  { email: 'user1@techsolutions.co.in', password: '123456789', name: 'TechSolutions User', phone_number: '+91-9000000013', role: 'user' }
+  { email: 'user1@srnext.in', password: '123456789', name: 'SR Next User', phone_number: '9000000010', role: 'user' },
+  { email: 'user1@innovatecorp.com', password: '123456789', name: 'InnovateCorp User', phone_number: '9000000011', role: 'user' },
+  { email: 'user1@startupxyz.in', password: '123456789', name: 'StartupXYZ User', phone_number: '9000000012', role: 'user' },
+  { email: 'user1@techsolutions.co.in', password: '123456789', name: 'TechSolutions User', phone_number: '9000000013', role: 'user' }
 ]
 
 user_company_map = {
@@ -350,8 +390,8 @@ end
 puts "📅 Creating bookings..."
 base_date = Date.current.beginning_of_day
 bookings_data = [
-  { phone_number: '+91-9000000007', company: company_records[0], room: room_records[0], start_time: base_date + 1.day + 9.hours, end_time: base_date + 1.day + 11.hours, status: 'confirmed' },
-  { phone_number: '+91-9000000008', company: company_records[1], room: room_records[6], start_time: base_date + 1.day + 14.hours, end_time: base_date + 1.day + 16.hours, status: 'confirmed' }
+  { phone_number: '9000000007', company: company_records[0], room: room_records[0], start_time: base_date + 1.day + 9.hours, end_time: base_date + 1.day + 11.hours, status: 'confirmed' },
+  { phone_number: '9000000008', company: company_records[1], room: room_records[6], start_time: base_date + 1.day + 14.hours, end_time: base_date + 1.day + 16.hours, status: 'confirmed' }
 ]
 
 bookings_data.each do |booking_data|
@@ -370,7 +410,7 @@ day_passes_data = [
   {
     workspace: workspace_records[0],
     name: 'Rajesh Kumar',
-    phone_number: '+91-9123456789',
+    phone_number: '9123456789',
     email: 'rajesh@gmail.com',
     pass_date: Date.current,
     company_name: 'External Client Corp'
@@ -378,7 +418,7 @@ day_passes_data = [
   {
     workspace: workspace_records[0],
     name: 'Priya Sharma',
-    phone_number: '+91-9123456790',
+    phone_number: '9123456790',
     email: 'priya.sharma@consultant.com',
     pass_date: Date.tomorrow,
     company_name: 'Freelance Consultant'
@@ -386,7 +426,7 @@ day_passes_data = [
   {
     workspace: workspace_records[1],
     name: 'Amit Patel',
-    phone_number: '+91-9123456791',
+    phone_number: '9123456791',
     email: 'amit@vendor.com',
     pass_date: Date.current + 2.days,
     company_name: 'Tech Vendor Solutions'
@@ -394,7 +434,7 @@ day_passes_data = [
   {
     workspace: workspace_records[2],
     name: 'Sneha Gupta',
-    phone_number: '+91-9123456792',
+    phone_number: '9123456792',
     email: 'sneha@interview.com',
     pass_date: Date.current + 3.days,
     company_name: 'Job Seeker'
@@ -418,7 +458,7 @@ office_enquiries_data = [
   {
     workspace: workspace_records[0],
     enquirer_name: 'Rohit Agarwal',
-    phone_number: '+91-9234567890',
+    phone_number: '9234567890',
     email: 'rohit@newstartup.com',
     company_name: 'New Startup Pvt Ltd',
     no_of_seats: 5
@@ -426,7 +466,7 @@ office_enquiries_data = [
   {
     workspace: workspace_records[1],
     enquirer_name: 'Kavita Singh',
-    phone_number: '+91-9234567891',
+    phone_number: '9234567891',
     email: 'kavita@expandingbiz.com',
     company_name: 'Expanding Business Co',
     no_of_seats: 8
@@ -434,7 +474,7 @@ office_enquiries_data = [
   {
     workspace: workspace_records[2],
     enquirer_name: 'Vikram Rao',
-    phone_number: '+91-9234567892',
+    phone_number: '9234567892',
     email: 'vikram@freelancer.in',
     company_name: 'Freelancer',
     no_of_seats: 2
@@ -442,7 +482,7 @@ office_enquiries_data = [
   {
     workspace: workspace_records[0],
     enquirer_name: 'Anita Joshi',
-    phone_number: '+91-9234567893',
+    phone_number: '9234567893',
     email: 'anita@consultancy.com',
     company_name: 'Consultancy Services Ltd',
     no_of_seats: 10
@@ -466,7 +506,7 @@ visitor_entries_data = [
     name: 'Suresh Chandra',
     person_to_visit_name: 'John Admin',
     workspace: workspace_records[0],
-    phone_number: '+91-9345678901',
+    phone_number: '9345678901',
     email: 'suresh@delivery.com',
     purpose: 'Package delivery for SR Next'
   },
@@ -474,7 +514,7 @@ visitor_entries_data = [
     name: 'Meera Kumari',
     person_to_visit_name: 'Floor Manager One',
     workspace: workspace_records[0],
-    phone_number: '+91-9345678902',
+    phone_number: '9345678902',
     email: 'meera@maintenance.com',
     purpose: 'AC maintenance check'
   },
@@ -482,7 +522,7 @@ visitor_entries_data = [
     name: 'Ravi Kumar',
     person_to_visit_name: 'Sarah Admin',
     workspace: workspace_records[1],
-    phone_number: '+91-9345678903',
+    phone_number: '9345678903',
     email: 'ravi@interview.in',
     purpose: 'Job interview with InnovateCorp'
   },
@@ -490,7 +530,7 @@ visitor_entries_data = [
     name: 'Pooja Mishra',
     person_to_visit_name: 'Floor Manager Three',
     workspace: workspace_records[2],
-    phone_number: '+91-9345678904',
+    phone_number: '9345678904',
     email: 'pooja@visitor.com',
     purpose: 'Meeting with startup team'
   },
@@ -498,7 +538,7 @@ visitor_entries_data = [
     name: 'Deepak Verma',
     person_to_visit_name: 'Alice Employee',
     workspace: workspace_records[0],
-    phone_number: '+91-9345678905',
+    phone_number: '9345678905',
     email: 'deepak@client.com',
     purpose: 'Project discussion'
   }

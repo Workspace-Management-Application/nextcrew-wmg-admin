@@ -56,6 +56,7 @@
           <th>Start Time</th>
           <th>End Time</th>
           <th>Status</th>
+          <th>Created At</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -77,6 +78,7 @@
                 <span class="badge bg-light text-dark">Active</span>
               <% end %>
             </td>
+            <td><%= booking.created_at.strftime("%b %d, %Y %I:%M %p") %></td>
             <td class="action-column">
               <% if booking.editable? %>
                 <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-secondary btn-sm me-2" %>

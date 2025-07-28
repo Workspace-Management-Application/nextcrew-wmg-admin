@@ -37,9 +37,13 @@
       <strong>Date:</strong>
       <div><%= @visitor_entry.created_at.strftime("%B %d, %Y") %></div>
     </div>
-    <div class="col-12 mb-3">
+    <div class="col-md-6 mb-3">
       <strong>Purpose:</strong>
       <div><%= @visitor_entry.purpose %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Check-In Time:</strong>
+      <div><%= @visitor_entry.created_at.strftime("%I:%M %p") %></div>
     </div>
     <% if @visitor_entry.photo.attached? %>
       <div class="col-12 mb-3">
