@@ -107,10 +107,17 @@
       .sidebar-title {
         margin-bottom: 0 !important;
         line-height: 1.5;
+        display: flex !important;
+        align-items: center !important;
       }
       
       .sidebar-toggle {
-        padding: 0.25rem 0.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        width: 38px !important;
+        height: 38px !important;
         line-height: 1 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
       }
@@ -281,9 +288,9 @@
   <body class="admin-body">
     <!-- Sidebar -->
     <div class="sidebar show" id="sidebar">
-      <div class="sidebar-header d-flex align-items-center justify-content-between">
-        <h4 class="sidebar-title mb-0"><%= format_role_display(current_user.role) %> Panel</h4>
-        <button class="sidebar-toggle btn btn-outline-light ms-2" onclick="toggleSidebar()" style="font-size: 1.5rem;">
+            <div class="sidebar-header d-flex align-items-center gap-2">
+        <h4 class="sidebar-title mb-0 d-flex align-items-center" style="font-size: 1.25rem;"><%= format_role_display(current_user.role) %> Panel</h4>
+        <button class="sidebar-toggle btn btn-outline-light" onclick="toggleSidebar()" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
           ☰
         </button>
       </div>

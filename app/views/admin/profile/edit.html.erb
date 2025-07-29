@@ -7,19 +7,24 @@
       <%= link_to "← Back to Profile", admin_profile_path, class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @user], url: admin_profile_path, local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
+    <%# Basic Information Form %>
+    <%= form_with model: [:admin, @user], url: admin_profile_path, local: true, data: { turbo: false }, class: "needs-validation mb-4", novalidate: true do |form| %>
       <% if @user.errors.any? %>
-        <div class="alert alert-danger">
-          <h6><%= pluralize(@user.errors.count, "error") %> prohibited the profile from being updated:</h6>
-          <ul class="mb-0">
-            <% @user.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
+        <% profile_errors = @user.errors.reject { |attr, _| [:password, :password_confirmation].include?(attr) } %>
+        <% if profile_errors.any? %>
+          <div class="alert alert-danger">
+            <h6><%= pluralize(profile_errors.count, "error") %> prohibited the profile from being updated:</h6>
+            <ul class="mb-0">
+              <% profile_errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
       <% end %>
 
       <div class="bg-dark p-4 rounded">
+        <h5 class="mb-3">Basic Information</h5>
         <div class="row">
           <div class="col-md-6 mb-3">
             <%= form.label :name, class: "form-label" %>
@@ -38,12 +43,32 @@
             <%= form.telephone_field :phone_number, class: "form-control" %>
           </div>
         </div>
+      </div>
 
-        <hr class="my-4">
+      <div class="d-flex gap-2 mt-3">
+        <%= form.submit "Update Profile Info", class: "btn btn-primary" %>
+        <%= link_to "Cancel", admin_profile_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
 
+    <%# Password Change Form %>
+    <%= form_with model: [:admin, @user], url: admin_profile_path, local: true, data: { turbo: false }, class: "needs-validation" do |form| %>
+      <% if @user.errors.any? %>
+        <% password_errors = @user.errors.select { |attr, _| [:password, :password_confirmation].include?(attr) } %>
+        <% if password_errors.any? %>
+          <div class="alert alert-danger">
+            <h6>Password update errors:</h6>
+            <ul class="mb-0">
+              <% password_errors.each do |error| %>
+                <li><%= error.full_message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      <% end %>
+
+      <div class="bg-dark p-4 rounded">
         <h5 class="mb-3">Change Password</h5>
-        <p class="text-muted mb-3">Leave blank if you don't want to change your password</p>
-        
         <div class="row">
           <div class="col-md-6 mb-3">
             <%= form.label :password, "New Password", class: "form-label" %>
@@ -58,8 +83,7 @@
       </div>
 
       <div class="d-flex gap-2 mt-3">
-        <%= form.submit "Update Profile", class: "btn btn-primary" %>
-        <%= link_to "Cancel", admin_profile_path, class: "btn btn-secondary" %>
+        <%= form.submit "Update Password", class: "btn btn-primary" %>
       </div>
     <% end %>
   </div>
