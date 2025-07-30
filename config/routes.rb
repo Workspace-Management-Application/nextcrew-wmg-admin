@@ -1,22 +1,22 @@
 Rails.application.routes.draw do
   # API routes
   namespace :api do
-    devise_for :users, controllers: { 
-      sessions: 'api/sessions',
-      registrations: 'api/users'
-    }, skip: [:registrations]  # Skip registrations if you're handling them separately for the API
-    
+    devise_for :users, controllers: {
+      sessions: "api/sessions",
+      registrations: "api/users"
+    }, skip: [ :registrations ]  # Skip registrations if you're handling them separately for the API
+
     devise_scope :user do
-      post 'refresh_token', to: 'sessions#refresh_token'
+      post "refresh_token", to: "sessions#refresh_token"
     end
-    
-    get 'get_profile', to: 'user#get_profile'
-    
-    resources :users, only: [:create, :show, :update]  # Add necessary user actions for API
-    resources :workspaces, only: [:show, :create, :update, :destroy] do
+
+    get "get_profile", to: "user#get_profile"
+
+    resources :users, only: [ :create, :show, :update ]  # Add necessary user actions for API
+    resources :workspaces, only: [ :show, :create, :update, :destroy ] do
       member do
-        get 'search_by_phone_number'
-        get 'get_data_for_room'
+        get "search_by_phone_number"
+        get "get_data_for_room"
         get :workspace_types
         get :company_today_bookings
       end
@@ -30,16 +30,16 @@ Rails.application.routes.draw do
 
   # Web routes (optional - for admin interface)
   devise_for :users, controllers: {
-    sessions: 'custom_sessions'
+    sessions: "custom_sessions"
   }
 
   # Admin routes
   namespace :admin do
-    get '/', to: 'dashboard#index', as: :root
-    get 'dashboard', to: 'dashboard#index'
-    
+    get "/", to: "dashboard#index", as: :root
+    get "dashboard", to: "dashboard#index"
 
-    
+
+
     resources :workspaces do
       resources :rooms
       member do
@@ -58,8 +58,8 @@ Rails.application.routes.draw do
         get :start_over
       end
     end
-    
-    resources :rooms, only: [:index, :show, :new, :create, :destroy]
+
+    resources :rooms, only: [ :index, :show, :new, :create, :destroy ]
     resources :bookings do
       collection do
         get :company_rooms
@@ -78,7 +78,7 @@ Rails.application.routes.draw do
         get :rooms_for_workspace
       end
     end
-    
+
     resources :users do
       member do
         get :assign_workspace
@@ -88,18 +88,19 @@ Rails.application.routes.draw do
         get :companies_for_workspace
       end
     end
-    
+
     resources :office_enquiries
     resources :visitor_entries
+    resources :day_passes
     resources :workspace_types
     resources :amenities
-    
-    resource :profile, only: [:show, :edit, :update], controller: 'profile'
-    
+
+    resource :profile, only: [ :show, :edit, :update ], controller: "profile"
+
     # Export routes
-    get 'exports', to: 'exports#index'
-    post 'exports/company_details', to: 'exports#export_company_details'
-    get 'exports/companies_by_workspace', to: 'exports#get_companies_by_workspace'
+    get "exports", to: "exports#index"
+    post "exports/company_details", to: "exports#export_company_details"
+    get "exports/companies_by_workspace", to: "exports#get_companies_by_workspace"
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

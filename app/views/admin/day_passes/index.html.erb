@@ -1,0 +1,111 @@
+<% content_for :page_title, "Day Passes" %>
+
+<div class="content-area bg-dark text-white p-4 rounded">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Day Passes</h2>
+    <%= link_to "Add Day Pass", new_admin_day_pass_path, class: "btn btn-primary" %>
+  </div>
+
+  <!-- Search and Filter Form -->
+  <div class="bg-dark p-3 rounded mb-4">
+    <%= form_with url: admin_day_passes_path, method: :get, local: true, class: "row g-3" do |form| %>
+      <div class="col-md-4">
+        <%= form.label :search, "Search", class: "form-label" %>
+        <div class="input-group">
+          <%= form.text_field :search, placeholder: "Search by name, email, phone, company...", 
+                             value: params[:search], 
+                             class: "form-control form-control-dark" %>
+          <%= form.submit "Search/Filter", class: "btn btn-outline-primary" %>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <%= form.label :workspace_id, "Workspace", class: "form-label" %>
+        <%= form.select :workspace_id, 
+                        options_from_collection_for_select(@workspaces, :id, :name, params[:workspace_id]), 
+                        { prompt: 'All Workspaces' }, 
+                        { class: "form-select form-control-dark", 
+                          onchange: "this.form.submit()" } %>
+      </div>
+      <div class="col-md-3">
+        <%= form.label :date, "Filter by Pass Date", class: "form-label" %>
+        <%= form.date_field :date, value: params[:date], 
+                           class: "form-control form-control-dark",
+                           onchange: "this.form.submit()" %>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <%= link_to "Clear", admin_day_passes_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Results Info -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <%= pagination_info(@day_passes) %>
+    </div>
+    <div>
+      <%= paginate @day_passes %>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-dark">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Company</th>
+          <th>Pass Date</th>
+          <th>Workspace</th>
+          <th>Created Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @day_passes.each do |day_pass| %>
+          <tr class="clickable-row" data-href="<%= admin_day_pass_path(day_pass) %>" style="cursor: pointer;">
+            <td><%= day_pass.name %></td>
+            <td><%= day_pass.email %></td>
+            <td><%= day_pass.phone_number %></td>
+            <td><%= day_pass.company_name %></td>
+            <td><%= day_pass.pass_date&.strftime("%b %d, %Y") %></td>
+            <td><%= day_pass.workspace.name %></td>
+            <td><%= day_pass.created_at.strftime("%b %d, %Y") %></td>
+            <td class="action-column">
+              <%= link_to "Edit", edit_admin_day_pass_path(day_pass), class: "btn btn-secondary btn-sm me-2" %>
+              <%= link_to "Delete", admin_day_pass_path(day_pass), 
+                          data: { 
+                            turbo_method: :delete, 
+                            turbo_confirm: "Are you sure you want to delete this day pass?" 
+                          },
+                          class: "btn btn-danger btn-sm" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @day_passes.empty? %>
+    <div class="text-center mt-5">
+      <% if params[:search].present? || params[:workspace_id].present? || params[:date].present? %>
+        <p class="text-muted">No day passes found matching your search criteria.</p>
+        <%= link_to "Clear filters", admin_day_passes_path, class: "btn btn-outline-secondary" %>
+      <% else %>
+        <p class="text-muted">No day passes found.</p>
+        <%= link_to "Add the first day pass", new_admin_day_pass_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  <% else %>
+    <!-- Bottom Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <div>
+        <%= pagination_info(@day_passes) %>
+      </div>
+      <div>
+        <%= paginate @day_passes %>
+      </div>
+    </div>
+  <% end %>
+</div>

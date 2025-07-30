@@ -238,7 +238,7 @@
         <div class="content">
             <div class="alert-box">
                 <h2>Monthly Limit Exceeded</h2>
-                <p>Dear <%= @user.name %>,</p>
+                <p>Dear <%= @company.name %> Team,</p>
                 <p>This is a friendly reminder that your company <strong><%= @company.name %></strong> has exceeded the monthly meeting time limit of <strong><%= @booking.format_minutes_to_hours_and_minutes(@monthly_limit) %></strong>.</p>
                 <p>Your booking has been confirmed, but please be mindful of your usage for the remainder of the month.</p>
             </div>
@@ -282,7 +282,7 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Booked By:</span>
-                    <span class="detail-value"><%= @user.name %> (<%= @user.email %>)</span>
+                    <span class="detail-value"><%= @booking.booker_name %> (Company: <%= @company.name %>)</span>
                 </div>
             </div>
             

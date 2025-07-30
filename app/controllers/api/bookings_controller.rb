@@ -1,6 +1,6 @@
 class Api::BookingsController < Api::BaseController
   before_action :set_workspace
-  before_action :set_booking, only: [:show, :update, :destroy]
+  before_action :set_booking, only: [ :show, :update, :destroy ]
 
   # GET /api/bookings
   def index
@@ -13,7 +13,7 @@ class Api::BookingsController < Api::BaseController
     if @booking
       render_success(@booking)
     else
-      render_error('Booking not found', :not_found)
+      render_error("Booking not found", :not_found)
     end
   end
 
@@ -21,7 +21,7 @@ class Api::BookingsController < Api::BaseController
   def create
     company = Company.find_by(id: booking_params[:company_id])
     unless company
-      return render_error('Company not found', :unprocessable_entity)
+      return render_error("Company not found", :unprocessable_entity)
     end
 
     @booking = Booking.new(booking_params)
@@ -29,16 +29,18 @@ class Api::BookingsController < Api::BaseController
     @booking.acting_user = current_user
 
     unless @workspace.rooms.exists?(id: @booking.room_id)
-      return render_error('Room does not belong to this workspace', :unprocessable_entity)
+      return render_error("Room does not belong to this workspace", :unprocessable_entity)
     end
 
     if @booking.save
       begin
         BookingMailer.booking_confirmation(@booking).deliver_now
+        Rails.logger.info "Booking confirmation email sent successfully to #{@booking.company.email}"
       rescue => e
         Rails.logger.error "Failed to send booking confirmation email: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
       end
-      render_success(@booking, 'Booking created successfully', :created)
+      render_success(@booking, "Booking created successfully", :created)
     else
       render_error(@booking.all_validation_errors)
     end
@@ -48,16 +50,16 @@ class Api::BookingsController < Api::BaseController
   def update
     if @booking
       if booking_params[:room_id] && !@workspace.rooms.exists?(id: booking_params[:room_id])
-        return render_error('Room does not belong to this workspace', :unprocessable_entity)
+        return render_error("Room does not belong to this workspace", :unprocessable_entity)
       end
       @booking.acting_user = current_user
       if @booking.update(booking_params)
-        render_success(@booking, 'Booking updated successfully')
+        render_success(@booking, "Booking updated successfully")
       else
         render_error(@booking.all_validation_errors)
       end
     else
-      render_error('Booking not found', :not_found)
+      render_error("Booking not found", :not_found)
     end
   end
 
@@ -65,9 +67,9 @@ class Api::BookingsController < Api::BaseController
   def destroy
     if @booking
       @booking.destroy
-      render_success({}, 'Booking deleted successfully')
+      render_success({}, "Booking deleted successfully")
     else
-      render_error('Booking not found', :not_found)
+      render_error("Booking not found", :not_found)
     end
   end
 
@@ -75,7 +77,7 @@ class Api::BookingsController < Api::BaseController
 
   def set_workspace
     @workspace = Workspace.find_by(id: params[:workspace_id])
-    render_error('Workspace not found', :not_found) unless @workspace
+    render_error("Workspace not found", :not_found) unless @workspace
   end
 
   def set_booking

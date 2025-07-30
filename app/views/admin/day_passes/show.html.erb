@@ -1,0 +1,63 @@
+<% content_for :page_title, "Day Pass Details" %>
+
+<div class="content-area bg-dark text-white p-4 rounded">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Day Pass Details</h2>
+    <div>
+      <%= link_to "Edit", edit_admin_day_pass_path(@day_pass), class: "btn btn-secondary me-2" %>
+      <%= link_to "Delete", admin_day_pass_path(@day_pass),
+                  data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this day pass?" },
+                  class: "btn btn-danger" %>
+      <%= link_to "Back", admin_day_passes_path, class: "btn btn-outline-light ms-2" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6 mb-3">
+      <strong>Name:</strong>
+      <div><%= @day_pass.name %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Email:</strong>
+      <div><%= @day_pass.email %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Phone Number:</strong>
+      <div><%= @day_pass.phone_number %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Company:</strong>
+      <div><%= @day_pass.company_name %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Pass Date:</strong>
+      <div><%= @day_pass.pass_date&.strftime("%B %d, %Y") %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Workspace:</strong>
+      <div><%= @day_pass.workspace&.name %></div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <strong>Created Date:</strong>
+      <div><%= @day_pass.created_at.strftime("%B %d, %Y") %></div>
+    </div>
+  </div>
+  
+  <!-- Images Row -->
+  <% if @day_pass.photo.attached? || @day_pass.id_proof.attached? %>
+    <div class="row mb-3">
+      <% if @day_pass.photo.attached? %>
+        <div class="col-md-6 mb-3">
+          <strong>Photo:</strong><br>
+          <%= image_tag @day_pass.photo, class: "img-thumbnail mt-2", style: "max-width: 200px;" %>
+        </div>
+      <% end %>
+      <% if @day_pass.id_proof.attached? %>
+        <div class="col-md-6 mb-3">
+          <strong>ID Proof:</strong><br>
+          <%= image_tag @day_pass.id_proof, class: "img-thumbnail mt-2", style: "max-width: 200px;" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

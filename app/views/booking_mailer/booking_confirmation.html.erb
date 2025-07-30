@@ -164,7 +164,7 @@
 
     <!-- Content -->
     <div class="content">
-      <p>Dear <%= @user.name %>,</p>
+      <p>Dear <%= @company.name %> Team,</p>
       
       <p>Thank you for booking with NEXTCOWORKS! Your reservation has been successfully confirmed. Here are the details of your booking:</p>
 
@@ -217,13 +217,13 @@
         <p><strong>Capacity:</strong> <%= @room.capacity %> people</p>
         
         <div class="facilities">
-          <% if @room.whiteboard %>
+          <% if @room.whiteboard? %>
             <span class="facility-tag">📝 Whiteboard</span>
           <% end %>
-          <% if @room.projector %>
+          <% if @room.projector? %>
             <span class="facility-tag">📽️ Projector</span>
           <% end %>
-          <% if @room.tv %>
+          <% if @room.tv? %>
             <span class="facility-tag">📺 TV</span>
           <% end %>
           <span class="facility-tag">💻 High-speed WiFi</span>

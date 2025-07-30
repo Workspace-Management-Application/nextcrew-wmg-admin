@@ -336,6 +336,11 @@
           <span class="nav-text">Visitor Entries</span>
         <% end %>
         
+        <%= link_to admin_day_passes_path, class: "nav-item #{'active' if controller_name == 'day_passes'}" do %>
+          <span class="nav-icon">🎫</span>
+          <span class="nav-text">Day Passes</span>
+        <% end %>
+        
         <%= link_to admin_workspace_types_path, class: "nav-item #{'active' if controller_name == 'workspace_types'}" do %>
           <span class="nav-icon">⚙️</span>
           <span class="nav-text">Workspace Types</span>

@@ -1,0 +1,51 @@
+<% if @day_pass.errors.any? %>
+  <div class="alert alert-danger">
+    <h5>
+      <%= pluralize(@day_pass.errors.count, "error") %> prohibited this day pass from being saved:
+    </h5>
+    <ul>
+      <% @day_pass.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with(model: [:admin, @day_pass], local: true, data: { turbo: false }, html: { class: "row g-3" }) do |form| %>
+  <div class="col-md-6">
+    <%= form.label :name, class: "form-label" %><span class="text-danger">*</span>
+    <%= form.text_field :name, class: "form-control form-control-dark" %>
+  </div>
+  <div class="col-md-6">
+    <%= form.label :email, class: "form-label" %><span class="text-danger">*</span>
+    <%= form.email_field :email, class: "form-control form-control-dark" %>
+  </div>
+  <div class="col-md-6">
+    <%= form.label :phone_number, class: "form-label" %><span class="text-danger">*</span>
+    <%= form.text_field :phone_number, class: "form-control form-control-dark" %>
+  </div>
+  <div class="col-md-6">
+    <%= form.label :company_name, "Company", class: "form-label" %>
+    <%= form.text_field :company_name, class: "form-control form-control-dark" %>
+  </div>
+  <div class="col-md-6">
+    <%= form.label :pass_date, "Pass Date", class: "form-label" %><span class="text-danger">*</span>
+    <%= form.date_field :pass_date, class: "form-control form-control-dark" %>
+  </div>
+  <div class="col-md-6">
+    <%= form.label :workspace_id, "Workspace", class: "form-label" %><span class="text-danger">*</span>
+    <%= form.collection_select :workspace_id, @workspaces, :id, :name, { prompt: "Select Workspace" }, { class: "select2-select", 'data-placeholder': "Select Workspace" } %>
+  </div>
+  <div class="col-md-6">
+    <%= form.label :photo, class: "form-label" %>
+    <%= form.file_field :photo, class: "form-control form-control-dark" %>
+  </div>
+  <div class="col-md-6">
+    <%= form.label :id_proof, "ID Proof", class: "form-label" %>
+    <%= form.file_field :id_proof, class: "form-control form-control-dark" %>
+  </div>
+  <div class="col-12 mt-3">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_day_passes_path, class: "btn btn-secondary ms-2" %>
+  </div>
+<% end %>

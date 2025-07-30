@@ -7,7 +7,7 @@ puts "🌱 Starting database seeding..."
 # Clear existing data in development (optional - uncomment if needed)
 # if Rails.env.development?
 #   puts "🗑️ Clearing existing data..."
-#   [Booking, CompanyRoom, UserWorkspace, CompanyUser, CompanyWorkspace, 
+#   [Booking, CompanyRoom, UserWorkspace, CompanyUser, CompanyWorkspace,
 #    VisitorEntry, OfficeEnquiry, DayPass, Room, User, Company, Workspace].each(&:destroy_all)
 # end
 
@@ -23,7 +23,7 @@ puts "🏢 Creating companies..."
 companies = [
   {
     name: 'SR Next Technologies',
-    email: 'contact@srnext.in',
+    email: 'somnathtyagi210787@acropolis.in',
     phone_number: '9876543210',
     address: 'Cabin 10, Tech Park, Vijay Nagar',
     status: 'active',
@@ -234,16 +234,16 @@ user_workspace_associations = [
   { user: user_records[1], workspace: workspace_records[0] }, # admin@srnext
   { user: user_records[3], workspace: workspace_records[0] }, # floor_user@gmail
   { user: user_records[6], workspace: workspace_records[0] }, # user1@srnext
-  
+
   # InnovateCorp users -> Floor 3 Standard
   { user: user_records[2], workspace: workspace_records[1] }, # admin2@innovatecorp
   { user: user_records[4], workspace: workspace_records[1] }, # floor_user2
   { user: user_records[7], workspace: workspace_records[1] }, # user2@innovatecorp
-  
+
   # StartupXYZ users -> Ground Floor Basic
   { user: user_records[5], workspace: workspace_records[2] }, # floor_user3
   { user: user_records[8], workspace: workspace_records[2] }, # user3@startupxyz
-  
+
   # TechSolutions users -> Floor 2 Executive
   { user: user_records[9], workspace: workspace_records[3] }  # user4@techsolutions
 ]
@@ -256,26 +256,26 @@ end
 puts "🏛️ Creating rooms..."
 rooms_data = [
   # Floor 5 Premium rooms
-  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true},
-  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true},
-  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, is_available: true},
-  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, is_available: true},
-  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, is_available: true},
-  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, is_available: false},
-  
+  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true },
+  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true },
+  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, is_available: true },
+  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, is_available: true },
+  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, is_available: true },
+  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, is_available: false },
+
   # Floor 3 Standard rooms
-  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, is_available: true},
-  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, is_available: true},
-  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, is_available: true},
-  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, is_available: true},
-  
+  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, is_available: true },
+  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, is_available: true },
+  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, is_available: true },
+  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, is_available: true },
+
   # Ground Floor Basic rooms
-  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, is_available: true},
-  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, is_available: true},
-  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, is_available: true},
-  
+  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, is_available: true },
+  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, is_available: true },
+  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, is_available: true },
+
   # Floor 2 Executive rooms (inactive workspace)
-  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, is_available: false}
+  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, is_available: false }
 ]
 
 room_records = rooms_data.map do |room_data|
@@ -291,15 +291,15 @@ company_room_associations = [
   { company: company_records[0], room: room_records[0] }, # SR Next -> Tesla
   { company: company_records[0], room: room_records[1] }, # SR Next -> Mercedes
   { company: company_records[0], room: room_records[3] }, # SR Next -> Alto
-  
+
   # InnovateCorp (Floor 3 Standard workspace) -> Floor 3 rooms
   { company: company_records[1], room: room_records[6] }, # InnovateCorp -> Boardroom Alpha
   { company: company_records[1], room: room_records[7] }, # InnovateCorp -> Meeting Beta
-  
+
   # StartupXYZ (Ground Floor Basic workspace) -> Ground Floor rooms
   { company: company_records[2], room: room_records[10] }, # StartupXYZ -> Conference One
   { company: company_records[2], room: room_records[11] }, # StartupXYZ -> Meeting Two
-  
+
   # TechSolutions (Floor 2 Executive workspace) -> Floor 2 rooms
   { company: company_records[3], room: room_records[13] }  # TechSolutions -> Executive Suite
 ]
@@ -321,58 +321,58 @@ room_amenity_associations = [
   { room: room_records[0], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[0], amenity: projector_amenity, has_amenity: true },
   { room: room_records[0], amenity: tv_amenity, has_amenity: true },
-  
+
   # Mercedes - Conference room with all amenities
   { room: room_records[1], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[1], amenity: projector_amenity, has_amenity: true },
   { room: room_records[1], amenity: tv_amenity, has_amenity: true },
-  
+
   # BMW - Conference room with all amenities
   { room: room_records[2], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[2], amenity: projector_amenity, has_amenity: true },
   { room: room_records[2], amenity: tv_amenity, has_amenity: true },
-  
+
   # Alto - Meeting room with whiteboard and TV
   { room: room_records[3], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[3], amenity: tv_amenity, has_amenity: true },
-  
+
   # Nano - Meeting room with whiteboard and TV
   { room: room_records[4], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[4], amenity: tv_amenity, has_amenity: true },
-  
+
   # Swift - Meeting room with all amenities (but unavailable)
   { room: room_records[5], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[5], amenity: projector_amenity, has_amenity: true },
   { room: room_records[5], amenity: tv_amenity, has_amenity: true },
-  
+
   # Boardroom Alpha - Conference room with all amenities
   { room: room_records[6], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[6], amenity: projector_amenity, has_amenity: true },
-  
+
   # Meeting Beta - Meeting room with whiteboard and TV
   { room: room_records[7], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[7], amenity: tv_amenity, has_amenity: true },
-  
+
   # Discussion Gamma - Meeting room with TV only
   { room: room_records[8], amenity: tv_amenity, has_amenity: true },
-  
+
   # Presentation Delta - Presentation room with all amenities
   { room: room_records[9], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[9], amenity: projector_amenity, has_amenity: true },
   { room: room_records[9], amenity: tv_amenity, has_amenity: true },
-  
+
   # Conference One - Conference room with whiteboard and TV
   { room: room_records[10], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[10], amenity: tv_amenity, has_amenity: true },
-  
+
   # Meeting Two - Meeting room with TV only
   { room: room_records[11], amenity: tv_amenity, has_amenity: true },
-  
+
   # Training Room - Training room with all amenities
   { room: room_records[12], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[12], amenity: projector_amenity, has_amenity: true },
   { room: room_records[12], amenity: tv_amenity, has_amenity: true },
-  
+
   # Executive Suite - Executive room with all amenities
   { room: room_records[13], amenity: whiteboard_amenity, has_amenity: true },
   { room: room_records[13], amenity: projector_amenity, has_amenity: true },
