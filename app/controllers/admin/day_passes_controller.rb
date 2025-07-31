@@ -3,16 +3,15 @@ class Admin::DayPassesController < Admin::BaseController
   before_action :set_workspaces, only: [ :index, :new, :create, :edit, :update ]
 
   def index
-    @day_passes = DayPass.includes(:workspace)
-
-    # Search functionality
-    if params[:search].present?
-      search_term = "%#{params[:search]}%"
-      @day_passes = @day_passes.where(
-        "name ILIKE ? OR email ILIKE ? OR phone_number ILIKE ? OR company_name ILIKE ?",
-        search_term, search_term, search_term, search_term
-      )
+    # Filter day passes by admin's workspace access
+    @day_passes = if current_user.super_admin?
+                    DayPass.includes(:workspace)
+    else
+                    DayPass.includes(:workspace).where(workspace: current_user.workspaces)
     end
+
+    # Search functionality using scope
+    @day_passes = @day_passes.search_by_term(params[:search])
 
     # Filter by workspace
     if params[:workspace_id].present?
@@ -21,8 +20,12 @@ class Admin::DayPassesController < Admin::BaseController
 
     # Filter by date
     if params[:date].present?
-      date = Date.parse(params[:date])
-      @day_passes = @day_passes.where(pass_date: date)
+      begin
+        date = Date.parse(params[:date])
+        @day_passes = @day_passes.where(pass_date: date)
+      rescue Date::Error
+        flash.now[:alert] = "Invalid date format"
+      end
     end
 
     # Order by most recent first
@@ -61,8 +64,17 @@ class Admin::DayPassesController < Admin::BaseController
   end
 
   def destroy
-    @day_pass.destroy
-    redirect_to admin_day_passes_path, notice: "Day pass was successfully deleted."
+    begin
+      @day_pass.destroy!
+      redirect_to admin_day_passes_path, notice: "Day pass was successfully deleted."
+    rescue ActiveRecord::RecordNotDestroyed => e
+      redirect_to admin_day_passes_path, alert: "Failed to delete day pass: #{e.message}"
+    rescue ActiveRecord::RecordNotFound
+      redirect_to admin_day_passes_path, alert: "Day pass not found."
+    rescue StandardError => e
+      Rails.logger.error "Error deleting day pass #{@day_pass.id}: #{e.message}"
+      redirect_to admin_day_passes_path, alert: "An error occurred while deleting the day pass."
+    end
   end
 
   private
@@ -72,7 +84,12 @@ class Admin::DayPassesController < Admin::BaseController
   end
 
   def set_workspaces
-    @workspaces = Workspace.all.order(:name)
+    # Super admins can see all workspaces, regular admins only see their assigned workspaces
+    if current_user.super_admin?
+      @workspaces = Workspace.all.order(:name)
+    else
+      @workspaces = current_user.workspaces.order(:name)
+    end
   end
 
   def day_pass_params

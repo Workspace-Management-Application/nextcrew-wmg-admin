@@ -34,10 +34,13 @@ class Api::BookingsController < Api::BaseController
 
     if @booking.save
       begin
-        BookingMailer.booking_confirmation(@booking).deliver_now
-        Rails.logger.info "Booking confirmation email sent successfully to #{@booking.company.email}"
-      rescue => e
-        Rails.logger.error "Failed to send booking confirmation email: #{e.message}"
+        BookingMailer.booking_confirmation(@booking).deliver_later
+        Rails.logger.info "Booking confirmation email queued for delivery to #{@booking.company.email}"
+      rescue Net::SMTPError, Net::OpenTimeoutError => e
+        Rails.logger.error "SMTP error queueing booking confirmation email: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+      rescue StandardError => e
+        Rails.logger.error "Failed to queue booking confirmation email: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
       end
       render_success(@booking, "Booking created successfully", :created)

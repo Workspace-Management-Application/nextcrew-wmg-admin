@@ -1,5 +1,5 @@
 class Admin::BookingsController < Admin::BaseController
-  before_action :set_booking, only: [:show, :edit, :update, :destroy]
+  before_action :set_booking, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @search = params[:search]
@@ -7,7 +7,7 @@ class Admin::BookingsController < Admin::BaseController
     @bookings = Booking.joins(room: :workspace)
                      .where(rooms: { workspace_id: workspace_ids })
                      .includes(:company, :room, room: :workspace).order(created_at: :desc)
-    
+
     # Search functionality
     if @search.present?
       @bookings = @bookings.joins(:company, :room).where(
@@ -15,25 +15,25 @@ class Admin::BookingsController < Admin::BaseController
         "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
       )
     end
-    
+
     # Filter by date if specified
     if params[:date].present?
-      @bookings = @bookings.where('DATE(start_time) = ?', Date.parse(params[:date]))
+      @bookings = @bookings.where("DATE(start_time) = ?", Date.parse(params[:date]))
     end
-    
+
     # Filter by workspace if specified
     if params[:workspace_id].present?
       @bookings = @bookings.joins(:room).where(rooms: { workspace_id: params[:workspace_id] })
     end
-    
+
     # Filter by status if specified
     if params[:status].present?
       @bookings = @bookings.where(status: params[:status])
     end
-    
+
     # Order by start time descending
     @bookings = @bookings.order(start_time: :asc)
-    
+
     # Pagination
     @bookings = @bookings.page(params[:page]).per(15)
   end
@@ -53,16 +53,19 @@ class Admin::BookingsController < Admin::BaseController
     if @booking.save
       # Send booking confirmation email
       begin
-        BookingMailer.booking_confirmation(@booking).deliver_now
-      rescue => e
-        Rails.logger.error "Failed to send booking confirmation email: #{e.message}"
+        BookingMailer.booking_confirmation(@booking).deliver_later
+        Rails.logger.info "Booking confirmation email queued for delivery to #{@booking.company.email}"
+      rescue Net::SMTPError, Net::OpenTimeoutError => e
+        Rails.logger.error "SMTP error sending booking confirmation email: #{e.message}"
+      rescue StandardError => e
+        Rails.logger.error "Failed to queue booking confirmation email: #{e.message}"
         # Don't fail the booking creation if email fails
       end
-      
+
       # Note: Monthly limit exceeded notification is automatically sent by the model validation
       # if the company exceeds their monthly limit
-      
-      redirect_to admin_bookings_path, notice: 'Booking was successfully created.'
+
+      redirect_to admin_bookings_path, notice: "Booking was successfully created."
     else
       @companies = Company.all
       @rooms = Room.all
@@ -72,23 +75,23 @@ class Admin::BookingsController < Admin::BaseController
 
   def edit
     unless @booking.editable?
-      redirect_to admin_booking_path(@booking), alert: 'Cannot edit completed bookings.'
+      redirect_to admin_booking_path(@booking), alert: "Cannot edit completed bookings."
       return
     end
-    
+
     @companies = Company.all
     @rooms = @booking.company.rooms.includes(:workspace) # Load rooms for the current company
   end
 
   def update
     unless @booking.editable?
-      redirect_to admin_booking_path(@booking), alert: 'Cannot update completed bookings.'
+      redirect_to admin_booking_path(@booking), alert: "Cannot update completed bookings."
       return
     end
-    
+
     @booking.acting_user = current_user
     if @booking.update(booking_params)
-      redirect_to admin_booking_path(@booking), notice: 'Booking was successfully updated.'
+      redirect_to admin_booking_path(@booking), notice: "Booking was successfully updated."
     else
       @companies = Company.all
       @rooms = Room.all
@@ -97,8 +100,17 @@ class Admin::BookingsController < Admin::BaseController
   end
 
   def destroy
-    @booking.destroy
-    redirect_to admin_bookings_path, notice: 'Booking was successfully cancelled.'
+    begin
+      @booking.destroy!
+      redirect_to admin_bookings_path, notice: "Booking was successfully cancelled."
+    rescue ActiveRecord::RecordNotDestroyed => e
+      redirect_to admin_bookings_path, alert: "Failed to cancel booking: #{e.message}"
+    rescue ActiveRecord::RecordNotFound
+      redirect_to admin_bookings_path, alert: "Booking not found."
+    rescue StandardError => e
+      Rails.logger.error "Error cancelling booking #{@booking.id}: #{e.message}"
+      redirect_to admin_bookings_path, alert: "An error occurred while cancelling the booking."
+    end
   end
 
   def company_rooms
