@@ -11,20 +11,20 @@ class Admin::CompaniesController < Admin::BaseController
     
     # Search functionality
     if @search.present?
+      search_term = "%#{@search}%"
       @companies = @companies.where(
-        "name ILIKE ? OR email ILIKE ? OR phone_number ILIKE ? OR address ILIKE ? OR status ILIKE ? OR cabin_number ILIKE ? OR centre_address ILIKE ? OR company_poc_contact ILIKE ? OR company_email_address ILIKE ?",
-        "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%", "%#{@search}%"
+        "companies.name ILIKE ? OR companies.email ILIKE ? OR companies.phone_number ILIKE ? OR companies.address ILIKE ? OR companies.status ILIKE ? OR companies.cabin_number ILIKE ? OR companies.centre_address ILIKE ? OR companies.company_poc_contact ILIKE ? OR companies.company_email_address ILIKE ?",
+        search_term, search_term, search_term, search_term, search_term, search_term, search_term, search_term, search_term
       )
     end
     
     # Filter by status if specified
     if params[:status].present?
-      @companies = @companies.where(status: params[:status])
+      @companies = @companies.where(companies: { status: params[:status] })
     end
     
     # Order by name
-    @companies = @companies.order(:name)
-    
+    @companies = @companies.order("companies.name")
     # Pagination
     @companies = @companies.page(params[:page]).per(10)
   end
