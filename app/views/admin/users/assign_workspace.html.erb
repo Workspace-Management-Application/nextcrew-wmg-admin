@@ -15,7 +15,9 @@
       <p><strong>Current Workspaces:</strong> <%= @user.workspaces.any? ? @user.workspaces.pluck(:name).join(', ') : 'Not assigned' %></p>
     </div>
 
-          <%= form_with url: assign_workspace_admin_user_path(@user), method: :patch, local: true, data: { turbo: false } do |form| %>
+    <%= form_with url: assign_workspace_admin_user_path(@user), method: :patch, local: true, data: { turbo: false } do |form| %>
+      <%= hidden_field_tag :assign_settings, "1" %>
+
       <div class="mb-4">
         <%= form.label :workspace_ids, "Select Workspaces", class: "form-label" %>
         <div class="workspace-selection">
@@ -39,8 +41,30 @@
         <small class="form-text text-muted">Select multiple workspaces to assign this admin user to manage</small>
       </div>
 
+      <% if @user.admin? %>
+        <hr class="my-4">
+        <div class="mb-4">
+          <label class="form-label">Visible Sidebar Items</label>
+          <div class="row">
+            <% @sidebar_items.each do |key, label| %>
+              <div class="col-md-6 mb-2">
+                <div class="form-check">
+                  <%= check_box_tag "sidebar_items[]",
+                                    key,
+                                    @user.sidebar_item_visible?(key),
+                                    class: "form-check-input",
+                                    id: "sidebar_item_#{key}" %>
+                  <%= label_tag "sidebar_item_#{key}", label, class: "form-check-label" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          <small class="form-text text-muted">Choose which sidebar links this admin can see.</small>
+        </div>
+      <% end %>
+
       <div class="d-flex gap-2">
-        <%= form.submit "Assign Workspaces", class: "btn btn-primary" %>
+        <%= form.submit "Save Settings", class: "btn btn-primary" %>
         <%= link_to "Cancel", admin_user_path(@user), class: "btn btn-secondary" %>
       </div>
     <% end %>

@@ -296,64 +296,27 @@
       </div>
       
       <nav class="sidebar-nav">
-        <%= link_to admin_dashboard_path, class: "nav-item #{'active' if current_page?(admin_dashboard_path)}" do %>
-          <span class="nav-icon">📊</span>
-          <span class="nav-text">Dashboard</span>
-        <% end %>
-        
-        <%= link_to admin_workspaces_path, class: "nav-item #{'active' if controller_name == 'workspaces'}" do %>
-          <span class="nav-icon">🏢</span>
-          <span class="nav-text">Workspaces</span>
-        <% end %>
-        
-        <%= link_to admin_rooms_path, class: "nav-item #{'active' if controller_name == 'rooms'}" do %>
-          <span class="nav-icon">🚪</span>
-          <span class="nav-text">Rooms</span>
-        <% end %>
-        
-        <%= link_to admin_bookings_path, class: "nav-item #{'active' if controller_name == 'bookings'}" do %>
-          <span class="nav-icon">📅</span>
-          <span class="nav-text">Bookings</span>
-        <% end %>
-        
-        <%= link_to admin_users_path, class: "nav-item #{'active' if controller_name == 'users'}" do %>
-          <span class="nav-icon">👤</span>
-          <span class="nav-text">Users</span>
-        <% end %>
-        
-        <%= link_to admin_companies_path, class: "nav-item #{'active' if controller_name == 'companies'}" do %>
-          <span class="nav-icon">🏭</span>
-          <span class="nav-text">Companies</span>
-        <% end %>
-        
-        <%= link_to admin_office_enquiries_path, class: "nav-item #{'active' if controller_name == 'office_enquiries'}" do %>
-          <span class="nav-icon">📋</span>
-          <span class="nav-text">Office Enquiries</span>
-        <% end %>
-        
-        <%= link_to admin_visitor_entries_path, class: "nav-item #{'active' if controller_name == 'visitor_entries'}" do %>
-          <span class="nav-icon">👥</span>
-          <span class="nav-text">Visitor Entries</span>
-        <% end %>
-        
-        <%= link_to admin_day_passes_path, class: "nav-item #{'active' if controller_name == 'day_passes'}" do %>
-          <span class="nav-icon">🎫</span>
-          <span class="nav-text">Day Passes</span>
-        <% end %>
-        
-        <%= link_to admin_workspace_types_path, class: "nav-item #{'active' if controller_name == 'workspace_types'}" do %>
-          <span class="nav-icon">⚙️</span>
-          <span class="nav-text">Workspace Types</span>
-        <% end %>
-        
-        <%= link_to admin_amenities_path, class: "nav-item #{'active' if controller_name == 'amenities'}" do %>
-          <span class="nav-icon">🛠️</span>
-          <span class="nav-text">Amenities</span>
-        <% end %>
-        
-        <%= link_to admin_exports_path, class: "nav-item #{'active' if controller_name == 'exports'}", data: { turbo: false } do %>
-          <span class="nav-icon">📊</span>
-          <span class="nav-text">Export</span>
+        <% sidebar_links = [
+          { key: "dashboard", label: "Dashboard", icon: "📊", path: admin_dashboard_path, active: current_page?(admin_dashboard_path) },
+          { key: "workspaces", label: "Workspaces", icon: "🏢", path: admin_workspaces_path, active: controller_name == "workspaces" },
+          { key: "rooms", label: "Rooms", icon: "🚪", path: admin_rooms_path, active: controller_name == "rooms" },
+          { key: "bookings", label: "Bookings", icon: "📅", path: admin_bookings_path, active: controller_name == "bookings" },
+          { key: "users", label: "Users", icon: "👤", path: admin_users_path, active: controller_name == "users" },
+          { key: "companies", label: "Companies", icon: "🏭", path: admin_companies_path, active: controller_name == "companies" },
+          { key: "office_enquiries", label: "Office Enquiries", icon: "📋", path: admin_office_enquiries_path, active: controller_name == "office_enquiries" },
+          { key: "visitor_entries", label: "Visitor Entries", icon: "👥", path: admin_visitor_entries_path, active: controller_name == "visitor_entries" },
+          { key: "day_passes", label: "Day Passes", icon: "🎫", path: admin_day_passes_path, active: controller_name == "day_passes" },
+          { key: "workspace_types", label: "Workspace Types", icon: "⚙️", path: admin_workspace_types_path, active: controller_name == "workspace_types" },
+          { key: "amenities", label: "Amenities", icon: "🛠️", path: admin_amenities_path, active: controller_name == "amenities" },
+          { key: "exports", label: "Export", icon: "📊", path: admin_exports_path, active: controller_name == "exports", data: { turbo: false } }
+        ] %>
+
+        <% sidebar_links.each do |item| %>
+          <% next unless current_user.sidebar_item_visible?(item[:key]) %>
+          <%= link_to item[:path], class: "nav-item #{'active' if item[:active]}", data: item[:data] do %>
+            <span class="nav-icon"><%= item[:icon] %></span>
+            <span class="nav-text"><%= item[:label] %></span>
+          <% end %>
         <% end %>
       </nav>
     </div>

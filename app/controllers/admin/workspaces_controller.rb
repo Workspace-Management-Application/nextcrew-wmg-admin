@@ -266,14 +266,11 @@ class Admin::WorkspacesController < Admin::BaseController
   end
 
   def determine_next_step(workspace)
-    # Check for attached floor user (role: 'floor_user')
     has_floor_user = workspace.users.where(role: 'floor_user').exists?
     if !has_floor_user
       step2_admin_workspace_path(workspace)
-    elsif workspace.rooms.empty?
-      step3_admin_workspace_path(workspace)
     else
-      admin_workspaces_path
+      step3_admin_workspace_path(workspace)
     end
   end
 

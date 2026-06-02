@@ -24,8 +24,8 @@
             <%= form.label :company_id, "Company", class: "form-label" %>
             <%= form.select :company_id, 
                 options_for_select(@companies.map { |c| [c.name, c.id] }), 
-                { prompt: 'Select Company' }, 
-                { class: "form-select", id: "company-select", required: true } %>
+                { prompt: 'All Companies' }, 
+                { class: "form-select", id: "company-select" } %>
           </div>
         </div>
 
@@ -52,6 +52,7 @@
             <li>Total exceeded hours per day (sum of all daily limit exceedances)</li>
             <li>Total exceeded hours per month (monthly limit exceedances)</li>
             <li>Total bookings and meeting hours in the selected period</li>
+            <li>Select only a workspace to export all companies in that workspace</li>
             <li>Data will be exported as a CSV file (.csv)</li>
           </ul>
         </div>
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedWorkspaceId = this.value;
     
     // Clear current options and add prompt
-    companySelect.innerHTML = '<option value="">Select Company</option>';
+    companySelect.innerHTML = '<option value="">All Companies</option>';
     
     if (selectedWorkspaceId) {
       // Load companies for specific workspace via AJAX

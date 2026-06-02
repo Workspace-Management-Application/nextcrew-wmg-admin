@@ -34,8 +34,8 @@
       <div><%= @office_enquiry.workspace&.name %></div>
     </div>
     <div class="col-md-6 mb-3">
-      <strong>Date:</strong>
-      <div><%= @office_enquiry.created_at.strftime("%B %d, %Y") %></div>
+      <strong>Enquiry Made At:</strong>
+      <div><%= @office_enquiry.created_at.strftime("%B %d, %Y %I:%M %p") %></div>
     </div>
     <div class="col-md-6 mb-3">
       <strong>Workspace Types:</strong>

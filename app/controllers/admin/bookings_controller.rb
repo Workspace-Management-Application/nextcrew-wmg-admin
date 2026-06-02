@@ -75,7 +75,7 @@ class Admin::BookingsController < Admin::BaseController
 
   def edit
     unless @booking.editable?
-      redirect_to admin_booking_path(@booking), alert: "Cannot edit completed bookings."
+      redirect_to admin_booking_path(@booking), alert: "Cannot edit this booking."
       return
     end
 
@@ -85,7 +85,7 @@ class Admin::BookingsController < Admin::BaseController
 
   def update
     unless @booking.editable?
-      redirect_to admin_booking_path(@booking), alert: "Cannot update completed bookings."
+      redirect_to admin_booking_path(@booking), alert: "Cannot update this booking."
       return
     end
 

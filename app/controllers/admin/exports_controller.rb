@@ -18,12 +18,12 @@ class Admin::ExportsController < Admin::BaseController
   def export_company_details
     workspace_id = params[:workspace_id]
     company_id = params[:company_id]
-    start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : Date.current.beginning_of_month
-    end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : Date.current.end_of_month
+    start_date = params[:start_date].present? ? Date.parse(params[:start_date]).beginning_of_day : Date.current.beginning_of_month.beginning_of_day
+    end_date = params[:end_date].present? ? Date.parse(params[:end_date]).end_of_day : Date.current.end_of_month.end_of_day
 
     # Validate required parameters
-    unless workspace_id.present? && company_id.present?
-      redirect_to admin_exports_path, alert: "Please select both workspace and company."
+    unless workspace_id.present?
+      redirect_to admin_exports_path, alert: "Please select a workspace."
       return
     end
 
@@ -40,31 +40,30 @@ class Admin::ExportsController < Admin::BaseController
 
   def generate_company_details_csv(workspace_id, company_id, start_date, end_date)
     require "csv"
+    companies = Company.joins(:workspaces).where(workspaces: { id: workspace_id }).order(:name)
+    companies = companies.where(id: company_id) if company_id.present?
+
     csv_data = CSV.generate do |csv|
-      # Company Details Section
-      csv << [ "COMPANY DETAILS" ]
-      csv << [
-        "Company Name",
-        "Email",
-        "Phone Number",
-        "Address",
-        "Cabin Number",
-        "Number of Employees",
-        "Meeting Time Limit per Month (minutes)",
-        "Meeting Time Limit per Day (minutes)",
-        "Number of Meetings per Day",
-        "Minimum Meeting Duration (minutes)",
-        "Maximum Meeting Duration (minutes)",
-        "Status",
-        "Total Exceed Minutes",
-        "Total Bookings in Period",
-        "Total Meeting Minutes in Period"
-      ]
-
-      companies = Company.joins(:workspaces).where(workspaces: { id: workspace_id }).where(id: company_id)
-
       companies.each do |company|
-        bookings = company.bookings.where("bookings.start_time >= ? AND bookings.start_time <= ?", start_date, end_date)
+        csv << [ "COMPANY DETAILS - #{company.name}" ]
+        csv << [
+          "Company Name",
+          "Email",
+          "Phone Number",
+          "Address",
+          "Cabin Number",
+          "Number of Employees",
+          "Meeting Time Limit per Month (minutes)",
+          "Meeting Time Limit per Day (minutes)",
+          "Number of Meetings per Day",
+          "Minimum Meeting Duration (minutes)",
+          "Maximum Meeting Duration (minutes)",
+          "Status",
+          "Total Exceed Minutes",
+          "Total Bookings in Period",
+          "Total Meeting Minutes in Period"
+        ]
+
         exceed_minutes, total_bookings, total_minutes = calculate_exceed_minutes(company, start_date, end_date)
         csv << [
           company.name,
@@ -83,29 +82,27 @@ class Admin::ExportsController < Admin::BaseController
           total_bookings,
           total_minutes
         ]
-      end
 
-      # Add empty rows for spacing
-      csv << []
-      csv << []
+        # Add empty rows for spacing
+        csv << []
+        csv << []
 
-      # Booking Details Section
-      csv << [ "BOOKING DETAILS" ]
-      csv << [
-        "Company Name",
-        "Booker Name",
-        "Phone Number",
-        "Room Name",
-        "Start Date",
-        "Start Time",
-        "End Time",
-        "Duration (minutes)",
-        "Exceed Time (minutes)",
-        "Status",
-        "Created At"
-      ]
+        # Booking Details Section
+        csv << [ "BOOKING DETAILS - #{company.name}" ]
+        csv << [
+          "Company Name",
+          "Booker Name",
+          "Phone Number",
+          "Room Name",
+          "Start Date",
+          "Start Time",
+          "End Time",
+          "Duration (minutes)",
+          "Exceed Time (minutes)",
+          "Status",
+          "Created At"
+        ]
 
-      companies.each do |company|
         bookings = company.bookings.includes(:room)
                           .where("bookings.start_time >= ? AND bookings.start_time <= ?", start_date, end_date)
                           .order("bookings.start_time ASC")
@@ -150,6 +147,9 @@ class Admin::ExportsController < Admin::BaseController
           "",
           ""
         ]
+
+        csv << []
+        csv << []
       end
     end
     csv_data

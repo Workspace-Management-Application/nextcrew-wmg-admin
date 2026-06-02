@@ -127,18 +127,23 @@ class Admin::UsersController < Admin::BaseController
     
     @user = User.find(params[:id])
     @workspaces = Workspace.all
+    @sidebar_items = User::SIDEBAR_ITEMS
     
     if request.patch?
-      if params[:workspace_ids].present?
+      if params[:assign_settings].present?
         # Clear existing assignments
         @user.user_workspaces.destroy_all
         
         # Create new assignments for selected workspaces
-        params[:workspace_ids].each do |workspace_id|
+        Array(params[:workspace_ids]).each do |workspace_id|
           UserWorkspace.create(user: @user, workspace_id: workspace_id) if workspace_id.present?
         end
+
+        if @user.admin?
+          @user.update(sidebar_items: Array(params[:sidebar_items]) & User::SIDEBAR_ITEMS.keys)
+        end
         
-        redirect_to assign_workspace_admin_user_path(@user), notice: 'Workspaces assigned successfully.'
+        redirect_to assign_workspace_admin_user_path(@user), notice: 'Admin settings updated successfully.'
       elsif params[:remove_workspace_id].present?
         # Remove specific workspace assignment
         @user.user_workspaces.where(workspace_id: params[:remove_workspace_id]).destroy_all

@@ -3,7 +3,13 @@
 <div class="content-area bg-dark text-white p-4 rounded">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Office Enquiries</h2>
-    <%= link_to "Add Enquiry", new_admin_office_enquiry_path, class: "btn btn-primary" %>
+    <div>
+      <%= link_to "Export CSV",
+                  admin_office_enquiries_path(request.query_parameters.except(:page).merge(format: :csv)),
+                  class: "btn btn-outline-light me-2",
+                  data: { turbo: false } %>
+      <%= link_to "Add Enquiry", new_admin_office_enquiry_path, class: "btn btn-primary" %>
+    </div>
   </div>
 
   <!-- Search and Filter Form -->
@@ -56,7 +62,7 @@
           <th>Workspace Types</th>
           <th>No. of Seats</th>
           <th>Workspace</th>
-          <th>Date</th>
+          <th>Date & Time</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -74,7 +80,7 @@
             </td>
             <td><%= enquiry.no_of_seats %></td>
             <td><%= enquiry.workspace&.name %></td>
-            <td><%= enquiry.created_at.strftime("%b %d, %Y") %></td>
+            <td><%= enquiry.created_at.strftime("%b %d, %Y %I:%M %p") %></td>
             <td class="action-column">
               <%= link_to "Edit", edit_admin_office_enquiry_path(enquiry), class: "btn btn-secondary btn-sm me-2" %>
               <%= link_to "Delete", admin_office_enquiry_path(enquiry), 
