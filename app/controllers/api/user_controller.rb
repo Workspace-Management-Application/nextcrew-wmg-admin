@@ -5,9 +5,8 @@ class Api::UserController < Api::BaseController
     begin
       payload = JWT.decode(token, Rails.application.credentials.devise_jwt_secret_key)[0]
       user = User.find_by(id: payload['sub'])
-      data = user.as_json(only: [:id, :email, :name, :role]).merge(workspace_id: user.workspaces.first&.id)
       if user
-        render_success(data)
+        render_success(user.api_profile_data)
       else
         render_error('User not found', :unauthorized)
       end
@@ -15,4 +14,4 @@ class Api::UserController < Api::BaseController
       render_error('Invalid or expired token')
     end
   end
-end 
+end

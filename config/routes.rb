@@ -87,6 +87,7 @@ Rails.application.routes.draw do
       member do
         get :assign_workspace
         patch :assign_workspace
+        delete "documents/:attachment_id", to: "users#destroy_document", as: :document
       end
       collection do
         get :companies_for_workspace

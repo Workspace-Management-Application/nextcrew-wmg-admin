@@ -137,25 +137,29 @@ users_data = [
   { email: 'floor_user3@workspace.com', password: '123456789', name: 'Floor User 3', phone_number: '9000000005', role: 'floor_user' },
   { email: 'floor_user4@workspace.com', password: '123456789', name: 'Floor User 4', phone_number: '9000000006', role: 'floor_user' },
 
-  # Company users (one per company, role: 'user')
-  { email: 'user1@srnext.in', password: '123456789', name: 'SR Next User', phone_number: '9000000010', role: 'user' },
-  { email: 'user1@innovatecorp.com', password: '123456789', name: 'InnovateCorp User', phone_number: '9000000011', role: 'user' },
-  { email: 'user1@startupxyz.in', password: '123456789', name: 'StartupXYZ User', phone_number: '9000000012', role: 'user' },
-  { email: 'user1@techsolutions.co.in', password: '123456789', name: 'TechSolutions User', phone_number: '9000000013', role: 'user' }
+  # Company users (role: 'user')
+  { email: 'user1@srnext.in', password: '123456789', name: 'SR Next User', phone_number: '9000000010', role: 'user', company_user_type: 'booking_user' },
+  { email: 'user1@innovatecorp.com', password: '123456789', name: 'InnovateCorp User', phone_number: '9000000011', role: 'user', company_user_type: 'booking_user' },
+  { email: 'user1@startupxyz.in', password: '123456789', name: 'StartupXYZ User', phone_number: '9000000012', role: 'user', company_user_type: 'booking_user' },
+  { email: 'user1@techsolutions.co.in', password: '123456789', name: 'TechSolutions User', phone_number: '9000000013', role: 'user', company_user_type: 'booking_user' },
+  { email: 'employee1@srnext.in', password: '123456789', name: 'SR Next Employee', phone_number: '9000000014', role: 'user', company_user_type: 'employee' }
 ]
 
 user_company_map = {
   'user1@srnext.in' => 'SR Next Technologies',
   'user1@innovatecorp.com' => 'InnovateCorp',
   'user1@startupxyz.in' => 'StartupXYZ',
-  'user1@techsolutions.co.in' => 'TechSolutions Ltd'
+  'user1@techsolutions.co.in' => 'TechSolutions Ltd',
+  'employee1@srnext.in' => 'SR Next Technologies'
 }
 
 user_records = users_data.map do |user_data|
-  User.find_or_create_by!(email: user_data[:email]) do |user|
+  user = User.find_or_create_by!(email: user_data[:email]) do |user|
     user.assign_attributes(user_data)
     user.confirmed_at = Time.current # Auto-confirm users
   end
+  user.update!(user_data.except(:password))
+  user
 end
 
 # After user_records and company_records are created
@@ -234,6 +238,7 @@ user_workspace_associations = [
   { user: user_records[1], workspace: workspace_records[0] }, # admin@srnext
   { user: user_records[3], workspace: workspace_records[0] }, # floor_user@gmail
   { user: user_records[6], workspace: workspace_records[0] }, # user1@srnext
+  { user: user_records[10], workspace: workspace_records[0] }, # employee1@srnext
 
   # InnovateCorp users -> Floor 3 Standard
   { user: user_records[2], workspace: workspace_records[1] }, # admin2@innovatecorp
@@ -564,6 +569,8 @@ puts "  • Super Admins: #{User.super_admin.count}"
 puts "  • Admins: #{User.admin.count}"
 puts "  • Floor Users: #{User.floor_user.count}"
 puts "  • Regular Users: #{User.user.count}"
+puts "  • Booking Users: #{User.user.booking_user.count}"
+puts "  • Employees: #{User.user.employee.count}"
 puts "- Rooms: #{Room.count}"
 puts "- Bookings: #{Booking.count}"
 puts "- Day Passes: #{DayPass.count}"

@@ -7,7 +7,7 @@
       <%= link_to "← Back to Company", admin_company_path(@company), class: "btn btn-outline-primary" %>
     </div>
 
-    <%= form_with model: [:admin, @user], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
+    <%= form_with model: [:admin, @user], local: true, data: { turbo: false }, html: { multipart: true }, class: "needs-validation", novalidate: true do |form| %>
       <% if @user.errors.any? %>
         <div class="alert alert-danger">
           <h6><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h6>
@@ -77,6 +77,27 @@
           { class: "select2-select", id: "user_company_id", 'data-placeholder': 'Select Company' } %>
       </div>
 
+      <div class="mb-3">
+        <%= form.label :company_user_type, "Company Access Type", class: "form-label" %><span class="text-danger">*</span>
+        <%= form.select :company_user_type,
+                        options_for_select([
+                          ['Booking User', 'booking_user'],
+                          ['Employee', 'employee']
+                        ], @user.company_user_type || 'booking_user'),
+                        {},
+                        { class: "select2-select", id: "user_company_user_type", 'data-placeholder': 'Select Company Access Type' } %>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :documents, "Documents", class: "form-label" %>
+        <%= form.file_field :documents,
+                            multiple: true,
+                            accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf",
+                            id: "user_documents",
+                            class: "form-control" %>
+        <div id="selected_documents" class="mt-2 small text-light"></div>
+      </div>
+
       <%= hidden_field_tag :company_id, @company.id %>
       
       <div class="d-flex gap-2">
@@ -92,7 +113,37 @@ document.addEventListener('DOMContentLoaded', function() {
   // Pre-select workspace and company
   const workspaceSelect = document.getElementById('user_workspace_id');
   const companySelect = document.getElementById('user_company_id');
-  
+  const documentsInput = document.getElementById('user_documents');
+  const selectedDocuments = document.getElementById('selected_documents');
+
+  function updateSelectedDocuments() {
+    if (!documentsInput || !selectedDocuments) return;
+
+    const files = Array.from(documentsInput.files || []);
+    if (files.length === 0) {
+      selectedDocuments.innerHTML = '';
+      return;
+    }
+
+    selectedDocuments.innerHTML = '';
+
+    const label = document.createElement('div');
+    label.className = 'mb-1';
+    label.textContent = 'Selected files:';
+    selectedDocuments.appendChild(label);
+
+    const list = document.createElement('ul');
+    list.className = 'mb-0 ps-3';
+    files.forEach(file => {
+      const item = document.createElement('li');
+      item.textContent = file.name;
+      list.appendChild(item);
+    });
+    selectedDocuments.appendChild(list);
+  }
+
+  documentsInput?.addEventListener('change', updateSelectedDocuments);
+
   if (workspaceSelect && '<%= @selected_workspace_id %>') {
     workspaceSelect.value = '<%= @selected_workspace_id %>';
     if (window.$ && $.fn.select2) {
@@ -112,7 +163,37 @@ document.addEventListener('turbo:load', function() {
   // Pre-select workspace and company
   const workspaceSelect = document.getElementById('user_workspace_id');
   const companySelect = document.getElementById('user_company_id');
-  
+  const documentsInput = document.getElementById('user_documents');
+  const selectedDocuments = document.getElementById('selected_documents');
+
+  function updateSelectedDocuments() {
+    if (!documentsInput || !selectedDocuments) return;
+
+    const files = Array.from(documentsInput.files || []);
+    if (files.length === 0) {
+      selectedDocuments.innerHTML = '';
+      return;
+    }
+
+    selectedDocuments.innerHTML = '';
+
+    const label = document.createElement('div');
+    label.className = 'mb-1';
+    label.textContent = 'Selected files:';
+    selectedDocuments.appendChild(label);
+
+    const list = document.createElement('ul');
+    list.className = 'mb-0 ps-3';
+    files.forEach(file => {
+      const item = document.createElement('li');
+      item.textContent = file.name;
+      list.appendChild(item);
+    });
+    selectedDocuments.appendChild(list);
+  }
+
+  documentsInput?.addEventListener('change', updateSelectedDocuments);
+
   if (workspaceSelect && '<%= @selected_workspace_id %>') {
     workspaceSelect.value = '<%= @selected_workspace_id %>';
     if (window.$ && $.fn.select2) {
@@ -127,4 +208,4 @@ document.addEventListener('turbo:load', function() {
     }
   }
 });
-</script> 
+</script>

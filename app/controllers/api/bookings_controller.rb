@@ -19,6 +19,8 @@ class Api::BookingsController < Api::BaseController
 
   # POST /api/bookings
   def create
+    return render_booking_access_error unless current_user.can_book_for_company?
+
     company = Company.find_by(id: booking_params[:company_id])
     unless company
       return render_error("Company not found", :unprocessable_entity)
@@ -52,6 +54,8 @@ class Api::BookingsController < Api::BaseController
   # PATCH/PUT /api/bookings/:id
   def update
     if @booking
+      return render_booking_access_error unless current_user.can_book_for_company?
+
       if booking_params[:room_id] && !@workspace.rooms.exists?(id: booking_params[:room_id])
         return render_error("Room does not belong to this workspace", :unprocessable_entity)
       end
@@ -89,5 +93,9 @@ class Api::BookingsController < Api::BaseController
 
   def booking_params
     params.require(:booking).permit(:company_id, :booker_name, :phone_number, :room_id, :start_time, :end_time, :status)
+  end
+
+  def render_booking_access_error
+    render_error("This user is not allowed to create or update bookings", :forbidden)
   end
 end

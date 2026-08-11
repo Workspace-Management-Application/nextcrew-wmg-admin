@@ -10,9 +10,16 @@ class User < ApplicationRecord
   has_many :companies, through: :company_users
   has_many :user_workspaces
   has_many :workspaces, through: :user_workspaces
+  has_many_attached :documents
 
   # Enum declaration with a default value
   enum :role, { super_admin: 'super_admin', admin: 'admin', floor_user: 'floor_user', user: 'user' }, default: :user
+  enum :company_user_type, { booking_user: 'booking_user', employee: 'employee' }, default: :booking_user
+
+  validates :company_user_type, inclusion: { in: company_user_types.keys }, if: :user?
+  validate :documents_must_be_images_or_pdfs
+
+  before_validation :normalize_company_user_type
   before_create :generate_token
 
   SIDEBAR_ITEMS = {
@@ -50,7 +57,37 @@ class User < ApplicationRecord
     visible_sidebar_items.include?(key.to_s)
   end
 
+  def company_user?
+    user? && companies.any?
+  end
+
+  def company_user_type_label
+    company_user_type.to_s.humanize
+  end
+
+  def can_book_for_company?
+    !user? || booking_user?
+  end
+
+  def api_profile_data
+    data = as_json(only: [:id, :email, :name, :role]).merge(workspace_id: workspaces.first&.id)
+    data[:company_user_type] = company_user_type if user?
+    data
+  end
+
   private
+
+  def normalize_company_user_type
+    self.company_user_type = user? ? (company_user_type.presence || 'booking_user') : nil
+  end
+
+  def documents_must_be_images_or_pdfs
+    documents.each do |document|
+      next if document.blob&.content_type.in?(%w[application/pdf image/jpeg image/jpg image/png image/gif image/webp])
+
+      errors.add(:documents, "must be images or PDFs")
+    end
+  end
 
   def generate_token
     self.refresh_token = SecureRandom.hex(32)

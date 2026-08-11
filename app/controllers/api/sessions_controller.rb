@@ -26,7 +26,7 @@ class Api::SessionsController < Devise::SessionsController
       # Prepare data to send back in the response
       data = {
         token: request.env['warden-jwt_auth.token'],  # Get JWT token
-        user: user.as_json(only: [:id, :email, :name, :role]).merge(workspace_id: user.workspaces.first&.id),
+        user: user.api_profile_data,
         refresh_token: refresh_token
       }
 

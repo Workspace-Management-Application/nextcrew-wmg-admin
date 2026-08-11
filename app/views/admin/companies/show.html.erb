@@ -109,6 +109,7 @@
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Company Access</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -120,6 +121,11 @@
                 <td>
                   <span class="badge <%= user.role == 'super_admin' ? 'bg-light text-dark' : user.role == 'admin' ? 'bg-secondary' : 'bg-dark' %>">
                     <%= user.role.humanize %>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge <%= user.booking_user? ? 'bg-success' : 'bg-secondary' %>">
+                    <%= user.company_user_type_label %>
                   </span>
                 </td>
                 <td>

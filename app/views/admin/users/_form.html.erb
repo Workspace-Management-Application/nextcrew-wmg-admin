@@ -1,4 +1,4 @@
-<%= form_with model: [:admin, @user], local: true, data: { turbo: false }, class: "needs-validation", novalidate: true do |form| %>
+<%= form_with model: [:admin, @user], local: true, data: { turbo: false }, html: { multipart: true }, class: "needs-validation", novalidate: true do |form| %>
   <% if @user.errors.any? %>
     <div class="alert alert-danger">
       <h6><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h6>
@@ -76,6 +76,32 @@
       { class: "select2-select", id: "user_company_id", 'data-placeholder': 'Select Company' } %>
   </div>
 
+  <div class="mb-3" id="company_user_type_field" style="display: none;">
+    <%= form.label :company_user_type, "Company Access Type", class: "form-label" %><span class="text-danger">*</span>
+    <%= form.select :company_user_type,
+                    options_for_select([
+                      ['Booking User', 'booking_user'],
+                      ['Employee', 'employee']
+                    ], @user.company_user_type || 'booking_user'),
+                    {},
+                    { class: "select2-select", id: "user_company_user_type", 'data-placeholder': 'Select Company Access Type' } %>
+  </div>
+
+  <div class="mb-3" id="documents_field" style="display: none;">
+    <%= form.label :documents, "Documents", class: "form-label" %>
+    <%= form.file_field :documents,
+                        multiple: true,
+                        accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf",
+                        id: "user_documents",
+                        class: "form-control" %>
+    <div id="selected_documents" class="mt-2 small text-light"></div>
+    <% if @user.persisted? && @user.documents.attached? %>
+      <div class="form-text text-light">
+        Existing documents are shown on the user details page. New uploads will be added to the current documents.
+      </div>
+    <% end %>
+  </div>
+
   <% if @user.persisted? && @user.workspaces.any? %>
     <div class="mb-3">
       <strong>Current Workspace:</strong>
@@ -102,8 +128,12 @@ function initializeUserForm() {
   const roleSelect = document.getElementById('user_role');
   const workspaceField = document.getElementById('workspace_field');
   const companyField = document.getElementById('company_field');
+  const companyUserTypeField = document.getElementById('company_user_type_field');
+  const documentsField = document.getElementById('documents_field');
   const workspaceSelect = document.getElementById('user_workspace_id');
   const companySelect = document.getElementById('user_company_id');
+  const documentsInput = document.getElementById('user_documents');
+  const selectedDocuments = document.getElementById('selected_documents');
 
   if (!roleSelect || !workspaceSelect || !companySelect) return;
 
@@ -113,15 +143,23 @@ function initializeUserForm() {
     if (selectedRole === 'user') {
       workspaceField.style.display = 'block';
       companyField.style.display = 'block';
+      companyUserTypeField.style.display = 'block';
+      documentsField.style.display = 'block';
     } else if (selectedRole === 'floor_user') {
       workspaceField.style.display = 'block';
       companyField.style.display = 'none';
+      companyUserTypeField.style.display = 'none';
+      documentsField.style.display = 'none';
     } else if (selectedRole === 'admin') {
       workspaceField.style.display = 'block';
       companyField.style.display = 'none';
+      companyUserTypeField.style.display = 'none';
+      documentsField.style.display = 'none';
     } else {
       workspaceField.style.display = 'none';
       companyField.style.display = 'none';
+      companyUserTypeField.style.display = 'none';
+      documentsField.style.display = 'none';
     }
   }
 
@@ -195,6 +233,32 @@ function initializeUserForm() {
       });
   }
 
+  function updateSelectedDocuments() {
+    if (!documentsInput || !selectedDocuments) return;
+
+    const files = Array.from(documentsInput.files || []);
+    if (files.length === 0) {
+      selectedDocuments.innerHTML = '';
+      return;
+    }
+
+    selectedDocuments.innerHTML = '';
+
+    const label = document.createElement('div');
+    label.className = 'mb-1';
+    label.textContent = 'Selected files:';
+    selectedDocuments.appendChild(label);
+
+    const list = document.createElement('ul');
+    list.className = 'mb-0 ps-3';
+    files.forEach(file => {
+      const item = document.createElement('li');
+      item.textContent = file.name;
+      list.appendChild(item);
+    });
+    selectedDocuments.appendChild(list);
+  }
+
   // Event listeners using jQuery for Select2 compatibility
   if (typeof $ !== 'undefined' && $.fn.select2) {
     $(roleSelect).on('change', updateFormVisibility);
@@ -203,6 +267,7 @@ function initializeUserForm() {
         loadCompaniesForWorkspace(this.value);
       }
     });
+    $(documentsInput).on('change', updateSelectedDocuments);
   } else {
     // Fallback to native event listeners
     roleSelect.addEventListener('change', updateFormVisibility);
@@ -211,6 +276,7 @@ function initializeUserForm() {
         loadCompaniesForWorkspace(this.value);
       }
     });
+    documentsInput?.addEventListener('change', updateSelectedDocuments);
   }
 
   // Initialize form state
@@ -225,6 +291,8 @@ function initializeUserForm() {
   <% if @user.persisted? && @user.user? %>
   if (roleSelect.value === 'user') {
     companyField.style.display = 'block';
+    companyUserTypeField.style.display = 'block';
+    documentsField.style.display = 'block';
   }
   <% end %>
   
@@ -240,4 +308,4 @@ function initializeUserForm() {
   }, 200);
   <% end %>
 }
-</script> 
+</script>

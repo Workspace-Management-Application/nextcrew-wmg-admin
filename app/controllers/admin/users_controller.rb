@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::BaseController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :destroy_document]
 
   def index
     @search = params[:search]
@@ -42,8 +42,10 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def create
-    @user = User.new(user_params)
+    @user = User.new(sanitized_user_params)
     @user.password = params[:user][:password] if params[:user][:password].present?
+    attach_user_documents(@user)
+
     if @user.save
       # Assign workspace if selected
       if params[:user][:workspace_id].present?
@@ -57,7 +59,7 @@ class Admin::UsersController < Admin::BaseController
       
       redirect_to admin_users_path, notice: 'User was successfully created.'
     else
-      @workspaces = Workspace.all
+      @workspaces = current_user.workspaces
       render :new
     end
   end
@@ -78,9 +80,12 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def update
-    user_update_params = user_params
+    user_update_params = sanitized_user_params
     user_update_params[:password] = params[:user][:password] if params[:user][:password].present?
-    if @user.update(user_update_params)
+    @user.assign_attributes(user_update_params)
+    attach_user_documents(@user)
+
+    if @user.save
       # Update workspace assignment
       if params[:user][:workspace_id].present?
         @user.user_workspaces.destroy_all
@@ -97,11 +102,14 @@ class Admin::UsersController < Admin::BaseController
         else
           @user.company_users.destroy_all
         end
+      else
+        @user.company_users.destroy_all
+        @user.documents.purge
       end
       
       redirect_to admin_user_path(@user), notice: 'User was successfully updated.'
     else
-      @workspaces = Workspace.all
+      @workspaces = current_user.workspaces
       render :edit
     end
   end
@@ -109,6 +117,17 @@ class Admin::UsersController < Admin::BaseController
   def destroy
     @user.destroy
     redirect_to admin_users_path, notice: 'User was successfully deleted.'
+  end
+
+  def destroy_document
+    attachment = @user.documents.attachments.find_by(id: params[:attachment_id])
+
+    if attachment
+      attachment.purge
+      redirect_to admin_user_path(@user), notice: 'Document was successfully deleted.'
+    else
+      redirect_to admin_user_path(@user), alert: 'Document not found.'
+    end
   end
 
   # API endpoint to get companies for a specific workspace
@@ -163,6 +182,23 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :phone_number, :role)
+    params.require(:user).permit(:name, :email, :phone_number, :role, :password, :workspace_id, :company_id, :company_user_type, documents: [])
+  end
+
+  def sanitized_user_params
+    permitted = user_params.except(:documents, :password, :workspace_id, :company_id)
+
+    unless permitted[:role] == 'user'
+      permitted.delete(:company_user_type)
+    end
+
+    permitted
+  end
+
+  def attach_user_documents(user)
+    return unless user.user?
+    return unless params[:user][:documents].present?
+
+    user.documents.attach(params[:user][:documents].reject(&:blank?))
   end
 end
