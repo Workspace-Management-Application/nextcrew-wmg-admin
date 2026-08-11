@@ -22,9 +22,9 @@
           
           <div class="col-md-6 mb-3">
             <%= form.label :company_id, "Company", class: "form-label" %>
-            <%= form.select :company_id, 
-                options_for_select(@companies.map { |c| [c.name, c.id] }), 
-                { prompt: 'All Companies' }, 
+            <%= form.select :company_id,
+                options_for_select([]),
+                { prompt: 'All Companies' },
                 { class: "form-select", id: "company-select" } %>
           </div>
         </div>

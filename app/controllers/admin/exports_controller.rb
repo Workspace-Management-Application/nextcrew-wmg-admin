@@ -1,15 +1,17 @@
 class Admin::ExportsController < Admin::BaseController
   def index
-    @workspaces = Workspace.all.order(:name)
-    @companies = Company.all.order(:name)
+    @workspaces = allowed_workspaces
+    @companies = Company.none
   end
 
   def get_companies_by_workspace
-    workspace_id = params[:workspace_id]
+    workspace = find_allowed_workspace(params[:workspace_id])
 
-    if workspace_id.present?
-      companies = Company.joins(:workspaces).where(workspaces: { id: workspace_id }).order(:name)
+    if workspace
+      companies = companies_for_workspace(workspace)
       render json: companies.map { |c| { id: c.id, name: c.name } }
+    elsif params[:workspace_id].present?
+      render json: [], status: :forbidden
     else
       render json: []
     end
@@ -17,6 +19,7 @@ class Admin::ExportsController < Admin::BaseController
 
   def export_company_details
     workspace_id = params[:workspace_id]
+    workspace = find_allowed_workspace(params[:workspace_id])
     company_id = params[:company_id]
     start_date = params[:start_date].present? ? Date.parse(params[:start_date]).beginning_of_day : Date.current.beginning_of_month.beginning_of_day
     end_date = params[:end_date].present? ? Date.parse(params[:end_date]).end_of_day : Date.current.end_of_month.end_of_day
@@ -27,8 +30,18 @@ class Admin::ExportsController < Admin::BaseController
       return
     end
 
+    unless workspace
+      redirect_to admin_exports_path, alert: "You are not authorized to export this workspace."
+      return
+    end
+
+    if company_id.present? && !companies_for_workspace(workspace).exists?(id: company_id)
+      redirect_to admin_exports_path, alert: "Selected company is not available for this workspace."
+      return
+    end
+
     # Generate CSV file
-    csv_data = generate_company_details_csv(workspace_id, company_id, start_date, end_date)
+    csv_data = generate_company_details_csv(workspace, company_id, start_date, end_date)
 
     # Send file as download
     send_data csv_data,
@@ -38,9 +51,27 @@ class Admin::ExportsController < Admin::BaseController
 
   private
 
-  def generate_company_details_csv(workspace_id, company_id, start_date, end_date)
+  def allowed_workspaces
+    if current_user.super_admin?
+      Workspace.all.order(:name)
+    else
+      current_user.workspaces.order(:name)
+    end
+  end
+
+  def find_allowed_workspace(workspace_id)
+    return if workspace_id.blank?
+
+    allowed_workspaces.find_by(id: workspace_id)
+  end
+
+  def companies_for_workspace(workspace)
+    Company.joins(:workspaces).where(workspaces: { id: workspace.id }).distinct.order(:name)
+  end
+
+  def generate_company_details_csv(workspace, company_id, start_date, end_date)
     require "csv"
-    companies = Company.joins(:workspaces).where(workspaces: { id: workspace_id }).order(:name)
+    companies = companies_for_workspace(workspace)
     companies = companies.where(id: company_id) if company_id.present?
 
     csv_data = CSV.generate do |csv|
