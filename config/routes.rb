@@ -20,7 +20,11 @@ Rails.application.routes.draw do
         get :workspace_types
         get :company_today_bookings
       end
-      resources :visitor_entries
+      resources :visitor_entries do
+        collection do
+          get :search_by_phone
+        end
+      end
       resources :bookings
       resources :office_enquiries
       resources :day_passes

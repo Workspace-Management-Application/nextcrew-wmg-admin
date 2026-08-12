@@ -9,6 +9,28 @@ class Api::VisitorEntriesController < Api::BaseController
     render_success(visitor_entries)
   end
 
+  # GET /api/workspaces/:workspace_id/visitor_entries/search_by_phone?phone_number=...
+  # Looks up the most recent visitor entry for this workspace with a matching phone
+  # number, so the check-in form can auto-fill a returning visitor's details.
+  def search_by_phone
+    phone_number = params[:phone_number].to_s.strip
+
+    if phone_number.blank?
+      return render_error("Phone number is required", :unprocessable_entity)
+    end
+
+    visitor_entry = @workspace.visitor_entries
+                              .where(phone_number: phone_number)
+                              .order(created_at: :desc)
+                              .first
+
+    if visitor_entry
+      render_success(visitor_entry_response(visitor_entry))
+    else
+      render_error("No previous visitor found with this phone number", :not_found)
+    end
+  end
+
   # GET /api/workspaces/:workspace_id/visitor_entries/:id
   def show
     if @visitor_entry
