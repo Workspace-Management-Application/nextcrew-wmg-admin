@@ -25,7 +25,7 @@ Rails.application.routes.draw do
           get :search_by_phone
         end
       end
-      resources :bookings
+      resources :bookings, except: [ :destroy ]
       resources :office_enquiries
       resources :day_passes
       resources :rooms
@@ -64,7 +64,7 @@ Rails.application.routes.draw do
     end
 
     resources :rooms, only: [ :index, :show, :new, :create, :destroy ]
-    resources :bookings do
+    resources :bookings, except: [ :destroy ] do
       collection do
         get :company_rooms
       end

@@ -1,10 +1,10 @@
 class Api::BookingsController < Api::BaseController
   before_action :set_workspace
-  before_action :set_booking, only: [ :show, :update, :destroy ]
+  before_action :set_booking, only: [ :show, :update ]
 
   # GET /api/bookings
   def index
-    bookings = Booking.where(room_id: @workspace.rooms.select(:id))
+    bookings = Booking.confirmed.where(room_id: @workspace.rooms.select(:id))
     render_success(bookings)
   end
 
@@ -70,16 +70,6 @@ class Api::BookingsController < Api::BaseController
     end
   end
 
-  # DELETE /api/bookings/:id
-  def destroy
-    if @booking
-      @booking.destroy
-      render_success({}, "Booking deleted successfully")
-    else
-      render_error("Booking not found", :not_found)
-    end
-  end
-
   private
 
   def set_workspace
@@ -88,11 +78,11 @@ class Api::BookingsController < Api::BaseController
   end
 
   def set_booking
-    @booking = Booking.where(room_id: @workspace.rooms.select(:id)).find_by(id: params[:id])
+    @booking = Booking.confirmed.where(room_id: @workspace.rooms.select(:id)).find_by(id: params[:id])
   end
 
   def booking_params
-    params.require(:booking).permit(:company_id, :booker_name, :phone_number, :room_id, :start_time, :end_time, :status)
+    params.require(:booking).permit(:company_id, :booker_name, :phone_number, :room_id, :start_time, :end_time)
   end
 
   def render_booking_access_error

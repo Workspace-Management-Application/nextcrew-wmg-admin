@@ -103,7 +103,7 @@ class Booking < ApplicationRecord
   end
 
   def editable?
-    !cancelled?
+    true
   end
 
   # Method to get all validation errors as an array

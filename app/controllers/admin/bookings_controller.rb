@@ -1,10 +1,10 @@
 class Admin::BookingsController < Admin::BaseController
-  before_action :set_booking, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_booking, only: [ :show, :edit, :update ]
 
   def index
     @search = params[:search]
     workspace_ids = current_user.workspaces.pluck(:id)
-    @bookings = Booking.joins(room: :workspace)
+    @bookings = Booking.confirmed.joins(room: :workspace)
                      .where(rooms: { workspace_id: workspace_ids })
                      .includes(:company, :room, room: :workspace).order(created_at: :desc)
 
@@ -24,11 +24,6 @@ class Admin::BookingsController < Admin::BaseController
     # Filter by workspace if specified
     if params[:workspace_id].present?
       @bookings = @bookings.joins(:room).where(rooms: { workspace_id: params[:workspace_id] })
-    end
-
-    # Filter by status if specified
-    if params[:status].present?
-      @bookings = @bookings.where(status: params[:status])
     end
 
     # Order by start time descending
@@ -99,20 +94,6 @@ class Admin::BookingsController < Admin::BaseController
     end
   end
 
-  def destroy
-    begin
-      @booking.destroy!
-      redirect_to admin_bookings_path, notice: "Booking was successfully cancelled."
-    rescue ActiveRecord::RecordNotDestroyed => e
-      redirect_to admin_bookings_path, alert: "Failed to cancel booking: #{e.message}"
-    rescue ActiveRecord::RecordNotFound
-      redirect_to admin_bookings_path, alert: "Booking not found."
-    rescue StandardError => e
-      Rails.logger.error "Error cancelling booking #{@booking.id}: #{e.message}"
-      redirect_to admin_bookings_path, alert: "An error occurred while cancelling the booking."
-    end
-  end
-
   def company_rooms
     company = Company.find(params[:company_id])
     rooms = company.rooms.includes(:workspace).map do |room|
@@ -127,7 +108,7 @@ class Admin::BookingsController < Admin::BaseController
   private
 
   def set_booking
-    @booking = Booking.find(params[:id])
+    @booking = Booking.confirmed.find(params[:id])
   end
 
   def booking_params

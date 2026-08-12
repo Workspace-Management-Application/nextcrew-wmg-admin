@@ -83,14 +83,6 @@
               <% if booking.editable? %>
                 <%= link_to "Edit", edit_admin_booking_path(booking), class: "btn btn-secondary btn-sm me-2" %>
               <% end %>
-              <% unless booking.end_time && booking.end_time < Time.current %>
-                <%= link_to "Cancel", admin_booking_path(booking), 
-                            data: { 
-                              turbo_method: :delete, 
-                              turbo_confirm: "Are you sure you want to cancel this booking?" 
-                            },
-                            class: "btn btn-danger btn-sm" %>
-              <% end %>
             </td>
           </tr>
         <% end %>
