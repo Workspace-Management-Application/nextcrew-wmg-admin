@@ -261,32 +261,34 @@ end
 puts "🏛️ Creating rooms..."
 rooms_data = [
   # Floor 5 Premium rooms
-  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true },
-  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, is_available: true },
-  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, is_available: true },
-  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, is_available: true },
-  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, is_available: true },
-  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, is_available: false },
+  { name: 'Tesla', category: 'Conference', workspace: workspace_records[0], capacity: 20, price_per_hour: 1200, is_available: true },
+  { name: 'Mercedes', category: 'Conference', workspace: workspace_records[0], capacity: 20, price_per_hour: 1200, is_available: true },
+  { name: 'BMW', category: 'Conference', workspace: workspace_records[0], capacity: 15, price_per_hour: 1000, is_available: true },
+  { name: 'Alto', category: 'Meeting', workspace: workspace_records[0], capacity: 6, price_per_hour: 600, is_available: true },
+  { name: 'Nano', category: 'Meeting', workspace: workspace_records[0], capacity: 4, price_per_hour: 500, is_available: true },
+  { name: 'Swift', category: 'Meeting', workspace: workspace_records[0], capacity: 8, price_per_hour: 700, is_available: false },
 
   # Floor 3 Standard rooms
-  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, is_available: true },
-  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, is_available: true },
-  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, is_available: true },
-  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, is_available: true },
+  { name: 'Boardroom Alpha', category: 'Conference', workspace: workspace_records[1], capacity: 12, price_per_hour: 900, is_available: true },
+  { name: 'Meeting Beta', category: 'Meeting', workspace: workspace_records[1], capacity: 6, price_per_hour: 650, is_available: true },
+  { name: 'Discussion Gamma', category: 'Meeting', workspace: workspace_records[1], capacity: 4, price_per_hour: 500, is_available: true },
+  { name: 'Presentation Delta', category: 'Presentation', workspace: workspace_records[1], capacity: 25, price_per_hour: 1500, is_available: true },
 
   # Ground Floor Basic rooms
-  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, is_available: true },
-  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, is_available: true },
-  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, is_available: true },
+  { name: 'Conference One', category: 'Conference', workspace: workspace_records[2], capacity: 10, price_per_hour: 800, is_available: true },
+  { name: 'Meeting Two', category: 'Meeting', workspace: workspace_records[2], capacity: 6, price_per_hour: 550, is_available: true },
+  { name: 'Training Room', category: 'Training', workspace: workspace_records[2], capacity: 20, price_per_hour: 1300, is_available: true },
 
   # Floor 2 Executive rooms (inactive workspace)
-  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, is_available: false }
+  { name: 'Executive Suite', category: 'Conference', workspace: workspace_records[3], capacity: 8, price_per_hour: 1100, is_available: false }
 ]
 
 room_records = rooms_data.map do |room_data|
-  Room.find_or_create_by!(name: room_data[:name], workspace: room_data[:workspace]) do |room|
+  room = Room.find_or_create_by!(name: room_data[:name], workspace: room_data[:workspace]) do |room|
     room.assign_attributes(room_data.except(:workspace))
   end
+  room.update!(price_per_hour: room_data[:price_per_hour])
+  room
 end
 
 # 8. Create Company-Room associations (Companies access rooms in their workspace only)

@@ -50,6 +50,7 @@
       <h5 class="mb-3">Room Details</h5>
       <p><strong>Category:</strong> <%= @booking.room.category %></p>
       <p><strong>Capacity:</strong> <%= @booking.room.capacity %> people</p>
+      <p><strong>Hourly Rate:</strong> ₹<%= @booking.room.price_per_hour %>/hr</p>
       
       <% if @booking.room.amenities.any? %>
         <div class="mt-3">

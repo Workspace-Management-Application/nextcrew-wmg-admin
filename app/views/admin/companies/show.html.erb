@@ -231,6 +231,7 @@
                   <th>Room Name</th>
                   <th>Category</th>
                   <th>Capacity</th>
+                  <th>Hourly Rate</th>
                   <th>Workspace</th>
                   <th>Actions</th>
                 </tr>
@@ -241,6 +242,7 @@
                     <td><%= room.name %></td>
                     <td><%= room.category.humanize %></td>
                     <td><%= room.capacity %> people</td>
+                    <td>₹<%= room.price_per_hour %>/hr</td>
                     <td><%= room.workspace.name %></td>
                     <td>
                       <%= button_to "Add to Company", add_room_admin_company_path(@company, room_id: room.id), 

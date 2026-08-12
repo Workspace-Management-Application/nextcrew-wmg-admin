@@ -11,6 +11,7 @@ class Room < ApplicationRecord
 
   validates :name, :category, presence: true
   validates :capacity, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :price_per_hour, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :is_available, inclusion: { in: [true, false] }
 
   accepts_nested_attributes_for :room_amenities, allow_destroy: true

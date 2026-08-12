@@ -31,6 +31,13 @@
       <%= f.number_field :capacity, class: 'form-control bg-black text-white border-secondary', min: 1, required: true %>
     </div>
     <div class="col-md-6 mb-2">
+      <%= f.label :price_per_hour, 'Hourly Rate (₹)', class: 'form-label' %>
+      <%= f.number_field :price_per_hour, class: 'form-control bg-black text-white border-secondary', min: 0, step: 1, required: true, placeholder: 'e.g., 500' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-2">
       <%= f.label :photo, class: 'form-label' %>
       <%= f.file_field :photo, class: 'form-control bg-black text-white border-secondary', accept: "image/*" %>
       <% if f.object.photo.attached? %>

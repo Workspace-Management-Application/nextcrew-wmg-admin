@@ -102,7 +102,7 @@ class Api::RoomsController < Api::BaseController
   end
 
   def room_params
-    params.require(:room).permit(:name, :category, :capacity, :whiteboard, :projector, :is_available, :photo)
+    params.require(:room).permit(:name, :category, :capacity, :price_per_hour, :whiteboard, :projector, :is_available, :photo)
   end
 
   def room_response(room)

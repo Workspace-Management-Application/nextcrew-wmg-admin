@@ -185,6 +185,45 @@ class Admin::ExportsController < Admin::BaseController
         ]
 
         csv << []
+        csv << [ "EXCEED CHARGES - #{company.name}" ]
+        csv << [
+          "Room",
+          "Exceed (min)",
+          "Rate/hr (₹)",
+          "Rate/min (₹)",
+          "Amount (₹)"
+        ]
+
+        exceed_charge_rows = build_exceed_charge_rows(exceed_rows)
+        if exceed_charge_rows.any?
+          total_charge_minutes = 0
+          total_charge_amount = 0.0
+
+          exceed_charge_rows.each do |charge_row|
+            total_charge_minutes += charge_row[:exceeded_minutes]
+            total_charge_amount += charge_row[:amount]
+
+            csv << [
+              charge_row[:room_name],
+              charge_row[:exceeded_minutes],
+              charge_row[:hourly_rate],
+              format_amount(charge_row[:rate_per_minute]),
+              format_amount(charge_row[:amount])
+            ]
+          end
+
+          csv << [
+            "TOTAL",
+            "",
+            "",
+            "",
+            format_amount(total_charge_amount)
+          ]
+        else
+          csv << [ "No exceeded time charges", "", "", "", "" ]
+        end
+
+        csv << []
         csv << []
       end
     end
@@ -207,6 +246,23 @@ class Admin::ExportsController < Admin::BaseController
                counts_toward_usage: true
              }
            end
+  end
+
+  def build_exceed_charge_rows(exceed_rows)
+    exceed_rows.each_with_object({}) do |row, charges|
+      next unless row[:exceed_time].positive?
+
+      room = row[:booking].room
+      charges[room.id] ||= {
+        room_name: room.name,
+        hourly_rate: room.price_per_hour.to_i,
+        rate_per_minute: room.price_per_hour.to_i / 60.0,
+        exceeded_minutes: 0,
+        amount: 0.0
+      }
+      charges[room.id][:exceeded_minutes] += row[:exceed_time]
+      charges[room.id][:amount] += (row[:exceed_time] / 60.0) * room.price_per_hour.to_i
+    end.values.sort_by { |row| row[:room_name] }
   end
 
   def calculate_exceed_result(booking, duration_minutes)
@@ -271,5 +327,9 @@ class Admin::ExportsController < Admin::BaseController
 
   def booking_duration_minutes(booking)
     ((booking.end_time - booking.start_time) / 60).to_i
+  end
+
+  def format_amount(amount)
+    format("%.2f", amount)
   end
 end

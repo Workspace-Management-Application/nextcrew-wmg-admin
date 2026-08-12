@@ -1,0 +1,5 @@
+class AddPricePerHourToRooms < ActiveRecord::Migration[8.0]
+  def change
+    add_column :rooms, :price_per_hour, :integer, default: 0, null: false
+  end
+end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_11_123000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_12_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -173,6 +173,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_11_123000) do
     t.boolean "is_available", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "price_per_hour", default: 0, null: false
     t.index ["workspace_id"], name: "index_rooms_on_workspace_id"
   end
 

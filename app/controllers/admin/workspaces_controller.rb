@@ -286,7 +286,7 @@ class Admin::WorkspacesController < Admin::BaseController
       rooms_attrs = {}
       params[:workspace][:rooms_attributes].each do |key, room_params|
         rooms_attrs[key] = room_params.permit(
-          :id, :name, :category, :capacity, :is_available, :photo, :_destroy, 
+          :id, :name, :category, :capacity, :price_per_hour, :is_available, :photo, :_destroy,
           amenity_ids: []
         )
       end

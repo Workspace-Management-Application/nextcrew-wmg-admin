@@ -59,11 +59,20 @@
     </div>
   </div>
 
-  <div class="mb-3">
-    <%= form.label :capacity, class: "form-label" do %>
-      Capacity <span class="text-danger">*</span>
-    <% end %>
-    <%= form.number_field :capacity, class: "form-control", required: true, min: 1, placeholder: "Maximum number of people" %>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= form.label :capacity, class: "form-label" do %>
+        Capacity <span class="text-danger">*</span>
+      <% end %>
+      <%= form.number_field :capacity, class: "form-control", required: true, min: 1, placeholder: "Maximum number of people" %>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <%= form.label :price_per_hour, class: "form-label" do %>
+        Hourly Rate (₹) <span class="text-danger">*</span>
+      <% end %>
+      <%= form.number_field :price_per_hour, class: "form-control", required: true, min: 0, step: 1, placeholder: "e.g., 500" %>
+    </div>
   </div>
 
   <div class="mb-3">

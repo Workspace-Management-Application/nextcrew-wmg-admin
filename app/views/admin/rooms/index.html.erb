@@ -89,6 +89,7 @@
           <th>Workspace</th>
           <th>Category</th>
           <th>Capacity</th>
+          <th>Hourly Rate</th>
           <th>Amenities</th>
           <th>Status</th>
           <th>Actions</th>
@@ -101,6 +102,7 @@
             <td><%= room.workspace.name %></td>
             <td><%= room.category.humanize %></td>
             <td><%= room.capacity %> people</td>
+            <td>₹<%= room.price_per_hour %>/hr</td>
             <td>
               <% if room.amenities.any? %>
                 <div class="d-flex flex-wrap gap-1">
@@ -157,4 +159,3 @@
     </div>
   <% end %>
 </div>
-

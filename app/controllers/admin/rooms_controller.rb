@@ -157,7 +157,7 @@ class Admin::RoomsController < Admin::BaseController
   end
 
   def room_params
-    params.require(:room).permit(:name, :category, :capacity, :is_available, :photo, :workspace_id, amenity_ids: [])
+    params.require(:room).permit(:name, :category, :capacity, :price_per_hour, :is_available, :photo, :workspace_id, amenity_ids: [])
   end
 
   def handle_amenity_associations(room, amenity_ids)
