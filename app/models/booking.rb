@@ -63,7 +63,7 @@ class Booking < ApplicationRecord
 
   def should_send_monthly_limit_notification?
     return false unless monthly_limit_exceeded?
-    return false if company.blank?
+    return false unless company&.email_notifications_enabled?
     
     # Only send notification for new bookings, not updates
     true
@@ -71,7 +71,7 @@ class Booking < ApplicationRecord
 
   def should_send_daily_limit_notification?
     return false unless daily_limit_exceeded?
-    return false if company.blank?
+    return false unless company&.email_notifications_enabled?
     
     # Only send notification for new bookings, not updates
     true

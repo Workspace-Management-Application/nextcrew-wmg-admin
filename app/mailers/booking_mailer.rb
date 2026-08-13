@@ -1,5 +1,5 @@
 class BookingMailer < ApplicationMailer
-  default from: "bookings@nextcoworks.com"
+  default from: -> { Rails.application.credentials.dig(:ses, :from_address) || "bookings@nextcoworks.com" }
 
   def booking_confirmation(booking)
     @booking = booking
@@ -8,7 +8,7 @@ class BookingMailer < ApplicationMailer
     @workspace = booking.room.workspace
 
     mail(
-      to: @company.email,
+      to: @company.notification_email,
       subject: "Booking Confirmation - #{@room.name} at #{@workspace.name}"
     )
   end
@@ -33,7 +33,7 @@ class BookingMailer < ApplicationMailer
 
     # Send to company email
     mail(
-      to: @company.email,
+      to: @company.notification_email,
       subject: "Monthly Meeting Limit Exceeded - #{@company.name}"
     )
   end
@@ -58,7 +58,7 @@ class BookingMailer < ApplicationMailer
 
     # Send to company email
     mail(
-      to: @company.email,
+      to: @company.notification_email,
       subject: "Daily Meeting Limit Exceeded - #{@company.name}"
     )
   end

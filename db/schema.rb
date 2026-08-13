@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_12_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_13_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -89,6 +89,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_12_000000) do
     t.boolean "name_board_charges"
     t.date "lease_expiry_date"
     t.integer "cost_per_seat"
+    t.boolean "email_notifications_enabled", default: true, null: false
   end
 
   create_table "company_rooms", force: :cascade do |t|

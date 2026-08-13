@@ -22,7 +22,7 @@
       <%= form.label :email, class: "form-label" do %>
         Email <span class="text-danger">*</span>
       <% end %>
-      <%= form.email_field :email, class: "form-control", required: true %>
+      <%= form.email_field :email, class: "form-control", required: true, id: "company_email" %>
     </div>
   </div>
 
@@ -140,7 +140,6 @@
     </div>
   </div>
 
-
   <!-- New Company Fields Section -->
   <h5 class="mt-4 mb-3">Company Details</h5>
   <div class="row">
@@ -246,6 +245,19 @@
     </div>
   </div>
 
+  <h5 class="mt-4 mb-3">Notification</h5>
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <%= form.label :email_notifications_enabled, "Email Notification", class: "form-label mb-0" %>
+      <div class="form-check form-switch mb-0">
+        <%= form.check_box :email_notifications_enabled, class: "form-check-input", role: "switch", checked: @company.new_record? ? true : @company.email_notifications_enabled? %>
+      </div>
+    </div>
+    <small class="form-text text-muted" id="company_email_notification_hint">
+      Email notification will send to <%= @company.email.presence || "the company email" %>.
+    </small>
+  </div>
+
   <div class="d-flex gap-2">
     <%= form.submit @company.persisted? ? "Update Company" : "Create Company", class: "btn btn-primary" %>
     <%= link_to "Cancel", request.referer || (@company.persisted? ? admin_company_path(@company) : admin_companies_path), class: "btn btn-secondary" %>
@@ -264,6 +276,18 @@ document.addEventListener('turbo:load', function() {
 function initializeCompanyForm() {
   const workspaceSelect = document.getElementById('company_workspace_id');
   const roomSelect = document.getElementById('company_room_ids');
+  const companyEmailInput = document.getElementById('company_email');
+  const emailNotificationHint = document.getElementById('company_email_notification_hint');
+
+  if (companyEmailInput && emailNotificationHint) {
+    function updateEmailNotificationHint() {
+      const email = companyEmailInput.value.trim() || 'the company email';
+      emailNotificationHint.textContent = `Email notification will send to ${email}.`;
+    }
+
+    companyEmailInput.addEventListener('input', updateEmailNotificationHint);
+    updateEmailNotificationHint();
+  }
   
   if (!workspaceSelect || !roomSelect) return;
 

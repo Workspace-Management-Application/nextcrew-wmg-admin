@@ -47,14 +47,18 @@ class Admin::BookingsController < Admin::BaseController
     @booking.acting_user = current_user
     if @booking.save
       # Send booking confirmation email
-      begin
-        BookingMailer.booking_confirmation(@booking).deliver_later
-        Rails.logger.info "Booking confirmation email queued for delivery to #{@booking.company.email}"
-      rescue Net::SMTPError, Net::OpenTimeoutError => e
-        Rails.logger.error "SMTP error sending booking confirmation email: #{e.message}"
-      rescue StandardError => e
-        Rails.logger.error "Failed to queue booking confirmation email: #{e.message}"
-        # Don't fail the booking creation if email fails
+      if @booking.company.email_notifications_enabled?
+        begin
+          BookingMailer.booking_confirmation(@booking).deliver_later
+          Rails.logger.info "Booking confirmation email queued for delivery to #{@booking.company.notification_email}"
+        rescue Net::SMTPError, Net::OpenTimeoutError => e
+          Rails.logger.error "SMTP error sending booking confirmation email: #{e.message}"
+        rescue StandardError => e
+          Rails.logger.error "Failed to queue booking confirmation email: #{e.message}"
+          # Don't fail the booking creation if email fails
+        end
+      else
+        Rails.logger.info "Booking confirmation email skipped because company email notifications are disabled for #{@booking.company.id}"
       end
 
       # Note: Monthly limit exceeded notification is automatically sent by the model validation

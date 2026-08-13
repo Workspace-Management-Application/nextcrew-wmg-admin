@@ -31,6 +31,10 @@ class Company < ApplicationRecord
   validate :lease_expiry_date_after_commencement_date
   validate :agreement_date_before_lease_expiry_date
 
+  def notification_email
+    email
+  end
+
   private
 
   def lease_expiry_date_after_commencement_date

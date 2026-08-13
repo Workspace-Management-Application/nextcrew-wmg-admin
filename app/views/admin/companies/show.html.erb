@@ -27,6 +27,11 @@
           <p><strong>Meeting Time Limit per Day:</strong> <%= @company.meeting_time_limit_per_day %> minutes</p>
           <p><strong>Number of Meetings per Day:</strong> <%= @company.no_of_meeting_per_day %></p>
           <p><strong>Meeting Duration Limits:</strong> <%= @company.minimum_minutes_meeting_limit %> - <%= @company.max_minutes_meeting_limit %> minutes</p>
+          <p><strong>Email Notifications:</strong>
+            <span class="badge <%= @company.email_notifications_enabled? ? 'bg-success' : 'bg-secondary' %>">
+              <%= @company.email_notifications_enabled? ? 'Enabled' : 'Disabled' %>
+            </span>
+          </p>
         </div>
       </div>
     </div>
