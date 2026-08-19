@@ -30,7 +30,8 @@ class Admin::CompaniesController < Admin::BaseController
   end
 
   def show
-    @company_users = @company.users
+    @company_booking_users = @company.users.booking_user
+    @company_employees = @company.users.employee
     @rooms = @company.rooms
     
     # Get available rooms from all workspaces that the company is associated with
@@ -166,7 +167,8 @@ class Admin::CompaniesController < Admin::BaseController
 
   def new_user_for_company
     @company = Company.find(params[:id])
-    @user = User.new(role: 'user')
+    @locked_company_user_type = params[:company_user_type].presence_in(User.company_user_types.keys) || 'booking_user'
+    @user = User.new(role: 'user', company_user_type: @locked_company_user_type)
     @workspaces = @company.workspaces
     @selected_workspace_id = @workspaces.first&.id
   end

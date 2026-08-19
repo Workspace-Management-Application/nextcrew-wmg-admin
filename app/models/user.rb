@@ -20,6 +20,7 @@ class User < ApplicationRecord
   validate :documents_must_be_images_or_pdfs
 
   before_validation :normalize_company_user_type
+  before_save :clear_password_for_employee
   before_create :generate_token
 
   SIDEBAR_ITEMS = {
@@ -69,6 +70,14 @@ class User < ApplicationRecord
     !user? || booking_user?
   end
 
+  # Employees are record-keeping only: no login, so Devise should never
+  # require a password for them.
+  def password_required?
+    return false if employee?
+
+    super
+  end
+
   def api_profile_data
     data = as_json(only: [:id, :email, :name, :role]).merge(workspace_id: workspaces.first&.id)
     data[:company_user_type] = company_user_type if user?
@@ -79,6 +88,13 @@ class User < ApplicationRecord
 
   def normalize_company_user_type
     self.company_user_type = user? ? (company_user_type.presence || 'booking_user') : nil
+  end
+
+  # Employees are record-keeping only and can never log in, even if a
+  # password was submitted (e.g. an existing Booking User converted to
+  # Employee) or tampered into the request.
+  def clear_password_for_employee
+    self.encrypted_password = '' if employee?
   end
 
   def documents_must_be_images_or_pdfs

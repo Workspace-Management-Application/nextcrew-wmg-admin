@@ -1,9 +1,10 @@
-<% content_for :page_title, "Add User to #{@company.name}" %>
+<% add_label = @locked_company_user_type == "employee" ? "Employee" : "User" %>
+<% content_for :page_title, "Add #{add_label} to #{@company.name}" %>
 
 <div class="row">
   <div class="col-lg-8 col-md-10 mx-auto">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Add User to <%= @company.name %></h2>
+      <h2>Add <%= add_label %> to <%= @company.name %></h2>
       <%= link_to "← Back to Company", admin_company_path(@company), class: "btn btn-outline-primary" %>
     </div>
 
@@ -35,30 +36,46 @@
 
       <div class="row">
         <div class="col-md-6 mb-3">
+          <%= form.label :role, class: "form-label" do %>
+            Role <span class="text-danger">*</span>
+          <% end %>
+          <%= form.select :role,
+                          options_for_select([
+                            ['User', 'user']
+                          ], 'user'),
+                          {},
+                          { class: "select2-select", required: true, id: "user_role", 'data-placeholder': 'Select Role' } %>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <%= form.label :company_user_type, "Company Employee Type", class: "form-label" %><span class="text-danger">*</span>
+          <%= form.select :company_user_type,
+                          options_for_select([
+                            ['Booking User', 'booking_user'],
+                            ['Employee', 'employee']
+                          ], @locked_company_user_type),
+                          {},
+                          { class: "select2-select", id: "user_company_user_type", disabled: true, 'data-placeholder': 'Select Company Employee Type' } %>
+          <%= hidden_field_tag "user[company_user_type]", @locked_company_user_type %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
           <%= form.label :email, class: "form-label" do %>
             Email <span class="text-danger">*</span>
           <% end %>
           <%= form.email_field :email, class: "form-control", required: true %>
         </div>
-        
-        <div class="col-md-6 mb-3">
-          <%= form.label :password, class: "form-label" do %>
-            Password <span class="text-danger">*</span>
-          <% end %>
-          <%= form.password_field :password, class: "form-control", required: true %>
-        </div>
-      </div>
 
-      <div class="mb-3">
-        <%= form.label :role, class: "form-label" do %>
-          Role <span class="text-danger">*</span>
+        <% if @locked_company_user_type != "employee" %>
+          <div class="col-md-6 mb-3">
+            <%= form.label :password, class: "form-label" do %>
+              Password <span class="text-danger">*</span>
+            <% end %>
+            <%= form.password_field :password, class: "form-control", required: true %>
+          </div>
         <% end %>
-        <%= form.select :role, 
-                        options_for_select([
-                          ['User', 'user']
-                        ], 'user'), 
-                        {}, 
-                        { class: "select2-select", required: true, id: "user_role", 'data-placeholder': 'Select Role' } %>
       </div>
 
       <div class="mb-3">
@@ -78,17 +95,6 @@
       </div>
 
       <div class="mb-3">
-        <%= form.label :company_user_type, "Company Access Type", class: "form-label" %><span class="text-danger">*</span>
-        <%= form.select :company_user_type,
-                        options_for_select([
-                          ['Booking User', 'booking_user'],
-                          ['Employee', 'employee']
-                        ], @user.company_user_type || 'booking_user'),
-                        {},
-                        { class: "select2-select", id: "user_company_user_type", 'data-placeholder': 'Select Company Access Type' } %>
-      </div>
-
-      <div class="mb-3">
         <%= form.label :documents, "Documents", class: "form-label" %>
         <%= form.file_field :documents,
                             multiple: true,
@@ -101,7 +107,7 @@
       <%= hidden_field_tag :company_id, @company.id %>
       
       <div class="d-flex gap-2">
-        <%= form.submit "Create User", class: "btn btn-primary" %>
+        <%= form.submit "Create #{add_label}", class: "btn btn-primary" %>
         <%= link_to "Cancel", admin_company_path(@company), class: "btn btn-secondary" %>
       </div>
     <% end %>

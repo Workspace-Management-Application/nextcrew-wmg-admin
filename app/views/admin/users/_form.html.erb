@@ -26,13 +26,41 @@
 
   <div class="row">
     <div class="col-md-6 mb-3">
+      <%= form.label :role, class: "form-label" do %>
+        Role <span class="text-danger">*</span>
+      <% end %>
+      <%= form.select :role,
+                      options_for_select([
+                        ['User', 'user'],
+                        ['Floor User', 'floor_user'],
+                        ['Admin', 'admin'],
+                        ['Super Admin', 'super_admin']
+                      ], @user.role),
+                      { prompt: 'Select Role' },
+                      { class: "select2-select", required: true, id: "user_role", 'data-placeholder': 'Select Role' } %>
+    </div>
+
+    <div class="col-md-6 mb-3" id="company_user_type_field" style="display: none;">
+      <%= form.label :company_user_type, "Company Employee Type", class: "form-label" %><span class="text-danger">*</span>
+      <%= form.select :company_user_type,
+                      options_for_select([
+                        ['Booking User', 'booking_user'],
+                        ['Employee', 'employee']
+                      ], @user.company_user_type || 'booking_user'),
+                      {},
+                      { class: "select2-select", id: "user_company_user_type", 'data-placeholder': 'Select Company Employee Type' } %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
       <%= form.label :email, class: "form-label" do %>
         Email <span class="text-danger">*</span>
       <% end %>
       <%= form.email_field :email, class: "form-control", required: true %>
     </div>
-    
-    <div class="col-md-6 mb-3">
+
+    <div class="col-md-6 mb-3" id="password_field">
       <% if @user.persisted? %>
         <%= form.label :password, "Password (leave blank to keep current)", class: "form-label" %>
         <%= form.password_field :password, class: "form-control", autocomplete: "new-password" %>
@@ -43,21 +71,6 @@
         <%= form.password_field :password, class: "form-control", required: true %>
       <% end %>
     </div>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :role, class: "form-label" do %>
-      Role <span class="text-danger">*</span>
-    <% end %>
-    <%= form.select :role, 
-                    options_for_select([
-                      ['User', 'user'],
-                      ['Floor User', 'floor_user'],
-                      ['Admin', 'admin'],
-                      ['Super Admin', 'super_admin']
-                    ], @user.role), 
-                    { prompt: 'Select Role' }, 
-                    { class: "select2-select", required: true, id: "user_role", 'data-placeholder': 'Select Role' } %>
   </div>
 
   <div class="mb-3" id="workspace_field">
@@ -74,17 +87,6 @@
       @user.persisted? && defined?(@user_workspace_companies) ? options_from_collection_for_select(@user_workspace_companies, :id, :name, @user.companies.first&.id) : (@user.persisted? ? options_from_collection_for_select(@user.companies, :id, :name, @user.companies.first&.id) : []),
       { prompt: 'Select Company' },
       { class: "select2-select", id: "user_company_id", 'data-placeholder': 'Select Company' } %>
-  </div>
-
-  <div class="mb-3" id="company_user_type_field" style="display: none;">
-    <%= form.label :company_user_type, "Company Access Type", class: "form-label" %><span class="text-danger">*</span>
-    <%= form.select :company_user_type,
-                    options_for_select([
-                      ['Booking User', 'booking_user'],
-                      ['Employee', 'employee']
-                    ], @user.company_user_type || 'booking_user'),
-                    {},
-                    { class: "select2-select", id: "user_company_user_type", 'data-placeholder': 'Select Company Access Type' } %>
   </div>
 
   <div class="mb-3" id="documents_field" style="display: none;">
@@ -129,13 +131,35 @@ function initializeUserForm() {
   const workspaceField = document.getElementById('workspace_field');
   const companyField = document.getElementById('company_field');
   const companyUserTypeField = document.getElementById('company_user_type_field');
+  const companyUserTypeSelect = document.getElementById('user_company_user_type');
   const documentsField = document.getElementById('documents_field');
+  const passwordField = document.getElementById('password_field');
+  const passwordInput = passwordField ? passwordField.querySelector('input[type="password"]') : null;
   const workspaceSelect = document.getElementById('user_workspace_id');
   const companySelect = document.getElementById('user_company_id');
   const documentsInput = document.getElementById('user_documents');
   const selectedDocuments = document.getElementById('selected_documents');
 
   if (!roleSelect || !workspaceSelect || !companySelect) return;
+
+  function updatePasswordVisibility() {
+    if (!passwordField) return;
+
+    const isEmployee = roleSelect.value === 'user' && companyUserTypeSelect && companyUserTypeSelect.value === 'employee';
+
+    if (isEmployee) {
+      passwordField.style.display = 'none';
+      if (passwordInput) {
+        passwordInput.required = false;
+        passwordInput.value = '';
+      }
+    } else {
+      passwordField.style.display = 'block';
+      if (passwordInput && !<%= @user.persisted? %>) {
+        passwordInput.required = true;
+      }
+    }
+  }
 
   function updateFormVisibility() {
     const selectedRole = roleSelect.value;
@@ -161,6 +185,8 @@ function initializeUserForm() {
       companyUserTypeField.style.display = 'none';
       documentsField.style.display = 'none';
     }
+
+    updatePasswordVisibility();
   }
 
   function loadCompaniesForWorkspace(workspaceId) {
@@ -267,6 +293,9 @@ function initializeUserForm() {
         loadCompaniesForWorkspace(this.value);
       }
     });
+    if (companyUserTypeSelect) {
+      $(companyUserTypeSelect).on('change', updatePasswordVisibility);
+    }
     $(documentsInput).on('change', updateSelectedDocuments);
   } else {
     // Fallback to native event listeners
@@ -276,6 +305,7 @@ function initializeUserForm() {
         loadCompaniesForWorkspace(this.value);
       }
     });
+    companyUserTypeSelect?.addEventListener('change', updatePasswordVisibility);
     documentsInput?.addEventListener('change', updateSelectedDocuments);
   }
 
@@ -294,6 +324,7 @@ function initializeUserForm() {
     companyUserTypeField.style.display = 'block';
     documentsField.style.display = 'block';
   }
+  updatePasswordVisibility();
   <% end %>
   
   // For edit form, ensure company is properly selected after Select2 initialization

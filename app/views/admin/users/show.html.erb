@@ -28,7 +28,7 @@
             </span>
           </p>
           <% if @user.user? %>
-            <p><strong>Company Access Type:</strong>
+            <p><strong>Company Employee Type:</strong>
               <span class="badge <%= @user.booking_user? ? 'bg-success' : 'bg-secondary' %>">
                 <%= @user.company_user_type_label %>
               </span>

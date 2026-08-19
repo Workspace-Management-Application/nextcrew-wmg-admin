@@ -98,28 +98,28 @@
       </div>
     <% end %>
 
-    <!-- Company Users -->
+    <!-- Company Booking Users -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4>Company Employee (<%= @company_users.count %>)</h4>
-      <%= link_to new_user_for_company_admin_company_path(@company), class: "btn btn-primary" do %>
-        <i class="fas fa-plus"></i> Add Users
+      <h4>Company Booking Users (<%= @company_booking_users.count %>)</h4>
+      <%= link_to new_user_for_company_admin_company_path(@company, company_user_type: "booking_user"), class: "btn btn-primary" do %>
+        <i class="fas fa-plus"></i> Add User
       <% end %>
     </div>
 
-    <% if @company_users.any? %>
-      <div class="table-responsive">
+    <% if @company_booking_users.any? %>
+      <div class="table-responsive mb-4">
         <table class="table table-hover table-dark">
           <thead>
             <tr>
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Company Access</th>
+              <th>Company Employee Type</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <% @company_users.each do |user| %>
+            <% @company_booking_users.each do |user| %>
               <tr class="clickable-row" data-href="<%= admin_user_path(user) %>" style="cursor: pointer;">
                 <td><%= user.name %></td>
                 <td><%= user.email %></td>
@@ -134,9 +134,61 @@
                   </span>
                 </td>
                 <td>
-                  <%= button_to "Remove", remove_user_admin_company_path(@company, user_id: user.id), 
-                              method: :delete, 
-                              class: "btn btn-danger btn-sm", 
+                  <%= button_to "Remove", remove_user_admin_company_path(@company, user_id: user.id),
+                              method: :delete,
+                              class: "btn btn-danger btn-sm",
+                              data: { confirm: "Are you sure you want to remove this user from the company?" } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center mt-4 mb-4">
+        <p class="text-muted">No booking users assigned to this company.</p>
+      </div>
+    <% end %>
+
+    <!-- Company Employees -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>Company Employees (<%= @company_employees.count %>)</h4>
+      <%= link_to new_user_for_company_admin_company_path(@company, company_user_type: "employee"), class: "btn btn-primary" do %>
+        <i class="fas fa-plus"></i> Add Employee
+      <% end %>
+    </div>
+
+    <% if @company_employees.any? %>
+      <div class="table-responsive">
+        <table class="table table-hover table-dark">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Company Employee Type</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @company_employees.each do |user| %>
+              <tr class="clickable-row" data-href="<%= admin_user_path(user) %>" style="cursor: pointer;">
+                <td><%= user.name %></td>
+                <td><%= user.email %></td>
+                <td>
+                  <span class="badge <%= user.role == 'super_admin' ? 'bg-light text-dark' : user.role == 'admin' ? 'bg-secondary' : 'bg-dark' %>">
+                    <%= user.role.humanize %>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge <%= user.booking_user? ? 'bg-success' : 'bg-secondary' %>">
+                    <%= user.company_user_type_label %>
+                  </span>
+                </td>
+                <td>
+                  <%= button_to "Remove", remove_user_admin_company_path(@company, user_id: user.id),
+                              method: :delete,
+                              class: "btn btn-danger btn-sm",
                               data: { confirm: "Are you sure you want to remove this user from the company?" } %>
                 </td>
               </tr>
@@ -146,7 +198,7 @@
       </div>
     <% else %>
       <div class="text-center mt-4">
-        <p class="text-muted">No users assigned to this company.</p>
+        <p class="text-muted">No employees assigned to this company.</p>
       </div>
     <% end %>
 
